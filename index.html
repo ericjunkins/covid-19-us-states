@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <title>Coronavirus</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <!-- jQuery UI CSS -->
+        <link rel="stylesheet" href="css/jquery-ui.min.css">
+        <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
+        <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- Bootstrap grid setup -->
+    <section id="title">
+        <div class="container-fluid">
+            <h1 class="title_text">Coronavirus COVID-19 US States Data </h1>
+        </div>
+    </section>
+    <section id="time-graph">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10" >
+                <div class="bounding border border-light">
+                    <div class = "row">
+                        <div>
+                            <div id="chart-area"></div>
+                        </div>
+                    </div>
+                    <div class = "row">
+                        <div class="row align-items-center">
+                            <div class="col-sm-10"><div id="slider-time"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2" >
+                <div id="control-panel"></div>
+                <div class="row">
+                    <h1> Data Selection </h1>
+                </div>
+                <div class="row">
+                    <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                    <table id="selection-table" class="table table-bordered table-striped mb-0" cellspacing="0" width="100%">
+                        <thead>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+        </div> 
+    </div>
+    </section>
+
+    <!-- External JS libraries -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+    <script src="https://d3js.org/d3-voronoi.v1.min.js"></script>
+
+    <!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"><script>
+    -->
+    <!-- Custom JS -->
+
+    <script src="js/main.js"></script>
+
+</body>
+</html>
