@@ -27,7 +27,7 @@ var sliderTime = d3.sliderBottom()
     .step(1000 * 60 * 60 * 24)
     .height(100)
     .fill('#616161')
-    .width(1100)
+    .width(1000)
     .step(86400000)
     .on('onchange', val=> {
         d3.select('p#value-time').text(formatTime(val));
@@ -37,7 +37,7 @@ var sliderTime = d3.sliderBottom()
 
 var gTime = d3.select('div#slider-time')
     .append('svg')
-        .attr('width', 1500)
+        .attr('width', 1300)
         .attr('height', 150)
         .append('g')
             .attr("class", "slider-tick")
@@ -78,7 +78,7 @@ function ready([abbrev, anno]){
         })
         var allStatesConfig = {
             'height':600,
-            'width': 1500,
+            'width': 1300,
             'parseDate': parseDate,
             'state_data': states_time_data,
             'anno': anno,
