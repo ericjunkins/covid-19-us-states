@@ -27,21 +27,22 @@ var sliderTime = d3.sliderBottom()
     .step(1000 * 60 * 60 * 24)
     .height(100)
     .fill('#616161')
-    .width(1500)
+    .width(1100)
     .step(86400000)
     .on('onchange', val=> {
         d3.select('p#value-time').text(formatTime(val));
         //sliderTime.displayValue(formatTime(val));
-        update_display_data();
+        update_vis();
     })
 
 var gTime = d3.select('div#slider-time')
     .append('svg')
-        .attr('width', 1800)
+        .attr('width', 1500)
         .attr('height', 150)
         .append('g')
             .attr("class", "slider-tick")
             .attr('transform', 'translate(250,75)')
+        
 
 function ready([abbrev, anno]){
     var full2abbrev = {}
@@ -77,7 +78,7 @@ function ready([abbrev, anno]){
         })
         var allStatesConfig = {
             'height':600,
-            'width': 1800,
+            'width': 1500,
             'parseDate': parseDate,
             'state_data': states_time_data,
             'anno': anno,
@@ -87,8 +88,8 @@ function ready([abbrev, anno]){
         }
         states_vis = test_chart(allStatesConfig);
         init_display();
-        
-        update_display_data();
+        selection_init();
+        update_vis();
     }
     request.send()
 }
@@ -96,7 +97,7 @@ function ready([abbrev, anno]){
 function init_display(){
     display_states = ['NY', 'CA', 'CO', 'AK', 'MT']
     organize_data();
-    init_checkboxes();
+    //init_checkboxes();
     init_slider();
     display_states.forEach(function(d,i){
         //d3.select("#chbox_" + d).property('checked', true)
@@ -104,7 +105,7 @@ function init_display(){
     })
 }
 
-function update_display_data(){
+function update_vis(){
     states_vis.curTime(sliderTime.value())
     states_vis.display_states(display_states);
     states_vis();
@@ -251,12 +252,14 @@ function init_checkboxes(){
         checkbox1.addEventListener('change', (event) => {
             var action = (event.target.checked ? 'add' : 'remove')
             update_display_states(event.target.name, action)
-          })
+        })
         checkbox2.addEventListener('change', (event) => {
             var action = (event.target.checked ? 'add' : 'remove')
             update_display_states(event.target.name, action)
 
-          })
+        })
+
+        checkbox1.addEventListener("mouseenter", console.log("mouseenter"))
     }
 }
 
@@ -273,5 +276,16 @@ function update_display_states(state, action){
         test_annotations.push(annotations[abbrev2full[d]].annotation)
         colors[d] = color(i)
     })
-    update_display_data();
+    update_vis();
+}
+
+function selection_init(){
+    var selectionConfig = {
+        'height':700,
+        'width': 300,
+        'selection': '#state-selection'
+    }
+    var selection_vis = stateSelector(selectionConfig);
+    selection_vis.states(d3.keys(data_by_states))
+    selection_vis();
 }

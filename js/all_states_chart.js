@@ -36,7 +36,7 @@ function states_chart(config){
     var x = d3.scaleLog()
         .domain([1, 1000000])
         .range([0,width])
-          
+
     var y = d3.scaleLog()
         .domain([1, 100000])
         .range([height, 0])
@@ -92,12 +92,8 @@ function states_chart(config){
         })
         //.curve(d3.curveBasis)
         .curve(d3.curveCardinal.tension(0.5))
-    
 
-    
 
-    
-    
     var table = document.getElementById("selection-table")
     
     var makeAnnotations = d3.annotation()
@@ -125,7 +121,7 @@ function states_chart(config){
         //update_display_data();
         draw_chart();
     }
-  
+
     function init_display(){
         init_checkboxes()
         init_slider()
@@ -175,12 +171,12 @@ function states_chart(config){
             checkbox1.addEventListener('change', (event) => {
                 var action = (event.target.checked ? 'add' : 'remove')
                 update_display_states(event.target.name, action)
-              })
+            })
             checkbox2.addEventListener('change', (event) => {
                 var action = (event.target.checked ? 'add' : 'remove')
                 update_display_states(event.target.name, action)
     
-              })
+            })
         }
     }
     
@@ -282,7 +278,7 @@ function states_chart(config){
             test_annotations.push(sah_data[abbrev2full[d]].annotation)
             colors[d] = color(i)
         })
-        update_display_data()
+        //update_display_data()
     }
     
     // function update_display_data(){

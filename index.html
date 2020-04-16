@@ -24,8 +24,11 @@
     </section>
     <section id="time-graph">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-10" >
+        <div class="row" style="height: 700px;">
+            <div class="col-lg-2">
+                <div class="bounding border border-light"> </div>
+            </div>
+            <div class="col-lg-8" >
                 <div class="bounding border border-light">
                     <div class = "row">
                         <div>
@@ -34,7 +37,9 @@
                     </div>
                     <div class = "row">
                         <div class="row align-items-center">
-                            <div class="col-sm-10"><div id="slider-time"></div></div>
+                            <div class="col-sm-10">
+                                <div id="slider-time"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -45,6 +50,8 @@
                     <h1> Data Selection </h1>
                 </div>
                 <div class="row">
+                    <div id="state-selection"> </div>
+                    <!--
                     <div class="table-wrapper-scroll-y my-custom-scrollbar">
                     <table id="selection-table" class="table table-bordered table-striped mb-0" cellspacing="0" width="100%">
                         <thead>
@@ -53,11 +60,12 @@
                         </tbody>
                     </table>
                     </div>
+                    -->
                 </div>
             </div>
         </div>
         <div class="row">
-
+            
         </div> 
     </div>
     </section>
@@ -77,6 +85,7 @@
     -->
     <!-- Custom JS -->
     <script src="js/chart_test.js"></script>
+    <script src="js/selectionChart.js"></script>
     <script src="js/main_test.js"></script>
     <!--
     <script src="js/all_states_chart.js"></script>

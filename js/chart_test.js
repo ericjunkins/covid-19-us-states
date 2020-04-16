@@ -1,5 +1,5 @@
 function test_chart(config){
-    var margin = { left:100, right:100, top:50, bottom:80 }
+    var margin = { left:120, right:10, top:50, bottom:80 }
     let data_list;
     var anno = config.anno;
     var abbrev2full = config.abbrev2full;
@@ -41,7 +41,7 @@ function test_chart(config){
     svg.append("text")
         .attr("class", "axis-text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left)
+        .attr("y", 0 - 90)
         .attr("x", 0 - (height/2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
@@ -152,6 +152,7 @@ function test_chart(config){
     
         dot.enter()
             .append("circle")
+            .attr("class", "stayHomeDot")
             .attr("opacity", 1)
             .style('fill', function(d,i){ return colors[d.state]; })
             .attr('cx', function(d){ return x((d.x == 0 ? 1 : d.x))})
@@ -194,15 +195,16 @@ function test_chart(config){
             if (res.length != 0){
                 data_list.push(res)
             }
-            if (anno[abbrev2full[d]].date <= curTime){
+
+            if (anno[abbrev2full[d]].date <= curTime && anno[abbrev2full[d]].date != null ){
                 stayHomeDots.push({
                     'x': anno[abbrev2full[d]].positive,
                     'y': anno[abbrev2full[d]].binnedPositiveIncrease,
                     'state': d
                 })
             }
+            
         })
-
         data_list.forEach(function(d, i){
             var tmp = anno[abbrev2full[d[0].state]]['line_label']
             tmp['x'] = x((d[0].positive == 0 ? 1 : d[0].positive))
@@ -260,7 +262,6 @@ function test_chart(config){
             .attr("stroke", color(i))
     
         if (anno[abbrev2full[d[0].state]].date <= curTime){
-            console.log(anno[abbrev2full[d[0].state]].annotation)
             tmp = anno[abbrev2full[d[0].state]].annotation
             tmp.color = color(i)
             draw_annotations([tmp], 'dot')
@@ -350,7 +351,6 @@ function test_chart(config){
     statesChart.display_states = function(value){
         if(!arguments.length) return this.display_states;
         display_states = value;
-        console.log('here')
         update_display_data();
         return statesChart;
     }
