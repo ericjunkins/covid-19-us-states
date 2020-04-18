@@ -29,7 +29,7 @@ display: block;
 }
 
 .annotation-note-label {
-	font-size: 2rem;
+	font-size: 1rem;
 }
 
 .axisWhite {
@@ -102,4 +102,23 @@ div#container {
     width: 400px;
     border:2px solid #fff;
     overflow: scroll;
+}
+
+circle-packs {
+	stroke: white;
+	fill: #05668D;
+	opacity: 0.3;
+	stroke-width: 2px;
+}
+
+.node-texts {
+	fill: #fff;
+	font-size: 1.5rem;
+	text-anchor: middle;
+	dominant-baseline: middle;
+}
+
+.node circle {
+	stroke: #3a403d;
+	stroke-width: .5px;
 }

@@ -25,10 +25,39 @@
     <section id="time-graph">
     <div class="container-fluid">
         <div class="row" style="height: 700px;">
-            <div class="col-lg-2">
-                <div class="bounding border border-light"> </div>
+            <div class="col-lg-3">
+                <div class="bounding border border-light"> 
+                    <div class = "row" >
+                        <div id="northwest-region"></div>
+                    </div>
+                    <div class = "row" >
+                        <div id="south-region"></div>
+                    </div>
+                    <div class = "row" >
+                        <div id="west-region"></div>
+                    </div>
+                    <div class = "row" >
+                        <div id="midwest-region"></div>
+                    </div>
+                    <div class = "row" >
+                        <div id="other-region"></div>
+                    </div>
+                    <div class ="row" >
+                        <select id="severity-select">
+                            <option value="cases">Total Cases</option>
+                            <option value="cases_per_capita">Cases Per Capita</option>
+                            <option value="deats">Total Deaths</option>
+                            <option value="deaths_per_capita">Deaths per Capita</option>
+                        </select>
+
+                        <select id="group-select">
+                            <option value="population">Population</option>
+                            <option value="region">Region</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-8" >
+            <div class="col-lg-7" >
                 <div class="bounding border border-light">
                     <div class = "row">
                         <div>
@@ -51,16 +80,6 @@
                 </div>
                 <div class="row">
                     <div id="state-selection"> </div>
-                    <!--
-                    <div class="table-wrapper-scroll-y my-custom-scrollbar">
-                    <table id="selection-table" class="table table-bordered table-striped mb-0" cellspacing="0" width="100%">
-                        <thead>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                    </div>
-                    -->
                 </div>
             </div>
         </div>
@@ -86,6 +105,7 @@
     <!-- Custom JS -->
     <script src="js/selectionChart.js"></script>
     <script src="js/all_states_chart.js"></script>
+    <script src="js/forcePack.js"></script>
     <script src="js/main.js"></script>
     
 </body>

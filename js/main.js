@@ -11,17 +11,20 @@ var text_locations = [];
 var line_labels = [];
 var parseTime = d3.timeParse("%Y%m%d");
 var formatTime = d3.timeFormat("%m/%d/%y");
-
+var selection_vis;
+var circle_vis;
 var promises = [
     d3.json("data/abbreviations.json"),
-    d3.json("data/stay_at_home.json")
+    d3.json("data/stay_at_home.json"),
+    d3.csv('data/regions.csv'),
+    d3.csv('data/2019_us_census.csv')
 ]
 
 var table = document.getElementById("selection-table")
 
 Promise.all(promises).then(ready)
 
-var color = d3.scaleOrdinal(d3.schemeCategory10);
+
 
 var sliderTime = d3.sliderBottom()
     .step(1000 * 60 * 60 * 24)
@@ -43,8 +46,30 @@ var gTime = d3.select('div#slider-time')
             .attr("class", "slider-tick")
             .attr('transform', 'translate(250,75)')
         
+var severityDropdown = d3.select("#severity-select")
+    .on("change", dropdownChange)
 
-function ready([abbrev, anno]){
+var regionDropdown = d3.select("#group-select")
+    .on("change", dropdownChange)
+
+function dropdownChange(){
+    var id = d3.select(this).property("id");
+    var sel = d3.select(this).property('value')
+    if (id == "group-select"){
+        bubbles_vis.groupSelector(sel)
+    } 
+    else if (id == "severity-select"){
+        bubbles_vis.severitySelector(sel)
+    } 
+    //console.log(d3.select(this).property('value'))
+}
+
+
+
+function ready([abbrev, anno, regions, census]){
+    census.forEach(function(d){
+        d.Population = +d.Population;
+    })
     var full2abbrev = {}
     const abb_entries = Object.entries(abbrev);
         for (const [key, vals] of abb_entries){
@@ -86,7 +111,81 @@ function ready([abbrev, anno]){
             'duration': 250,
             'selection': '#slip-chart'
         }
+        var selectionConfig = {
+            'height':700,
+            'width': 300,
+            'selection': '#state-selection'
+        }
+
+        var forcePackWidth = 500,
+            forcePackHeight = 700
+        var bubblesConfig = {
+            'height':forcePackHeight,
+            'width': forcePackWidth,
+            'anno': anno,
+            'regions': regions, 
+            'states_data': states_time_data,
+            'full2abbrev': full2abbrev,
+            'census':census, 
+            'group': 'population',
+            'severity': 'cases',
+            'selection': '#northwest-region'
+        }
+        
+        var southConfig = {
+            'height':forcePackHeight,
+            'width': forcePackWidth,
+            'anno': anno,
+            'regions': regions, 
+            'states_data': states_time_data,
+            'full2abbrev': full2abbrev,
+            'regionFilter': 'South',
+            'selection': '#south-region'
+        }
+        var westConfig = {
+            'height':forcePackHeight,
+            'width': forcePackWidth,
+            'anno': anno,
+            'regions': regions, 
+            'states_data': states_time_data,
+            'full2abbrev': full2abbrev,
+            'regionFilter': 'West',
+            'selection': '#west-region'
+        }
+        var midwestConfig = {
+            'height':forcePackHeight,
+            'width': forcePackWidth,
+            'anno': anno,
+            'regions': regions, 
+            'states_data': states_time_data,
+            'full2abbrev': full2abbrev,
+            'regionFilter': 'Midwest',
+            'selection': '#midwest-region'
+        }
+        var otherConfig = {
+            'height':forcePackHeight,
+            'width': forcePackWidth,
+            'anno': anno,
+            'regions': regions, 
+            'states_data': states_time_data,
+            'full2abbrev': full2abbrev,
+            'regionFilter': 'Other',
+            'selection': '#other-region'
+        }
+
+
         states_vis = states_chart(allStatesConfig);
+        selection_vis = stateSelector(selectionConfig);
+        bubbles_vis = forcePack(bubblesConfig);
+        // south_vis = forcePack(southConfig)
+        // west_vis = forcePack(westConfig)
+        // midwest_vis = forcePack(midwestConfig)
+        // other_vis = forcePack(otherConfig)
+        bubbles_vis();
+        // south_vis();
+        // midwest_vis();
+        // west_vis();
+        // other_vis();
         init_display();
         selection_init();
         update_vis();
@@ -95,19 +194,14 @@ function ready([abbrev, anno]){
 }
 
 function init_display(){
-    display_states = ['NY', 'CA', 'CO', 'AK', 'MT']
     organize_data();
-    //init_checkboxes();
     init_slider();
-    display_states.forEach(function(d,i){
-        //d3.select("#chbox_" + d).property('checked', true)
-        colors[d] = color(i)
-    })
 }
 
 function update_vis(){
     states_vis.curTime(sliderTime.value())
-    states_vis.display_states(display_states);
+    states_vis.colors(selection_vis.colors())
+    states_vis.display_states(selection_vis.display_states());
     states_vis();
 }
 
@@ -149,8 +243,8 @@ function organize_data(){
                         'disable': [],
                         'x': x(vals[i].positive),
                         'y': y(vals[i].binnedPositiveIncrease),
-                        'dy': -75,
-                        'dx': -75
+                        'dy': -50,
+                        'dx': -50
                     }
                 }
             }
@@ -175,8 +269,8 @@ function organize_data(){
                 'disable': ['subject, note, connector'],
                 'x': -1000,
                 'y': -1000,
-                'dy': -50,
-                'dx': -50
+                'dy': -30,
+                'dx': -30
             }
         }
 
@@ -193,7 +287,7 @@ function organize_data(){
             'x': x(1),
             'y': y(1),
             'dy': 0,
-            'dx': 60
+            'dx': 30
         }
     }
 }
@@ -202,7 +296,6 @@ function init_slider(){
     date_range = d3.extent(states_time_data, function(d){
         return d.date;
     })
-
     sliderTime
         .min(date_range[0])
         .max(date_range[1])
@@ -213,79 +306,7 @@ function init_slider(){
     d3.select('p#value-time').text(formatTime(sliderTime.value()));
 }
 
-function init_checkboxes(){
-    states = d3.keys(data_by_states);
-    for (var i=0; i< states.length; i +=2){
-        var checkbox1 = document.createElement('input');
-        var checkbox2 = document.createElement('input');
-        var table_row = table.insertRow(-1)
-        var cell1 = table_row.insertCell(0);
-        var cell2 = table_row.insertCell(1);
-        checkbox1.setAttribute("class", "c")
-        checkbox2.setAttribute("class", "c")
-        checkbox1.type = "checkbox";
-        checkbox2.type = "checkbox";
-        checkbox1.name = states[i];
-        checkbox2.name = states[i+1];
-        checkbox1.checked = false;
-        checkbox2.checked = false;
-        checkbox1.value = 0;
-        checkbox2.value = 0;
-        checkbox1.id = "chbox_" + states[i]
-        checkbox2.id = "chbox_" + states[i+1]
-
-        cell1.appendChild(checkbox1);
-        cell2.appendChild(checkbox2);
-        // // creating label for checkbox 
-        var label1 = document.createElement('label'); 
-        var label2 = document.createElement('label');  
-        // // assigning attributes for  
-        // // the created label tag  
-        label1.htmlFor = "id"; 
-        label2.htmlFor = "id"; 
-
-        label1.appendChild(document.createTextNode(abbrev2full[states[i]])); 
-        label2.appendChild(document.createTextNode(abbrev2full[states[i+1]])); 
-        cell1.appendChild(label1)
-        cell2.appendChild(label2)
-        
-        checkbox1.addEventListener('change', (event) => {
-            var action = (event.target.checked ? 'add' : 'remove')
-            update_display_states(event.target.name, action)
-        })
-        checkbox2.addEventListener('change', (event) => {
-            var action = (event.target.checked ? 'add' : 'remove')
-            update_display_states(event.target.name, action)
-
-        })
-
-        checkbox1.addEventListener("mouseenter", console.log("mouseenter"))
-    }
-}
-
-function update_display_states(state, action){
-    colors = {}
-    if (action == "add"){
-        display_states.push(state)
-    } else {
-        const index = display_states.indexOf(state)
-        display_states.splice(index, 1)
-    }
-    test_annotations = []
-    display_states.forEach(function(d, i){
-        test_annotations.push(annotations[abbrev2full[d]].annotation)
-        colors[d] = color(i)
-    })
-    update_vis();
-}
-
 function selection_init(){
-    var selectionConfig = {
-        'height':700,
-        'width': 300,
-        'selection': '#state-selection'
-    }
-    var selection_vis = stateSelector(selectionConfig);
     selection_vis.states(d3.keys(data_by_states))
     selection_vis();
 }

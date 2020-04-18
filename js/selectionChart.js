@@ -6,7 +6,14 @@ function stateSelector(config){
         rect_height = 15,
         rect_width = 150
 
-    var state_rects = [];
+    var state_rects = []
+    var colors = {}
+    var display_states = ['NY', 'CA', 'CO', 'AK', 'MT']
+
+    var color = d3.scaleOrdinal(d3.schemeTableau10);
+    display_states.forEach(function(d, i){
+        colors[d] = color(i)
+    })
 
     // append the svg object to the body of the page
     var container = d3.select(selection)
@@ -44,6 +51,7 @@ function stateSelector(config){
 
         rects.enter()
             .append("rect")
+            .attr('id', function(d){ return 'rect-' + d})
             .attr("x", function(d, i){
                 return x(i % 2)
             })
@@ -51,7 +59,14 @@ function stateSelector(config){
             .attr("height", y.bandwidth())
             .attr("y", function(d, i){
                 return y(Math.floor(i/2)); })
-            .attr("fill", "#fff")
+            .attr("fill", function(d){
+                if (display_states.includes(d)) return colors[d]; 
+                return '#fff';
+            })
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseout", mouseout)
+            .on("click", clicked)
 
         var texts = view.selectAll('text')
             .data(states)
@@ -64,11 +79,41 @@ function stateSelector(config){
             .attr("text-anchor", "middle")
             .attr("y", function(d, i){
                 return y(Math.floor(i/2)) + y.bandwidth()/2; })
-            .attr("stroke", "#000")
-            .attr("font-size", "1rem")
+            .attr("fill", "#000")
+            .attr("font-size", "0.8rem")
             .attr("alignment-baseline", "middle")
             .text(function(d){ return d; })
+            .on("click", clicked)
 
+    }
+
+    function mouseover(d){
+    }
+
+    function mousemove(d){
+    }
+
+    function mouseout(d){
+    }
+
+    function clicked(d){
+        update_display_states(d)
+    }
+
+    function update_display_states(state){
+        colors = {}
+        if (!display_states.includes(state)){
+            display_states.push(state)
+            d3.select('#rect-' + state).attr("fill", color(display_states.length-1))
+        } else {
+            const index = display_states.indexOf(state)
+            display_states.splice(index, 1)
+            d3.select('#rect-' + state).attr("fill", '#fff')
+        }
+        display_states.forEach(function(d, i){
+            colors[d] = color(i)
+        })
+        update_vis();
     }
 
     selectionChart.width = function(value){
@@ -95,6 +140,11 @@ function stateSelector(config){
         return selectionChart;  
     }
     
+    selectionChart.display_states = function(value){
+        if (!arguments.length) return display_states;
+        display_states = value;
+        return selectionChart;  
+    }
     return selectionChart;
 }
 

@@ -24,7 +24,7 @@ function states_chart(config){
         .domain([1, 100000])
         .range([height, 0])
     
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
+    var color = d3.scaleOrdinal(d3.schemeTableau10);
     
     var x_axis = d3.axisBottom(x).ticks(10, ",.1d")
     var y_axis = d3.axisLeft(y).ticks(8, ",.1d")
