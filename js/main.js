@@ -13,11 +13,14 @@ var parseTime = d3.timeParse("%Y%m%d");
 var formatTime = d3.timeFormat("%m/%d/%y");
 var selection_vis;
 var circle_vis;
+
 var promises = [
     d3.json("data/abbreviations.json"),
     d3.json("data/stay_at_home.json"),
     d3.csv('data/regions.csv'),
-    d3.csv('data/2019_us_census.csv')
+    d3.csv('data/2019_us_census.csv'),
+    d3.json('data/us_urban_pop.json'),
+    d3.json('data/2016_election_affiliation.json')
 ]
 
 var table = document.getElementById("selection-table")
@@ -52,6 +55,9 @@ var severityDropdown = d3.select("#severity-select")
 var regionDropdown = d3.select("#group-select")
     .on("change", dropdownChange)
 
+var colorDropdown = d3.select("#color-select")
+    .on("change", dropdownChange)
+
 function dropdownChange(){
     var id = d3.select(this).property("id");
     var sel = d3.select(this).property('value')
@@ -61,15 +67,17 @@ function dropdownChange(){
     else if (id == "severity-select"){
         bubbles_vis.severitySelector(sel)
     } 
+    else if (id == "color-select"){
+        bubbles_vis.timeSelector(sel);
+    }
     //console.log(d3.select(this).property('value'))
 }
 
-
-
-function ready([abbrev, anno, regions, census]){
+function ready([abbrev, anno, regions, census, urban_pop, pol]){
     census.forEach(function(d){
         d.Population = +d.Population;
     })
+
     var full2abbrev = {}
     const abb_entries = Object.entries(abbrev);
         for (const [key, vals] of abb_entries){
@@ -81,7 +89,9 @@ function ready([abbrev, anno, regions, census]){
     const anno_entries = Object.entries(anno);
     for (const [key, vals] of anno_entries){
         anno[key].date = parseDate(vals.date)
+        urban_pop[key].urban = +urban_pop[key].urban
     }
+
     annotations = anno
     var request = new XMLHttpRequest()
     request.open("GET", "https://covidtracking.com/api/states/daily", true)
@@ -117,8 +127,11 @@ function ready([abbrev, anno, regions, census]){
             'selection': '#state-selection'
         }
 
-        var forcePackWidth = 500,
-            forcePackHeight = 700
+
+        currentWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
+        var forcePackWidth = currentWidth * 0.9,
+            forcePackHeight = 1200
+
         var bubblesConfig = {
             'height':forcePackHeight,
             'width': forcePackWidth,
@@ -129,63 +142,18 @@ function ready([abbrev, anno, regions, census]){
             'census':census, 
             'group': 'population',
             'severity': 'cases',
-            'selection': '#northwest-region'
+            'selection': '#northwest-region',
+            'dateSelector': 'state_hundred',
+            'urban': urban_pop,
+            'political_aff': pol
         }
-        
-        var southConfig = {
-            'height':forcePackHeight,
-            'width': forcePackWidth,
-            'anno': anno,
-            'regions': regions, 
-            'states_data': states_time_data,
-            'full2abbrev': full2abbrev,
-            'regionFilter': 'South',
-            'selection': '#south-region'
-        }
-        var westConfig = {
-            'height':forcePackHeight,
-            'width': forcePackWidth,
-            'anno': anno,
-            'regions': regions, 
-            'states_data': states_time_data,
-            'full2abbrev': full2abbrev,
-            'regionFilter': 'West',
-            'selection': '#west-region'
-        }
-        var midwestConfig = {
-            'height':forcePackHeight,
-            'width': forcePackWidth,
-            'anno': anno,
-            'regions': regions, 
-            'states_data': states_time_data,
-            'full2abbrev': full2abbrev,
-            'regionFilter': 'Midwest',
-            'selection': '#midwest-region'
-        }
-        var otherConfig = {
-            'height':forcePackHeight,
-            'width': forcePackWidth,
-            'anno': anno,
-            'regions': regions, 
-            'states_data': states_time_data,
-            'full2abbrev': full2abbrev,
-            'regionFilter': 'Other',
-            'selection': '#other-region'
-        }
+
 
 
         states_vis = states_chart(allStatesConfig);
         selection_vis = stateSelector(selectionConfig);
         bubbles_vis = forcePack(bubblesConfig);
-        // south_vis = forcePack(southConfig)
-        // west_vis = forcePack(westConfig)
-        // midwest_vis = forcePack(midwestConfig)
-        // other_vis = forcePack(otherConfig)
         bubbles_vis();
-        // south_vis();
-        // midwest_vis();
-        // west_vis();
-        // other_vis();
         init_display();
         selection_init();
         update_vis();
@@ -222,7 +190,7 @@ function organize_data(){
         
         for (var i = vals.length-1; i >= 0; i--){
             window.push(vals[i].positiveIncrease)
-            if (window.length >4){
+            if (window.length >7){
                 window.shift()
             }
             var total = (window.length == 1 ? window[0] : d3.sum(window) )

@@ -24,39 +24,46 @@
     </section>
     <section id="time-graph">
     <div class="container-fluid">
-        <div class="row" style="height: 700px;">
-            <div class="col-lg-3">
-                <div class="bounding border border-light"> 
+        <div class="row" style="height: 1300px;">
+            <div class="col-lg-4" id="bubbles-area">
+                <div class="">
+                    <div class ="row" style="text-align: center">
+                        <h1 style="margin-bottom: 20px;"> Severity when stay at home issued </h1>
+                        <div class="col-sm-4" style="position: absolute; left: 10%;">
+                            <h4> Severity (radius) </h4>
+                            <select class="select-css" id="severity-select" >
+                                <option value="cases">Total Cases</option>
+                                <option value="cases_per_capita">Cases Per Capita</option>
+                                <option value="deaths">Total Deaths</option>
+                                <option value="deaths_per_capita">Deaths per Capita</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4" style="position: absolute; left: 35%;">
+                            <h4> Grouping (y-axis)</h4>
+                            <select class="select-css" id="group-select">
+                                <option value="population">Population</option>
+                                <option value="region">Region</option>
+                                <option value="urban">Percent Urban</option>
+                                <option value="political_aff">Political</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-sm-4" style="position: absolute; left: 60%;">     
+                            <h4> Time (color) </h4>                       
+                            <select class="select-css" id="color-select">
+                                <option value="state_hundred">States's 100th Case</option>
+                                <option value="us_hundred_case">US 100th Case</option>
+                                <option value="us_first_case">US 1st Case</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class = "row" >
                         <div id="northwest-region"></div>
                     </div>
-                    <div class = "row" >
-                        <div id="south-region"></div>
-                    </div>
-                    <div class = "row" >
-                        <div id="west-region"></div>
-                    </div>
-                    <div class = "row" >
-                        <div id="midwest-region"></div>
-                    </div>
-                    <div class = "row" >
-                        <div id="other-region"></div>
-                    </div>
-                    <div class ="row" >
-                        <select id="severity-select">
-                            <option value="cases">Total Cases</option>
-                            <option value="cases_per_capita">Cases Per Capita</option>
-                            <option value="deats">Total Deaths</option>
-                            <option value="deaths_per_capita">Deaths per Capita</option>
-                        </select>
-
-                        <select id="group-select">
-                            <option value="population">Population</option>
-                            <option value="region">Region</option>
-                        </select>
-                    </div>
                 </div>
             </div>
+        </div>
+        <div class="row">
             <div class="col-lg-7" >
                 <div class="bounding border border-light">
                     <div class = "row">
@@ -82,11 +89,9 @@
                     <div id="state-selection"> </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            
         </div> 
     </div>
+    <div id="div_template"></div>
     </section>
 
     <!-- External JS libraries -->
@@ -104,6 +109,7 @@
     -->
     <!-- Custom JS -->
     <script src="js/selectionChart.js"></script>
+    <script src="https://unpkg.com/d3fc"></script>
     <script src="js/all_states_chart.js"></script>
     <script src="js/forcePack.js"></script>
     <script src="js/main.js"></script>
