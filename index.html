@@ -19,7 +19,7 @@
     <!-- Bootstrap grid setup -->
     <section id="title">
         <div class="container-fluid">
-            <h1 class="title_text">Coronavirus COVID-19 US States Data </h1>
+            <h1 style="margin-bottom: 60px;" class="title_text">Coronavirus COVID-19 US States Data </h1>
         </div>
     </section>
     <section id="time-graph">
@@ -29,7 +29,7 @@
                 <div class="">
                     <div class ="row" style="text-align: center">
                         <h1 style="margin-bottom: 20px;"> Severity when stay at home issued </h1>
-                        <div class="col-sm-4" style="position: absolute; left: 10%;">
+                        <div class="col-sm-4" style="position: absolute; left: 12%;">
                             <h4> Severity (radius) </h4>
                             <select class="select-css" id="severity-select" >
                                 <option value="cases">Total Cases</option>
@@ -38,7 +38,7 @@
                                 <option value="deaths_per_capita">Deaths per Capita</option>
                             </select>
                         </div>
-                        <div class="col-sm-4" style="position: absolute; left: 35%;">
+                        <div class="col-sm-4" style="position: absolute; left: 36%;">
                             <h4> Grouping (y-axis)</h4>
                             <select class="select-css" id="group-select">
                                 <option value="population">Population</option>
@@ -62,34 +62,27 @@
                     </div>
                 </div>
             </div>
+            <div class="col-lg-8">
+                <div class="row">   
+                    <div class="col-sm-4" style="position: relative; left: 20%;">
+                        <h4> Axes Selection </h4>
+                            <select class="select-css" id="axes-select">
+                                <option value="log">Logarithmic</option>
+                                <option value="linear">Linear</option>
+                            </select>
+                    </div>
+                </div>
+                <div class="row" style="height: 650px;">
+
+                    <div class="col-lg-12">
+                        <div id="chart-area"></div>
+                    </div>
+                </div>
+                <div class="row" style="height: 650px;">
+                    <div class="col-lg-12"></div>
+                </div>
+            </div>
         </div>
-        <div class="row">
-            <div class="col-lg-7" >
-                <div class="bounding border border-light">
-                    <div class = "row">
-                        <div>
-                            <div id="chart-area"></div>
-                        </div>
-                    </div>
-                    <div class = "row">
-                        <div class="row align-items-center">
-                            <div class="col-sm-10">
-                                <div id="slider-time"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-2" >
-                <div id="control-panel"></div>
-                <div class="row">
-                    <h1> Data Selection </h1>
-                </div>
-                <div class="row">
-                    <div id="state-selection"> </div>
-                </div>
-            </div>
-        </div> 
     </div>
     <div id="div_template"></div>
     </section>
@@ -112,6 +105,7 @@
     <script src="https://unpkg.com/d3fc"></script>
     <script src="js/all_states_chart.js"></script>
     <script src="js/forcePack.js"></script>
+    <script src="js/legistative_orders.js"></script>
     <script src="js/main.js"></script>
     
 </body>

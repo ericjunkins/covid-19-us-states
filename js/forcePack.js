@@ -13,7 +13,8 @@ function forcePack(config){
         groupSelector = config.group,
         urban_percent = config.urban;
         timeSelector = config.dateSelector,
-        political_aff = config.political_aff;
+        political_aff = config.political_aff,
+        focus = [];
 
 
     var max_pop = 40000000,
@@ -36,7 +37,7 @@ function forcePack(config){
     var labels = svg.append("g")
         .attr("class", "labels")
 
-
+    var color = d3.scaleOrdinal(d3.schemeDark2);
 
     var today = new Date();
     var radius_max = 50
@@ -375,13 +376,17 @@ function forcePack(config){
 
         vis_nodes.selectAll("circle").remove()
         vis_texts.selectAll("text").remove()
+        //TODO FIX DIS JANK
+
         var node = vis_nodes.selectAll("circle")
             .data(data, function(d){ return d.state; })
             .enter()
             .append("circle")
             .attr("class", "node-circle")
+            // .attr("stroke", "#000")
+            .attr("stroke-width", "0.5px")
             .attr("id", function(d){
-                return "circle-"+ d.state})
+                return "circle-"+ full2abbrev[d.state]})
             .attr("fill", function(d){ return colorScale(d[timeSelector]); })
             .attr("cx", function(d){ d.x; })
             .attr("cy", function(d){ d.y; })
@@ -391,10 +396,6 @@ function forcePack(config){
                 .on("end", dragended)
             )
             .attr("r", function(d){ return a(area2radius(d[severitySelector])); });
-
-        
-
-
 
         var texts = vis_texts.selectAll("text")
             .data(data)
@@ -411,13 +412,13 @@ function forcePack(config){
             .on("mouseover", mouseover)
             .on("mousemove", mousemove)
             .on("mouseout", mouseout)
-            .on("click", mouseout)
+            .on("click", clicked)
 
         d3.selectAll(".node-texts")
             .on("mouseover", mouseover)
             .on("mousemove", mousemove)
             .on("mouseout", mouseout)
-            .on("click", mouseout)
+            .on("click", clicked)
     
         simulation
             .nodes(data)
@@ -427,6 +428,7 @@ function forcePack(config){
                     .attr("cx", function(d){
                         return d.x; })
                     .attr("cy", function(d){ return d.y; })
+
                 texts
                     .attr("x", function(d){ return d.x; })
                     .attr("y", function(d){ return d.y; })
@@ -450,6 +452,8 @@ function forcePack(config){
             .attr("font-size", "1.3rem")
             .text(function(d){ return d.text})
 
+            
+        highlight_focus();
 
     }
 
@@ -509,8 +513,8 @@ function forcePack(config){
                 .tickFormat(null)
 
             labels.call(yAxis)
-
         }
+        
     }
 
     function format_area(){
@@ -561,6 +565,7 @@ function forcePack(config){
         tooltip
             .transition().duration(250)
             .style("opacity", 1)
+
     }
 
     function mousemove(d){
@@ -573,13 +578,65 @@ function forcePack(config){
         )
         .style("left", (d3.mouse(this)[0]+ 175) + "px")
         .style("top", (d3.mouse(this)[1]+50) + "px")
+
+        if (!focus.includes(full2abbrev[d.state])){
+            d3.select("#circle-" + full2abbrev[d.state])
+                .attr("stroke", "steelblue")
+                .attr("stroke-width", "3px")
+        }
     }
 
-    function mouseout(){
+    function mouseout(d){
         tooltip
             .transition().duration(250)
             .style("opacity", 0)
 
+        if (!focus.includes(full2abbrev[d.state])){
+            d3.select("#circle-" + full2abbrev[d.state])
+                .attr("stroke", "#000")
+                .attr("stroke-width", "0.5px")
+        }
+
+    }
+
+    function highlight_focus(){
+
+        d3.selectAll(".node-circle")
+            .attr("stroke", "#000")
+            .attr('stroke-width', "0.5")
+
+        focus.forEach(function(d, i){
+            d3.select("#circle-" + d)
+                .attr("stroke", function(d){
+                    return color(i)
+                })
+                .attr("stroke-width", "5px")
+        })
+
+    }
+
+    function add2Focus(d, i){
+        if (!focus.includes(d)) focus.push(d)
+        // highlight_focus();
+        update_vis(focus);
+    }
+    
+    function clicked(d, i){
+        if (focus.includes(full2abbrev[d.state])) removeFromFocus(full2abbrev[d.state], i)
+        else add2Focus(full2abbrev[d.state],i)
+    }
+
+    function removeFromFocus(d, i){
+        if (focus.includes(d)){
+            const index = focus.indexOf(d);
+            focus.splice(index, 1);
+        }
+
+        d3.select("#circle-" + d)
+            .attr("stroke", "#000")
+            .attr("stroke-width", "0.5px")
+
+        update_vis(focus);
     }
 
     forcePack.width = function(value){
@@ -636,6 +693,13 @@ function forcePack(config){
         return forcePack();
     }
     
+    forcePack.focus = function(value){
+        if(!arguments.length) return focus;
+        focus = value;
+        highlight_focus();
+        return forcePack;
+    }
+
     return forcePack;
 }
 

@@ -1,12 +1,8 @@
 function states_chart(config){
-    var margin = { left:120, right:100, top:150, bottom:80 }
+    var margin = { left:120, right:10, top:50, bottom:80 }
     let data_list;
     var anno = config.anno;
     var abbrev2full = config.abbrev2full;
-
-    
-    var focus = [],
-        axesSelector = "log";
 
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
@@ -20,54 +16,37 @@ function states_chart(config){
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
     
-    var xLog = d3.scaleLog()
+    var x = d3.scaleLog()
         .domain([1, 1000000])
         .range([0,width])
 
-    var yLog = d3.scaleLog()
+    var y = d3.scaleLog()
         .domain([1, 100000])
         .range([height, 0])
-
-    var xLinear = d3.scaleLinear()
-        .range([0, width])
     
-    var yLinear = d3.scaleLinear()
-        .range([height, 0])
+    var color = d3.scaleOrdinal(d3.schemeTableau10);
     
-
-    var x = xLog;
-    var y = yLog;
+    var x_axis = d3.axisBottom(x).ticks(10, ",.1d")
+    var y_axis = d3.axisLeft(y).ticks(8, ",.1d")
     
-    var color = d3.scaleOrdinal(d3.schemeDark2);
-    
-    // var x_axis = d3.axisBottom(x).ticks(10, ",.1d")
-    // var y_axis = d3.axisLeft(y).ticks(8, ",.1d")
-
-    var x_axis = d3.axisBottom();
-    var y_axis = d3.axisLeft();
-    
-    var labels = svg.append('g')
-        .attr("class", "labels")
-
-
-    xAxisCall = labels.append("g")
+    svg.append("g")
         .attr("transform", "translate(0," + height + ")")
         .attr("class", "axis axis--x axisWhite")
-        // .call(x_axis);
+        .call(x_axis);
     
-    yAxisCall = labels.append("g")
+    svg.append("g")
         .attr("class", "axis axis--y axisWhite")
-        // .call(y_axis)
+        .call(y_axis)
     
     svg.append("text")
         .attr("class", "axis-text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - 100)
+        .attr("y", 0 - 90)
         .attr("x", 0 - (height/2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .attr("font-size", "2rem")
-        .text("New Confirmed Cases (in past week)")
+        .text("New Confirmed Cases (in the Past Week)")
     
     svg.append("text")
         .attr("class", "axis-text")
@@ -118,47 +97,44 @@ function states_chart(config){
     }
 
     function draw_chart(data){
-        get_lines_data();
-        formatAxes();
-        //draw_paths()
-        //draw_stay_home_dots();
-        //draw_leading_dots();
-        //draw_annotations(line_labels, 'line');
+        draw_paths()
+        draw_stay_home_dots();
+        draw_leading_dots();
+        draw_annotations(line_labels, 'line');
     }
     
     function draw_paths(){
         lines = svg.selectAll(".line")
             .data(data_list, function(d){ return d[0].state })
-
+                .on("mousemove", moved)
+                .on("mouseenter", entered)
+                .on("mouseleave", leave)
+                .on("click", entered)
     
         lines.exit().remove()
     
         lines
             .attr("fill", "none")
+            .attr("id", function(d){
+                "path_" + d.state; 
+            })
             .attr("opacity", 1)
-            .attr("stroke", 'grey')
-            .attr("stroke-width", 0.5)
-            .attr("opacity", 0.5)
+            .attr("stroke", function(d,i){ return color(i); })
+            .attr("stroke-width", 3)
             .attr("d", function(d){ return line(d); });
     
         lines.enter()
             .append("path")
-                .attr("class", "covid-line")
+                .attr("class", "line")
                 .attr("opacity", 1)
                 .attr("id", function(d){
-                    return "path-" + d[0].state; 
+                    "path_" + d.state; 
                 })
                 .attr("fill", "none")
-                .attr("stroke", 'grey')
-                .attr("stroke-width", 0.5)
-                .attr("opacity", 0.20)
+                .attr("stroke", function(d,i){ return color(i); })
+                .attr("stroke-width", 3)
                 .attr("d", function(d){ return line(d) });
-
-        d3.selectAll(".covid-line")
-            .on("mousemove", moved)
-            .on("mouseenter", entered)
-            .on("mouseleave", leave)
-            .on("click", clicked)
+    
     }
     
     function draw_stay_home_dots(){
@@ -177,7 +153,6 @@ function states_chart(config){
         dot.enter()
             .append("circle")
             .attr("class", "stayHomeDot")
-            .attr("id", "stayHome-" + d.state)
             .attr("opacity", 1)
             .style('fill', function(d,i){ return colors[d.state]; })
             .attr('cx', function(d){ return x((d.x == 0 ? 1 : d.x))})
@@ -187,42 +162,60 @@ function states_chart(config){
                 .attr("r", 8.5)
     }
 
-
+    function draw_leading_dots(){
+        circles = circ.selectAll("circle")
+            .data(text_locations, function(d){ return d.state})
     
-    function get_lines_data(){
+        circles.exit().remove()
+    
+        circles
+            .style('fill', function(d,i){ return color(i)})
+            .attr('cx', function(d){ return x((d.positive == 0 ? 1 : d.positive))})
+            .attr("cy", function(d){ return y((d.binnedPositiveIncrease == 0 ? 1 : d.binnedPositiveIncrease))})
+            .attr("r", 3)
+    
+        circles.enter()
+            .append("circle")
+            .style('fill', function(d,i){ return color(i)})
+            .attr('cx', function(d){ return x((d.positive == 0 ? 1 : d.positive))})
+            .attr("cy", function(d){ return y((d.binnedPositiveIncrease == 0 ? 1 : d.binnedPositiveIncrease))})
+            .attr("r", 3)
+    }
+
+    function update_display_data(){
         data_list = []
         stayHomeDots = []
         text_locations = []
         line_labels = []
 
-        const entries = Object.entries(data_by_states);
-        for (const [key, val] of entries){
-            data_list.push(val)
+        display_states.forEach(function(d, i){
+            var res = data_by_states[d].filter(function(v){
+                return v.date < curTime;
+            })
+            if (res.length != 0){
+                data_list.push(res)
+            }
 
-            if (anno[abbrev2full[key]].date != null){
+            if (anno[abbrev2full[d]].date <= curTime && anno[abbrev2full[d]].date != null ){
                 stayHomeDots.push({
-                    'x': anno[abbrev2full[key]].positive,
-                    'y': anno[abbrev2full[key]].binnedPositiveIncrease,
-                    'state': key
+                    'x': anno[abbrev2full[d]].positive,
+                    'y': anno[abbrev2full[d]].binnedPositiveIncrease,
+                    'state': d
                 })
             }
-        }
-
-        var maxY = d3.max(data_list, function(d){ 
-            return d3.max(d, function(v){
-                return v.binnedPositiveIncrease
-            })
+            
         })
+        data_list.forEach(function(d, i){
+            var tmp = anno[abbrev2full[d[0].state]]['line_label']
+            tmp['x'] = x((d[0].positive == 0 ? 1 : d[0].positive))
+            tmp['y'] = y(d[0].binnedPositiveIncrease == 0 ? 1 : d[0].binnedPositiveIncrease)
+            tmp['color'] = color(i)
 
-        var maxX = d3.max(data_list, function(d){ 
-            return d3.max(d, function(v){
-                return v.positive
-            })
+            text_locations.push(d[0])
+            line_labels.push(tmp)
         })
-        xLinear.domain([0, maxX])
-        yLinear.domain([0, maxY])
     }
-
+    
     function draw_annotations(anno, type){
         if (type == 'line'){
             line_annotations
@@ -239,109 +232,60 @@ function states_chart(config){
         //console.log('moved', d3.event)
     }
     
-
-    function highlight_focus(){
-        var tmp = []
-
-        d3.selectAll(".covid-line")
-            .attr("opacity", 0.5)
-            .attr("stroke-width", 0.5)
-            .attr("stroke", "grey")
-            .attr("opacity", 0.20)
-
-        focus.forEach(function(d, i){
-            d3.select("#path-" + d)
-                .attr("stroke-width", 2.5)
-                .attr("stroke", function(d){ return color(i); })
-                .attr("opacity", 1)
-
-            var a = anno[abbrev2full[d]].annotation
-            a.color = color(i)
-            a.disable = ['note']
-            tmp.push(a)
-        })
-        draw_annotations(tmp, 'dot')
-    }
-
-    function add2Focus(d, i){
-        if (!focus.includes(d)) focus.push(d)
-        //highlight_focus();
-        update_vis(focus);
-    }
-
     function entered (d,i){
-        if (!focus.includes(d[0].state)){
-            d3.select("#path-" + d[0].state)
-                .attr("stroke", "steelblue")
-                .attr("opacity", 1)
-                .attr("stroke-width", 3)
-        }
-    }
+        svg.selectAll(".line")
+            .attr("stroke", "#e0e0e0")
+            .attr("opacity", function(v,j){
+                return (j == i ? 1 : 0.5)
+            })
+            .attr("stroke-width", 1)
     
-    function clicked(d, i){
-        if (focus.includes(d[0].state)) removeFromFocus(d[0].state, i)
-        else add2Focus(d[0].state,i)
-    }
-
-    function removeFromFocus(d, i){
-        var tmp = [];
-        if (focus.includes(d)){
-            const index = focus.indexOf(d);
-            focus.splice(index, 1);
-        }
-
-        d3.select("path-" + d)
-            .attr("stroke", "grey")
-            .attr("stroke-width", 0.5)
-            .attr("opacity", 0.20)
-
-
-        focus.forEach(function(d){
-            var a = anno[abbrev2full[d]].annotation
-            a.color = 'yellow'
-            tmp.push(a)
-        })
-        draw_annotations(tmp, 'dot')
-        update_vis(focus);
-    }
-
-    function leave (d, i){
-        if (!focus.includes(d[0].state)){
-            d3.select("#path-" + d[0].state)
-                .attr("stroke", "grey")
-                .attr("stroke-width", 0.5)
-                .attr("opacity", 0.20)
-        }
-
-    }
+        dots.selectAll("circle")
+            .style("fill", function(v,j){
+                return (j == i ? color(i) : '#e0e0e0')
+            })
+            .attr("opacity", function(v,j){
+                return (j == i ? 1 : 0.5)
+            })
+            .attr("r", 3)
     
-    function formatAxes(){
-        if (axesSelector == "log"){
-            x = xLog;
-            y = yLog;
-
-            x_axis.scale(x).ticks(10, ",.1d")
-            y_axis.scale(y).ticks(8, ",.1d")
-
-
-            // var x_axis = d3.axisBottom(x)
-            // var y_axis = d3.axisLeft(y)
-
-            xAxisCall.call(x_axis)
-            yAxisCall.call(y_axis)
-        } else if (axesSelector == "linear"){
-            x = xLinear;
-            y = yLinear;
-
-            x_axis.scale(x).tickFormat(null)
-            y_axis.scale(y).ticks(6).tickFormat(null)
-
-            xAxisCall.call(x_axis)
-            yAxisCall.call(y_axis)
-
+        circ.selectAll("circle")
+            .style("fill", function(v,j){
+                return (j == i ? color(i) : '#e0e0e0')
+            })
+            .attr("opacity", function(v,j){
+                return (j == i ? 1 : 0.5)
+            })
+        
+        d3.select(this)
+            .attr("stroke-width", 6.5)
+            .attr("stroke", color(i))
+    
+        if (anno[abbrev2full[d[0].state]].date <= curTime){
+            tmp = anno[abbrev2full[d[0].state]].annotation
+            tmp.color = color(i)
+            draw_annotations([tmp], 'dot')
         }
+    
+        var tmp = anno[abbrev2full[d[0].state]]['line_label']
+            tmp['x'] = x((d[0].positive == 0 ? 1 : d[0].positive))
+            tmp['y'] = y(d[0].binnedPositiveIncrease == 0 ? 1 : d[0].binnedPositiveIncrease)
+            tmp['color'] = color(i)
+    
+        draw_annotations([tmp], 'line')
+
+    
+    }   
+    
+    function leave (){
+        draw_leading_dots();
         draw_paths();
+        draw_stay_home_dots();
+        draw_annotations(line_labels, 'line')
+        draw_annotations([], 'dot')
+    
     }
+    
 
     statesChart.width = function(value){
         if (!arguments.length) return width;
@@ -405,29 +349,11 @@ function states_chart(config){
     }
 
     statesChart.display_states = function(value){
-        if(!arguments.length) return display_states;
+        if(!arguments.length) return this.display_states;
         display_states = value;
         update_display_data();
         return statesChart;
     }
 
-    statesChart.focus = function(value){
-        if(!arguments.length) return focus;
-        focus = value;
-        highlight_focus();
-        return statesChart;
-    }
-
-
-    statesChart.axesSelector = function(value){
-        if(!arguments.length) return axesSelector;
-        axesSelector = value;
-        console.log("changing axes")
-        formatAxes();
-        return statesChart;
-    }
-
     return statesChart;
 }
-
-

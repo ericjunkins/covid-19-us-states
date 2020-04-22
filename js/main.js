@@ -27,27 +27,6 @@ var table = document.getElementById("selection-table")
 
 Promise.all(promises).then(ready)
 
-
-
-var sliderTime = d3.sliderBottom()
-    .step(1000 * 60 * 60 * 24)
-    .height(100)
-    .fill('#616161')
-    .width(1000)
-    .step(86400000)
-    .on('onchange', val=> {
-        d3.select('p#value-time').text(formatTime(val));
-        //sliderTime.displayValue(formatTime(val));
-        update_vis();
-    })
-
-var gTime = d3.select('div#slider-time')
-    .append('svg')
-        .attr('width', 1300)
-        .attr('height', 150)
-        .append('g')
-            .attr("class", "slider-tick")
-            .attr('transform', 'translate(250,75)')
         
 var severityDropdown = d3.select("#severity-select")
     .on("change", dropdownChange)
@@ -56,6 +35,9 @@ var regionDropdown = d3.select("#group-select")
     .on("change", dropdownChange)
 
 var colorDropdown = d3.select("#color-select")
+    .on("change", dropdownChange)
+
+var axesDropdown = d3.select("#axes-select")
     .on("change", dropdownChange)
 
 function dropdownChange(){
@@ -69,6 +51,8 @@ function dropdownChange(){
     } 
     else if (id == "color-select"){
         bubbles_vis.timeSelector(sel);
+    } else if (id == "axes-select"){
+        states_vis.axesSelector(sel);
     }
     //console.log(d3.select(this).property('value'))
 }
@@ -85,13 +69,21 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
     }
 
     abbrev2full = abbrev;
+    tmp = []
     var parseDate = d3.timeParse("%m/%d/%y")
     const anno_entries = Object.entries(anno);
     for (const [key, vals] of anno_entries){
         anno[key].date = parseDate(vals.date)
         urban_pop[key].urban = +urban_pop[key].urban
+        if (vals.date != null) tmp.push({"state": full2abbrev[key], "date": formatTime(vals.date)})
     }
 
+    
+    var ordersByDate = d3.nest()
+        .key(function(d){ return d.date; })
+        .entries(tmp)
+    
+    
     annotations = anno
     var request = new XMLHttpRequest()
     request.open("GET", "https://covidtracking.com/api/states/daily", true)
@@ -111,9 +103,12 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             if(d.death == null){d.death = 0}
             if(d.pending == null){d.pending = 0}
         })
+
+
+        chartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
         var allStatesConfig = {
-            'height':600,
-            'width': 1300,
+            'height':650,
+            'width': chartWidth,
             'parseDate': parseDate,
             'state_data': states_time_data,
             'anno': anno,
@@ -150,27 +145,33 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
 
 
 
+        var legistateConfig = {
+            'height':650,
+            'width': chartWidth,
+            'data': ordersByDate
+        }
+
         states_vis = states_chart(allStatesConfig);
         selection_vis = stateSelector(selectionConfig);
         bubbles_vis = forcePack(bubblesConfig);
+        legistate_vis = legistate_chart(legistateConfig)
         bubbles_vis();
         init_display();
+        legistate_vis();
         selection_init();
-        update_vis();
+        states_vis();
     }
     request.send()
 }
 
 function init_display(){
     organize_data();
-    init_slider();
 }
 
-function update_vis(){
-    states_vis.curTime(sliderTime.value())
-    states_vis.colors(selection_vis.colors())
-    states_vis.display_states(selection_vis.display_states());
-    states_vis();
+function update_vis(f){
+    states_vis.focus(f);
+    bubbles_vis.focus(f);
+    legistate_vis.focus(f);
 }
 
 function organize_data(){
@@ -193,7 +194,7 @@ function organize_data(){
             if (window.length >7){
                 window.shift()
             }
-            var total = (window.length == 1 ? window[0] : d3.sum(window) )
+            var total = (window.length == 1 ? window[0] : d3.sum(window))
             data_by_states[key][i]['binnedPositiveIncrease'] = total
             if (annotations[abbrev2full[key]].date != null){
                 if (vals[i].date.getTime() == annotations[abbrev2full[key]].date.getTime()){
@@ -206,13 +207,13 @@ function organize_data(){
                         },      
                         'connector': {
                             'end': "dot",
-                            'endScale': 8
+                            'endScale': 10
                         },
                         'disable': [],
                         'x': x(vals[i].positive),
                         'y': y(vals[i].binnedPositiveIncrease),
-                        'dy': -50,
-                        'dx': -50
+                        'dy': 0,
+                        'dx': 0
                     }
                 }
             }
@@ -260,19 +261,6 @@ function organize_data(){
     }
 }
 
-function init_slider(){
-    date_range = d3.extent(states_time_data, function(d){
-        return d.date;
-    })
-    sliderTime
-        .min(date_range[0])
-        .max(date_range[1])
-        .ticks(data_by_states["NY"].length/2)
-        .default(date_range[0])
-
-    gTime.call(sliderTime);
-    d3.select('p#value-time').text(formatTime(sliderTime.value()));
-}
 
 function selection_init(){
     selection_vis.states(d3.keys(data_by_states))
