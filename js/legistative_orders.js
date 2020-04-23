@@ -62,6 +62,9 @@ function legistate_chart(config){
     var y1 = d3.scaleLinear()
         .range([height, height/2 + height * 0.05])
 
+    var y1band = d3.scaleBand()
+        .range([height, height/2 + height * 0.05])
+
     var y2 = d3.scaleLinear()
         .domain([0,1])
         .range([height/2 - height * 0.05, 0])
@@ -142,9 +145,21 @@ function legistate_chart(config){
             if (! isDate ) data.push({ 'date': d, 'count': 0, "order": 0 })
         })
 
-        y1.domain([0, d3.max(data, function(d){ 
-            return d.count; })])
+
+        var y1_max = d3.max(data, function(d){ 
+            return d.count; })
+        
+        var y1_string = []
+        for(var i=0; i<y1_max; ++i){
+            y1_string.push(String(i))
+        }
+
+        y1.domain([0, y1_max])
         y2.domain([0, 10])
+
+        y1band.domain(y1_string)
+
+        
 
         legis_y_axis.scale(y1).ticks(6)
         legisYaxisCall1.call(legis_y_axis);
@@ -205,7 +220,12 @@ function legistate_chart(config){
     }
   
     function add2Focus(d, i){
-        if (!focus.includes(d)) focus.push(d)
+        if (!focus.includes(d)){
+            var dates = focus.map(function(d){
+                return d.date
+            })
+            focus.push(d)
+        }
         update_vis(focus);
     }
 
@@ -222,7 +242,32 @@ function legistate_chart(config){
     }
 
     function highlight_focus(){
+        var dates = [];
         focus_markers = [];
+        focus.forEach(function(d){
+            markerData.forEach(function(v){
+                if (v.state == d){
+                    var collisions = focus_markers.filter(function(k){ return k.date == v.date}).length
+                    v.level = String(collisions)                   
+                    focus_markers.push(v)
+                }
+            })
+            
+        })
+        draw_markers();
+    }
+
+    function draw_markers(){
+        var markers = svg.selectAll("circle")
+            .data(focus_markers, function(d){ return d.state})
+
+        markers.enter()
+            .append("circle")
+            .attr("cx", function(d){ return x(d.date) + x.bandwidth()/2; })
+            .attr("cy", function(d){ return y1band(d.level) + y1band.bandwidth()/2; })
+            .attr("r", 8)
+            .attr("fill", function(d, i){
+                return color(i); })
     }
 
     legistateChart.width = function(value){
