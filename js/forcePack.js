@@ -1,5 +1,5 @@
 function forcePack(config){
-    var margin = { left:160, right:20, top:80, bottom:120 }
+    var margin = { left:160, right:20, top:20, bottom:120 }
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right,
         selection = config.selection,

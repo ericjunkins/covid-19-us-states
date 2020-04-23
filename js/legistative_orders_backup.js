@@ -1,16 +1,14 @@
 function legistate_chart(config){
-    var margin = { left:120, right:100, top:50, bottom:60 },
-        chartData = config.data,
-        markerData = config.marker;
+    var margin = { left:120, right:100, top:50, bottom:120 },
+        chartData = config.data
 
-    var focus = [],
-        focus_markers = [];
+    var focus = [];
 
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
     
     // append the svg object to the body of the page
-    var svg = d3.select("#legis-chart")
+    var svg = d3.select("#chart-area")
         .append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -30,8 +28,6 @@ function legistate_chart(config){
         return date;
     }
     
-    var today = new Date();
-
     function getDates(startDate, stopDate) {
         var dateArray = new Array();
         var currentDate = startDate;
@@ -41,11 +37,13 @@ function legistate_chart(config){
         }
         return dateArray;
     }
+
+    
     var m = d3.max(chartData, function(d){
         return d.values.length;
     })
 
-    var dateArray = getDates(min_date, today)
+    var dateArray = getDates(min_date, max_date)
     var dateArrayStrings = [];
 
     dateArray.forEach(function(d){
@@ -58,66 +56,29 @@ function legistate_chart(config){
         .domain(dateArrayStrings)
         .range([0,width])
 
+    var s = [];
+    for (var i=0; i < m; ++i){
+        s.push(String(i + 1));
+    }
     
-    var y1 = d3.scaleLinear()
-        .range([height, height/2 + height * 0.05])
-
-    var y2 = d3.scaleLinear()
-        .domain([0,1])
-        .range([height/2 - height * 0.05, 0])
-
+    var y = d3.scaleBand()
+        .domain(s)
+        .range([height, 0])
+        //.padding(0.02)
 
     var color = d3.scaleOrdinal(d3.schemeDark2);
     
-    var x_axis = d3.axisBottom(x).tickValues(x.domain().filter(function(d,i){ return !(i%2)}));
-    var x_axis2 = d3.axisBottom(x).tickValues(x.domain().filter(function(d,i){ return }));
-    var legis_y_axis = d3.axisLeft()
-    var legis_y_axis2 = d3.axisLeft()
+    var x_axis = d3.axisBottom(x)
+    var y_axis = d3.axisLeft(y)
 
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
         .attr("class", "axis axis--x")
         .call(x_axis);
-
-    svg.append("g")
-        .attr("transform", "translate(0," +(height/2 - height * 0.05)+ ")")
-        .attr("class", "axis axis--x")
-        .call(x_axis2);
-
-    svg.append("line")
-        .attr("x1", 0)
-        .attr("x2", 0)
-        .attr("y1", height/2 + height * 0.05)
-        .attr("y2", height/2 - height * 0.05)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", "1px")
     
-    legisYaxisCall1 = svg.append("g")
-        .attr("class", "axis axis--y axisWhite")
-        
-    legisYaxisCall2 = svg.append("g")
-        .attr("class", "axis axis--y axisWhite")
-
-    var labels = svg.append("g")
-        .attr("class", "legis-labels")
-
-    labels.append("text")
-        .attr("x", -height * 0.75)
-        .attr("y", - 45)
-        .attr("transform", "rotate(-90)")
-        .attr("font-size", "1.8rem")
-        .attr("fill", "#fff")
-        .attr("text-anchor", "middle")
-        .text("Lockdown Orders")
-
-    labels.append("text")
-        .attr("x", -(height/2 - height * 0.05)/2)
-        .attr("y", - 45)
-        .attr("transform", "rotate(-90)")
-        .attr("font-size", "1.8rem")
-        .attr("fill", "#fff")
-        .attr("text-anchor", "middle")
-        .text("Re-open Orders")
+    // svg.append("g")
+    //     .attr("class", "axis axis--y axisWhite")
+    //     .call(y_axis)
 
 
     function legistateChart(){
@@ -126,50 +87,54 @@ function legistate_chart(config){
 
     function draw_chart(){
         var data = []
-
-        dateArrayStrings.forEach(function(d){
-            isDate = false;
-            chartData.forEach(function(v){
-                if (v.key == d){
-                    isDate = true;
-                    data.push({
-                        'date': d,
-                        'count': v.values.length,
-                        'order': +v.values[0].order 
-                    })
-                }
+        chartData.forEach(function(d){
+            d.values.forEach(function(v, i){
+                data.push({
+                    'state': v.state,
+                    'date':  v.date,
+                    'count': String(i+1)
+                })
             })
-            if (! isDate ) data.push({ 'date': d, 'count': 0, "order": 0 })
         })
-
-        y1.domain([0, d3.max(data, function(d){ 
-            return d.count; })])
-        y2.domain([0, 10])
-
-        legis_y_axis.scale(y1).ticks(6)
-        legisYaxisCall1.call(legis_y_axis);
-
-        legis_y_axis2.scale(y2).ticks(6)
-        legisYaxisCall2.call(legis_y_axis2);
 
         var rects = svg.selectAll("rect")
             .data(data)
 
-        var w = width/data.length * 0.9
+
+        var w = width/chartData.length * 0.8
         rects.enter()
             .append('rect')
             .attr("class", "legis-rect")
+            .attr("id", function(d){
+                return "rect-" + d.state;
+            })
             .attr("x", function(d){
                 return x(d.date); })
-            .attr("y", function(d){ 
-                var s = (d.order == 0 ? y1 : y2)
-                return s(d.count); })
+            .attr("y", function(d){ return y(d.count); })
             .attr("width", w)
-            .attr("height", function(d){ 
-                var s = (d.order == 0 ? y1 : y2)
-                return s(0) - s(d.count); })
+            .attr("height", y.bandwidth())
             .attr("fill", "grey")
             .attr("opacity", 0.20)
+                .on("mouseover", mouseover)
+                .on("mousemove", mousemove)
+                .on("mouseout", mouseout)
+                .on("click", clicked)
+
+        var texts = svg.selectAll("text")
+            .data(data, function(d){ return d.state})
+
+
+        texts.enter()
+            .append("text")
+            .attr("class", "legis-text")
+            .attr("id", function(d){ return "legis-text-" + d.state })
+            .attr("x", function(d){ return x(d.date) + w/2; })
+            .attr("y", function(d){ return y(d.count) + y.bandwidth()/2; })
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("fill", "#fff")
+            .attr("font-size", "2rem")
+            .text(function(d){ return d.state; })
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseout", mouseout)
@@ -222,7 +187,18 @@ function legistate_chart(config){
     }
 
     function highlight_focus(){
-        focus_markers = [];
+        d3.selectAll(".legis-rect")
+            .attr('stroke-width', "0")
+            .attr("fill", "grey")
+            .attr("opacity", 0.20)
+
+        focus.forEach(function(d, i){
+            d3.select("#rect-" + d)
+                .attr("fill", function(d){
+                    return color(i)
+                })
+                .attr("opacity", "1")
+        })
     }
 
     legistateChart.width = function(value){

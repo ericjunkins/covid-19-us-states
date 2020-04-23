@@ -75,14 +75,12 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
     for (const [key, vals] of anno_entries){
         anno[key].date = parseDate(vals.date)
         urban_pop[key].urban = +urban_pop[key].urban
-        if (vals.date != null) tmp.push({"state": full2abbrev[key], "date": formatTime(vals.date)})
+        if (vals.date != null) tmp.push({"state": full2abbrev[key], "date": formatTime(vals.date), "order": vals.order})
     }
 
-    
     var ordersByDate = d3.nest()
         .key(function(d){ return d.date; })
         .entries(tmp)
-    
     
     annotations = anno
     var request = new XMLHttpRequest()
@@ -104,10 +102,10 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             if(d.pending == null){d.pending = 0}
         })
 
-
+        let fullHeight = window.innerHeight;
         chartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
         var allStatesConfig = {
-            'height':650,
+            'height':fullHeight * 0.40,
             'width': chartWidth,
             'parseDate': parseDate,
             'state_data': states_time_data,
@@ -116,19 +114,12 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'duration': 250,
             'selection': '#slip-chart'
         }
-        var selectionConfig = {
-            'height':700,
-            'width': 300,
-            'selection': '#state-selection'
-        }
-
 
         currentWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
-        var forcePackWidth = currentWidth * 0.9,
-            forcePackHeight = 1200
+        var forcePackWidth = currentWidth * 0.9
 
         var bubblesConfig = {
-            'height':forcePackHeight,
+            'height':fullHeight * 0.75,
             'width': forcePackWidth,
             'anno': anno,
             'regions': regions, 
@@ -143,23 +134,32 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'political_aff': pol
         }
 
-
-
         var legistateConfig = {
-            'height':650,
+            'height':fullHeight * 0.40,
             'width': chartWidth,
-            'data': ordersByDate
+            'data': ordersByDate,
+            'marker': tmp
         }
 
+        var selWidth = parseInt(d3.select("#state-selection").style("width"), 10)
+        var selectionConfig = {
+            'height':fullHeight * 0.10,
+            'width': selWidth,
+            'states_list': d3.values(abbrev),
+            'selection': '#state-selection',
+            'full2abbrev': full2abbrev
+        }
+
+
         states_vis = states_chart(allStatesConfig);
-        selection_vis = stateSelector(selectionConfig);
         bubbles_vis = forcePack(bubblesConfig);
         legistate_vis = legistate_chart(legistateConfig)
+        selector_vis = selector(selectionConfig);
         bubbles_vis();
         init_display();
         legistate_vis();
-        selection_init();
         states_vis();
+        selector_vis();
     }
     request.send()
 }
@@ -172,6 +172,7 @@ function update_vis(f){
     states_vis.focus(f);
     bubbles_vis.focus(f);
     legistate_vis.focus(f);
+    selector_vis.focus(f);
 }
 
 function organize_data(){

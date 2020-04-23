@@ -1,5 +1,5 @@
 function states_chart(config){
-    var margin = { left:120, right:100, top:150, bottom:80 }
+    var margin = { left:120, right:100, top:30, bottom:60 }
     let data_list;
     var anno = config.anno;
     var abbrev2full = config.abbrev2full;
