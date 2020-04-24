@@ -20,7 +20,7 @@
     <!-- Bootstrap grid setup -->
     <section id="title">
         <div class="container-fluid">
-            <h1 style="margin-bottom: 40px;" class="title_text">Coronavirus COVID-19 US States Data </h1>
+            <h1 style="margin-bottom: 0px;" class="title_text">Coronavirus COVID-19 US States Data </h1>
         </div>
     </section>
     <section id="time-graph">
@@ -41,16 +41,16 @@
                     </div>
                     <div class ="row" style="text-align: center">
                         
-                        <div class="col-sm-4">
+                        <div class="col-sm-3" style="margin-left: 15%;">
                             <h4> Severity (radius) </h4>
-                            <select class="select-css" id="severity-select" >
+                            <select class="select-css" id="severity-select">
                                 <option value="cases">Total Cases</option>
                                 <option value="cases_per_capita">Cases Per Capita</option>
                                 <option value="deaths">Total Deaths</option>
                                 <option value="deaths_per_capita">Deaths per Capita</option>
                             </select>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <h4> Grouping (y-axis)</h4>
                             <select class="select-css" id="group-select">
                                 <option value="population">Population</option>
@@ -60,7 +60,7 @@
                                 
                             </select>
                         </div>
-                        <div class="col-sm-4" >     
+                        <div class="col-sm-3" >     
                             <h4> Time (color) </h4>                       
                             <select class="select-css" id="color-select">
                                 <option value="state_hundred">States's 100th Case</option>
@@ -99,11 +99,11 @@
     <div id="div_template"></div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="logChartModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content center-block" style="width: 1500px;">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Cases Log-Log chart</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Covid-19 Trajectory chart</h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -137,6 +137,137 @@
                     <p class="modal-text" style="font-size: 1.5rem;">
                         Inspiration of this visulization from <a href="https://aatishb.com/covidtrends/">https://aatishb.com/covidtrends/</a> and <a href="https://www.youtube.com/user/minutephysics">MinutePhysics</a>
                     </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="bubblesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content center-block" style="width: 1500px;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Severity Bubbles</h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                                This chart is to show the relative severity of each state when it's local government decided to take legislative action. It is made to be sortable/filterable by different criteria so you can use many variables to determine if a state had an appropriate response to the pandemic.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-4" style="text-align: center;">
+                            <img src="img/bubbles_area_exp.png" style="width:95%;" />
+                            <p class = "modal-text em-yellow" style="text-align: left; padding: 5px 20px; ">
+                                The <em> Severity</em> of a state is given by the radius of each individual bubble
+                            </p>
+                        </div>
+                        <div class="col-sm-4" style="text-align: center;">
+                            <img src="img/bubbles_y_exp.png" style="width:95%;"/>
+                                <p class = "modal-text em-green" style="text-align: left; padding: 5px 20px; ">
+                                The <em> Y-axis Grouping </em> of a state filters how the bubbles are positioned on the Y-axis, given different filtering criteria
+                            </p>
+                        </div>
+                        <div class="col-sm-4" style="text-align: center;">
+                            <img src="img/bubbles_time_exp.png" style="width:95%;"/>
+                                <p class = "modal-text em-blue" style="text-align: left; padding: 5px 20px; ">
+                                The <em> Time Since specific event </em> of a state is given by the color of the bubble, less time appearing more white, and longer appearing more red
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+                    <p class="modal-text" style="font-size: 1.5rem;">
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="legisModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content center-block" style="width: 1500px;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Legislative Orders Chart</h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                            This chart is to show the legislative actions taken by the local government, sorted by which type of order it is and dates it was released on
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/legis_exp.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text em-yellow">
+                                The fainter rectangles in the chart are the number of that type of order given on each day. More order types will come in the future. 
+                            </p>
+
+                            <p class="modal-text em-yellow">
+                                This chart can be used to correlate the <em> Date of the order </em> by state to the <em> data in the line chart </em> above to determine if trends emerge in response to this event, either spikes/resurgenses in cases, or "flattening" of the curve
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="selectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content center-block" style="width: 1500px;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Covid-19 Trajectory chart</h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                                This section is used to be a selection tool for exploring the visulization
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/selection_exp.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
                 </div>
             </div>
         </div>

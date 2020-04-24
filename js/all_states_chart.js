@@ -1,5 +1,5 @@
 function states_chart(config){
-    var margin = { left:120, right:100, top:30, bottom:60 }
+    var margin = { left:120, right:100, top:100, bottom:60 }
     let data_list;
     var anno = config.anno;
     var abbrev2full = config.abbrev2full;
@@ -56,12 +56,12 @@ function states_chart(config){
         .on("mouseout", helpIconLeave)
 
     function helpIconClick(d){
-        $("#exampleModal").modal();
+        $("#logChartModal").modal();
     }
 
     function helpIconHover(d){
         document.body.style.cursor = "pointer"
-        d3.select(this).attr("fill", "steelblue")
+        d3.select(this).attr("fill", "#d1d134")
             .attr("opacity", 1)
     }
 
@@ -76,18 +76,33 @@ function states_chart(config){
     // var x_axis = d3.axisBottom(x).ticks(10, ",.1d")
     // var y_axis = d3.axisLeft(y).ticks(8, ",.1d")
 
-    var x_axis = d3.axisBottom();
-    var y_axis = d3.axisLeft();
+    var x_axis = d3.axisBottom().tickPadding(8);
+    var y_axis = d3.axisLeft().tickPadding(8);
     
     var labels = svg.append('g')
         .attr("class", "labels")
 
+    svg.append('text')
+        .attr("class", "title-text")
+        .attr("transform", "translate(" + (width * 0.15) + "," + 0 + ")")
+        .attr("x", 0)
+        .attr("y", -15)
+        .text("Covid-19 Trajectory")
 
     xAxisCall = labels.append("g")
         .attr("transform", "translate(0," + height + ")")
         .attr("class", "axis axis--x axisWhite")
         // .call(x_axis);
     
+    // svg.append("rect")
+    //     .attr("class", "outline-rect")
+    //     .attr("x", 0)
+    //     .attr("y", 0)
+    //     .attr("height", height)
+    //     .attr("width", width)
+    //     .attr("fill", "none")
+
+
     yAxisCall = labels.append("g")
         .attr("class", "axis axis--y axisWhite")
         // .call(y_axis)
@@ -98,12 +113,12 @@ function states_chart(config){
         .attr("y", 0 - 100)
         .attr("x", 0 - (height/2))
         .attr("dy", "1em")
-        .text("New Confirmed Cases (in past week)")
+        .text("New Confirmed Cases")
     
     svg.append("text")
         .attr("class", "axis-label")
         .attr("transform", "translate(0," + height + ")")
-        .attr("y", margin.bottom/2)
+        .attr("y", 40)
         .attr("x",(width/2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")

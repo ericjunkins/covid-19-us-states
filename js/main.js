@@ -105,7 +105,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         let fullHeight = window.innerHeight;
         chartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
         var allStatesConfig = {
-            'height':fullHeight * 0.40,
+            'height':fullHeight * 0.44,
             'width': chartWidth,
             'parseDate': parseDate,
             'state_data': states_time_data,
@@ -119,7 +119,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         var forcePackWidth = currentWidth * 0.9
 
         var bubblesConfig = {
-            'height':fullHeight * 0.75,
+            'height':fullHeight * 0.8,
             'width': forcePackWidth,
             'anno': anno,
             'regions': regions, 
@@ -143,11 +143,11 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
 
         var selWidth = parseInt(d3.select("#state-selection").style("width"), 10)
         if ( selWidth <= 768){
-            selHeight = fullHeight * 0.25
+            selHeight = fullHeight * 0.22
             rows = 4
         }
         else if ( 768 <= selWidth && selWidth <= 992) {
-            selHeight = fullHeight * 0.175
+            selHeight = fullHeight * 0.17
             rows = 3
         }
         else{

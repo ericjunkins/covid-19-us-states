@@ -1,5 +1,5 @@
 function forcePack(config){
-    var margin = { left:160, right:20, top:20, bottom:120 }
+    var margin = { left:160, right:20, top:100, bottom:120 }
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right,
         selection = config.selection,
@@ -37,13 +37,60 @@ function forcePack(config){
     var axisLabels = svg.append("g")
         .attr("class", "axis-labels")
 
-    var axes = svg.append("g")
+
+    var axes= svg.append("g")
+        .attr("class", "axis axis--y axisWhite")
+    
+    var grid = svg.append("g")
         .attr('class', "axes")
 
     var color = d3.scaleOrdinal(d3.schemeDark2);
 
+    svg.append('text')
+        .attr("class", "title-text")
+        .attr("transform", "translate(" + (width /2) + "," + 0 + ")")
+        .attr("x", 0)
+        .attr("y", -15)
+        .attr("text-anchor", "middle")
+        .text("States Codid-19 Severity")
+
+
     var today = new Date();
     var radius_max = width * 0.1
+ 
+    var icons_loc = svg.append("g")
+        .attr("class", "states-icons")
+        .attr("transform", "translate(" + (width - 5) + ",-15)")
+    
+    icons_loc.append("text")
+        .attr("font-family", "FontAwesome")
+        .attr("font-size", "3rem")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("text-anchor", "middle")
+        .attr("fill", "lightsteelblue")
+        .attr("opacity", 0.5)
+        .text("\uf059")
+        .on("click", helpIconClick)
+        .on("mouseover", helpIconHover)
+        .on("mouseout", helpIconLeave)
+
+    function helpIconClick(d){
+        $("#bubblesModal").modal();
+    }
+
+    function helpIconHover(d){
+        document.body.style.cursor = "pointer"
+        d3.select(this).attr("fill", "#d1d134")
+            .attr("opacity", 1)
+    }
+
+    function helpIconLeave(d){
+        d3.select(this).attr("fill", "lightsteelblue")
+            .attr("opacity", 0.5)
+            document.body.style.cursor = "default"
+    }
+
 
     var a = d3.scaleLinear()
         .range([0, radius_max])
@@ -116,7 +163,7 @@ function forcePack(config){
         .attr("x", -height/2)
         .attr("y", -105)
         
-    var gridlines = axes.append("g")
+    var gridlines = grid.append("g")
         .attr("class", "grid")
 
 
@@ -458,7 +505,7 @@ function forcePack(config){
                 .tickPadding(10)
                 .tickFormat(d3.formatPrefix(".1", 1e6))
 
-            axisLabels.call(yAxis)
+            axes.call(yAxis)
             gridlines.call(make_y_gridlines()
                 .tickSize(-(width))
                 .tickFormat("")
@@ -474,7 +521,7 @@ function forcePack(config){
                 .tickPadding(10)
                 .tickFormat(null)
 
-            axisLabels.call(yAxis)
+            axes.call(yAxis)
             gridlines.call(make_y_gridlines()
                 .tickSize(-width)
                 .tickFormat(""))
@@ -488,7 +535,7 @@ function forcePack(config){
                 .tickPadding(10)
                 .tickFormat(null)
 
-            axisLabels.call(yAxis)
+            axes.call(yAxis)
             gridlines.call(make_y_gridlines()
                 .tickSize(-width)
                 .tickFormat("")
@@ -502,7 +549,7 @@ function forcePack(config){
                 .tickPadding(10)
                 .tickFormat(null)
 
-            axisLabels.call(yAxis)
+            axes.call(yAxis)
             gridlines.call(make_y_gridlines()
                 .tickSize(-width)
                 .tickFormat(""))

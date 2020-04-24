@@ -1,5 +1,5 @@
 function selector(config){
-    var margin = { left:20, right:20, top:10, bottom:20 },
+    var margin = { left:20, right:20, top:35, bottom:0 },
         states_list = config.states_list,
         full2abbrev = config.full2abbrev
 
@@ -19,15 +19,52 @@ function selector(config){
     var rect_svg = svg.append("g")
     var text_svg = svg.append("g")
 
-    console.log(width)
-    console.log(height)
+    var icons_loc = svg.append("g")
+        .attr("class", "states-icons")
+        .attr("transform", "translate(" + (width - 5) + ",-15)")
+    
+    icons_loc.append("text")
+        .attr("font-family", "FontAwesome")
+        .attr("font-size", "2rem")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("text-anchor", "middle")
+        .attr("fill", "lightsteelblue")
+        .attr("opacity", 0.5)
+        .text("\uf059")
+        .on("click", helpIconClick)
+        .on("mouseover", helpIconHover)
+        .on("mouseout", helpIconLeave)
+
+    function helpIconClick(d){
+        $("#selectionModal").modal();
+    }
+
+    function helpIconHover(d){
+        document.body.style.cursor = "pointer"
+        d3.select(this).attr("fill", "#d1d134")
+            .attr("opacity", 1)
+    }
+
+    function helpIconLeave(d){
+        d3.select(this).attr("fill", "lightsteelblue")
+            .attr("opacity", 0.5)
+            document.body.style.cursor = "default"
+    }
+
+    
     var num_rows = config.rows;
     var items_per_row = Math.ceil((states_list.length)/num_rows)
 
+
+
+    
     var xBand = [];
     for (var i=0; i<items_per_row; ++i){
         xBand.push(String(i));
     }
+
+
 
 
     var yBand = [];
