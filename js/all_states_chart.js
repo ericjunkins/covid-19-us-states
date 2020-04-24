@@ -38,6 +38,39 @@ function states_chart(config){
     var x = xLog;
     var y = yLog;
     
+    var icons_loc = svg.append("g")
+        .attr("class", "states-icons")
+        .attr("transform", "translate(" + (width) + ",0)")
+    
+    icons_loc.append("text")
+        .attr("font-family", "FontAwesome")
+        .attr("font-size", "3rem")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("text-anchor", "middle")
+        .attr("fill", "lightsteelblue")
+        .attr("opacity", 0.5)
+        .text("\uf059")
+        .on("click", helpIconClick)
+        .on("mouseover", helpIconHover)
+        .on("mouseout", helpIconLeave)
+
+    function helpIconClick(d){
+        $("#exampleModal").modal();
+    }
+
+    function helpIconHover(d){
+        document.body.style.cursor = "pointer"
+        d3.select(this).attr("fill", "steelblue")
+            .attr("opacity", 1)
+    }
+
+    function helpIconLeave(d){
+        d3.select(this).attr("fill", "lightsteelblue")
+            .attr("opacity", 0.5)
+            document.body.style.cursor = "default"
+    }
+
     var color = d3.scaleOrdinal(d3.schemeDark2);
     
     // var x_axis = d3.axisBottom(x).ticks(10, ",.1d")
@@ -60,17 +93,15 @@ function states_chart(config){
         // .call(y_axis)
     
     svg.append("text")
-        .attr("class", "axis-text")
+        .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - 100)
         .attr("x", 0 - (height/2))
         .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .attr("font-size", "2rem")
         .text("New Confirmed Cases (in past week)")
     
     svg.append("text")
-        .attr("class", "axis-text")
+        .attr("class", "axis-label")
         .attr("transform", "translate(0," + height + ")")
         .attr("y", margin.bottom/2)
         .attr("x",(width/2))
@@ -270,6 +301,8 @@ function states_chart(config){
     }
 
     function entered (d,i){
+        document.body.style.cursor = "pointer"
+
         if (!focus.includes(d[0].state)){
             d3.select("#path-" + d[0].state)
                 .attr("stroke", "steelblue")
@@ -312,7 +345,7 @@ function states_chart(config){
                 .attr("stroke-width", 0.5)
                 .attr("opacity", 0.20)
         }
-
+        document.body.style.cursor = "default"
     }
     
     function formatAxes(){

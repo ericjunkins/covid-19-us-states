@@ -16,15 +16,16 @@ function selector(config){
             .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
-
     var rect_svg = svg.append("g")
     var text_svg = svg.append("g")
 
-    var num_rows = 3;
+    console.log(width)
+    console.log(height)
+    var num_rows = config.rows;
     var items_per_row = Math.ceil((states_list.length)/num_rows)
 
     var xBand = [];
-    for (var i=0; i<=items_per_row; ++i){
+    for (var i=0; i<items_per_row; ++i){
         xBand.push(String(i));
     }
 
@@ -110,7 +111,7 @@ function selector(config){
             .on("click", clicked)
     }
     function mouseover(d){
-
+        document.body.style.cursor = "pointer"
     }
 
     function mousemove(d){
@@ -129,6 +130,7 @@ function selector(config){
                 .attr("opacity", 0.20)
                 
         }
+        document.body.style.cursor = "default"
     }
 
     function clicked(d){

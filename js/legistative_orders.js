@@ -106,20 +106,16 @@ function legistate_chart(config){
 
     labels.append("text")
         .attr("x", -height * 0.75)
+        .attr("class", "axis-label")
         .attr("y", - 45)
         .attr("transform", "rotate(-90)")
-        .attr("font-size", "1.8rem")
-        .attr("fill", "#fff")
-        .attr("text-anchor", "middle")
         .text("Lockdown Orders")
 
     labels.append("text")
         .attr("x", -(height/2 - height * 0.05)/2)
         .attr("y", - 45)
+        .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
-        .attr("font-size", "1.8rem")
-        .attr("fill", "#fff")
-        .attr("text-anchor", "middle")
         .text("Re-open Orders")
 
 

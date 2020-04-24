@@ -142,12 +142,26 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         }
 
         var selWidth = parseInt(d3.select("#state-selection").style("width"), 10)
+        if ( selWidth <= 768){
+            selHeight = fullHeight * 0.25
+            rows = 4
+        }
+        else if ( 768 <= selWidth && selWidth <= 992) {
+            selHeight = fullHeight * 0.175
+            rows = 3
+        }
+        else{
+            selHeight = fullHeight * 0.1
+            rows = 2
+        } 
+        console.log('selHeight', selHeight)
         var selectionConfig = {
-            'height':fullHeight * 0.10,
+            'height':selHeight,
             'width': selWidth,
             'states_list': d3.values(abbrev),
             'selection': '#state-selection',
-            'full2abbrev': full2abbrev
+            'full2abbrev': full2abbrev,
+            'rows': rows
         }
 
 

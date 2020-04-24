@@ -10,7 +10,8 @@
         <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
         <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
         <!-- Custom CSS -->
-        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/style.css">        
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 
 </head>
 
@@ -40,7 +41,7 @@
                     </div>
                     <div class ="row" style="text-align: center">
                         
-                        <div class="col-sm-4" style="position: absolute; left: 12%;">
+                        <div class="col-sm-4">
                             <h4> Severity (radius) </h4>
                             <select class="select-css" id="severity-select" >
                                 <option value="cases">Total Cases</option>
@@ -49,7 +50,7 @@
                                 <option value="deaths_per_capita">Deaths per Capita</option>
                             </select>
                         </div>
-                        <div class="col-sm-4" style="position: absolute; left: 36%;">
+                        <div class="col-sm-4">
                             <h4> Grouping (y-axis)</h4>
                             <select class="select-css" id="group-select">
                                 <option value="population">Population</option>
@@ -59,7 +60,7 @@
                                 
                             </select>
                         </div>
-                        <div class="col-sm-4" style="position: absolute; left: 60%;">     
+                        <div class="col-sm-4" >     
                             <h4> Time (color) </h4>                       
                             <select class="select-css" id="color-select">
                                 <option value="state_hundred">States's 100th Case</option>
@@ -82,12 +83,12 @@
                             -->
                     </div>
                 </div>
-                <div class="row" style="height: 525px;">
+                <div class="row">
                     <div class="col-lg-12">
                         <div id="chart-area"></div>
                     </div>
                 </div>
-                <div class="row" style="height: 525px;">
+                <div class="row">
                     <div class="col-lg-12">
                         <div id="legis-chart"></div>
                     </div>
@@ -96,6 +97,51 @@
         </div>
     </div>
     <div id="div_template"></div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content center-block" style="width: 1500px;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Cases Log-Log chart</h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                            This chart is to show the growth rate of COVID-19 on a scale that that makes seeing if it is spreading at an exponential rate, or if the curve has begun to "flatten". It is important to note that it is on a Logarithmic scale, and also that the "Y-axis" is the total cases in the last 7 days, meaning it will be more conservative in showing trends. 
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/log_explaination.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <ul>
+                                <li class="modal-text em-red" ><em>Exponential growth line</em>: Given by x=y, this line denotes where exponential growth in cases is occuring</li>
+                                <li class="modal-text em-green" ><em>A vertical line</em> would indicate that there was no new cases of COVID-19, that is the eventual goal</li>
+                                <li class="modal-text em-blue" > Look for <em>significant deviation from the exponential growth line </em>, with significant downward trends to see a state experiencing "flattening the curve" </li>
+                                <li class="modal-text" >"Stay at Home" orders issued by each state goverment mark the number of total cases a state had</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+                    <p class="modal-text" style="font-size: 1.5rem;">
+                        Inspiration of this visulization from <a href="https://aatishb.com/covidtrends/">https://aatishb.com/covidtrends/</a> and <a href="https://www.youtube.com/user/minutephysics">MinutePhysics</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </section>
 
     <!-- External JS libraries -->

@@ -34,13 +34,16 @@ function forcePack(config){
             .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-    var labels = svg.append("g")
-        .attr("class", "labels")
+    var axisLabels = svg.append("g")
+        .attr("class", "axis-labels")
+
+    var axes = svg.append("g")
+        .attr('class', "axes")
 
     var color = d3.scaleOrdinal(d3.schemeDark2);
 
     var today = new Date();
-    var radius_max = 50
+    var radius_max = width * 0.1
 
     var a = d3.scaleLinear()
         .range([0, radius_max])
@@ -106,13 +109,14 @@ function forcePack(config){
     var vis_nodes = masked.append('g').attr("class", "nodes")
     var vis_texts = masked.append("g").attr("class", "nodes-text")
         
-    labels.append('text')
-        .attr("id", "axis-label")
+    axisLabels.append('text')
+        .attr("id", "grouping-label")
+        .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
         .attr("x", -height/2)
         .attr("y", -105)
         
-    var gridlines = labels.append("g")
+    var gridlines = axes.append("g")
         .attr("class", "grid")
 
 
@@ -123,7 +127,7 @@ function forcePack(config){
 
     var severityLegend = legends.append("g")
         .attr("class", "severity-legend")
-        .attr("transform", "translate(60, 45)")
+        .attr("transform", "translate(" + width * 0.13 + "," + 45 + ")")
 
     sevR = a.range()[1]*0.6
     sevX = 15
@@ -135,34 +139,12 @@ function forcePack(config){
         .attr("fill", "none")
         .attr("stroke", "#fff")
 
-    sevLines = severityLegend.append("g")
-        .attr("transform", "translate(" + (sevR + sevY + 10) + "," + sevY +")")
-
-    sevLines.append("line")
-        .attr("x1", 0)
-        .attr("x2", 0)
-        .attr("y2", sevR)
-        .attr("y1", -sevR)
-        .attr("stroke", "#fff")
-
-    sevLines.append("line")
-        .attr("x1", -5)
-        .attr("x2", 5)
-        .attr("y2", sevR)
-        .attr("y1", sevR)
-        .attr("stroke", "#fff")
-        
-    sevLines.append("line")
-        .attr("x1", -5)
-        .attr("x2", 5)
-        .attr("y2", -sevR)
-        .attr("y1", -sevR)
-        .attr("stroke", "#fff")
-    var sevText = sevLines.append("text")
+    var sevText = severityLegend.append("text")
         .attr("fill", "#fff")
-        .attr("x", 10)
-        .attr("y", 0)
+        .attr("x", sevX)
+        .attr("y", sevY)
         .attr("dominant-baseline", "middle")
+        .attr("text-anchor", "middle")
 
 
     var simulation = d3.forceSimulation()
@@ -190,24 +172,27 @@ function forcePack(config){
     svg_init();
     initilize();
 
+
+
     function svg_init(){
+        var legendW = width * 0.05
         for (var i=1; i<11; ++i){
             c.push({
                 'val': 0.1 * i,
-                'x': 30 * i
+                'x': legendW * i
             })
             if (i == 1 || i == 6){
                 color_text_labels.push({
                     'text': ((0.1 * i)* 20).toFixed(0),
-                    'x': 30 * i
+                    'x': legendW * i
                 })
-                ticks.push({ 'x': 30*i })
+                ticks.push({ 'x': legendW*i })
             } else if (i == 10){
                 color_text_labels.push({
                     'text': ((0.1 * i) * 20).toFixed(0),
-                    'x': 30 * (i+1)
+                    'x': legendW * (i+1)
                 })
-                ticks.push({ 'x': 30*(i+1) })
+                ticks.push({ 'x': legendW*(i+1) })
             } 
         }
     
@@ -217,16 +202,16 @@ function forcePack(config){
             .append("rect")
             .attr('x', function(d){ return d.x; })
             .attr("y", 0)
-            .attr("height", 30)
-            .attr("width", 30)
+            .attr("height", legendW)
+            .attr("width", legendW)
             .attr("fill", function(d){
                 return colorScale(d.val * colorScale.domain()[1]);
             })
         
         colorLegend.append("line")
-            .attr("transform", "translate(30,30)")
+            .attr("transform", "translate(" + legendW +"," + legendW + ")")
             .attr("x1", 0)
-            .attr("x2", 300)
+            .attr("x2", legendW * 10)
             .attr("y1", 0)
             .attr("y2", 0)
             .attr("stroke", "#fff")
@@ -238,13 +223,13 @@ function forcePack(config){
             .attr("class", "legend-ticks")
             .attr("x1", function(d){ return d.x; })
             .attr("x2", function(d){ return d.x; })
-            .attr("y1", -5 + 30)
-            .attr("y2", 5 + 30)
+            .attr("y1", -5 + legendW)
+            .attr("y2", 5 + legendW)
             .attr("stroke", "#fff")
     
     
         colorLegendText = colorLegend.append("text")
-            .attr("x", 180)
+            .attr("x", 6* legendW)
             .attr("y", -18)
             .attr("fill", "#fff")
             .text("Days Since States 100th Case")
@@ -310,13 +295,17 @@ function forcePack(config){
     function sevTextFormat(t){
         t = t * 2 * 0.6
         if (severitySelector == "cases"){
-            return "= " + numberWithCommas(Math.round(t/1000) *1000)  + " Cases";
+            //return numberWithCommas(Math.round(t/1000) *1000)  + " Cases";
+            return numberWithCommas(Math.round(t/1000) *1000)
         } else if (severitySelector == "cases_per_capita"){
-            return t.toExponential(0) + " Cases per Capita";
+            //return t.toExponential(0) + " Cases per Capita";
+            return t.toExponential(0)
         } else if (severitySelector == "deaths"){
-            return numberWithCommas(Math.round(t/10) *10)  + " Deaths" ;
+            // return numberWithCommas(Math.round(t/10) *10)  + " Deaths" ;
+            return numberWithCommas(Math.round(t/10) *10)
         } else if (severitySelector == "deaths_per_capita"){
-            return t.toExponential(0) + " Deaths per Capita";
+            // return t.toExponential(0) + " Deaths per Capita";
+            return t.toExponential(0)
         }
     }
 
@@ -383,7 +372,6 @@ function forcePack(config){
             .enter()
             .append("circle")
             .attr("class", "node-circle")
-            // .attr("stroke", "#000")
             .attr("stroke-width", "0.5px")
             .attr("id", function(d){
                 return "circle-"+ full2abbrev[d.state]})
@@ -461,7 +449,7 @@ function forcePack(config){
         if (groupSelector == "population"){
             y = yLinearPop
 
-            labels.select("#axis-label")
+            axisLabels.select("#grouping-label")
                 .text("Population (Millions)")
 
             yAxis.scale(y)
@@ -470,7 +458,7 @@ function forcePack(config){
                 .tickPadding(10)
                 .tickFormat(d3.formatPrefix(".1", 1e6))
 
-            labels.call(yAxis)
+            axisLabels.call(yAxis)
             gridlines.call(make_y_gridlines()
                 .tickSize(-(width))
                 .tickFormat("")
@@ -479,50 +467,55 @@ function forcePack(config){
             
         } else if (groupSelector == "region"){
             y = yOrdinalRegion;
-            labels.select("#axis-label").text("Geographic Region of US")
+            axisLabels.select("#grouping-label").text("Geographic Region of US")
 
             yAxis.scale(y)
                 .ticks(5)
                 .tickPadding(10)
                 .tickFormat(null)
 
-            labels.selectAll('path')
+            axisLabels.call(yAxis)
+            gridlines.call(make_y_gridlines()
+                .tickSize(-width)
+                .tickFormat(""))
 
-            labels.call(yAxis)
         } else if (groupSelector == "urban"){
             y = yLinearUrban
             
-            labels.select("#axis-label").text("Percent Urbanization")
+            axisLabels.select("#grouping-label").text("Percent Urbanization")
 
             yAxis.scale(y)
                 .tickPadding(10)
                 .tickFormat(null)
 
-            labels.call(yAxis)
+            axisLabels.call(yAxis)
             gridlines.call(make_y_gridlines()
                 .tickSize(-width)
                 .tickFormat("")
             )
         } else if (groupSelector == "political_aff"){
             y = yOrdinalPol;
-            labels.select("#axis-label").text("Political Affiliation")
+            axisLabels.select("#grouping-label").text("Political Affiliation")
 
             yAxis.scale(y)
                 .ticks(3)
                 .tickPadding(10)
                 .tickFormat(null)
 
-            labels.call(yAxis)
+            axisLabels.call(yAxis)
+            gridlines.call(make_y_gridlines()
+                .tickSize(-width)
+                .tickFormat(""))
         }
         
     }
 
     function format_area(){
         var tmp;
-        if (severitySelector == "cases") tmp = 60;
-        else if (severitySelector == "deaths") tmp = 60;
-        else if (severitySelector == "cases_per_capita") tmp = 45;
-        else if (severitySelector == "deaths_per_capita") tmp = 45;
+        if (severitySelector == "cases")                    tmp = width*0.1;
+        else if (severitySelector == "deaths")              tmp = width*0.1;
+        else if (severitySelector == "cases_per_capita")    tmp = width*0.08;
+        else if (severitySelector == "deaths_per_capita")   tmp = width*0.08;
 
         a.range([0,tmp])
 
@@ -566,6 +559,8 @@ function forcePack(config){
             .transition().duration(250)
             .style("opacity", 1)
 
+        document.body.style.cursor = "pointer"
+
     }
 
     function mousemove(d){
@@ -596,6 +591,7 @@ function forcePack(config){
                 .attr("stroke", "#000")
                 .attr("stroke-width", "0.5px")
         }
+        document.body.style.cursor = "default"
 
     }
 

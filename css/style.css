@@ -42,6 +42,12 @@ display: block;
 	stroke: #fff;
 }
 
+.axis-label{
+	font-size: 2.0rem;
+	fill: #fff;
+	text-anchor: middle;
+}
+
 .axis--grid .domain {
 	fill: #ddd;
 	stroke: none;
@@ -132,11 +138,11 @@ circle-packs {
 } */
 
 
-#axis-label {
+/* #grouping-label {
 	font-size: 2.8rem;
 	fill: #fff;
 	text-anchor: middle;
-}
+} */
 
 .labels text {
 	font-size: 1.4rem;
@@ -190,3 +196,73 @@ circle-packs {
 .select-css option {
 	font-weight:normal;
 }
+
+
+.modal-body {
+	/* background-color: #3b3b3b; */
+}
+
+.modal-title {
+	font-size: 3rem;
+	color: #fff;
+}
+
+.modal-content {
+	background-color: #3b3b3b ;
+	border: 1px solid rgb(155, 155, 155)
+}
+
+.modal-text {
+	font-size: 2rem;
+	color: #fff;
+}
+
+.em-red em{
+	color: #f74a4a ;
+}
+
+.em-green em{
+	color: #52fa52 ;
+}
+
+.em-blue em{
+	color: #4af1f7 ;
+}
+
+.em-yellow em{
+	color: #f74a4a ;
+}
+
+.modal-header {
+	padding: 10px 20px 0px;
+	/* height: 20px; */
+	/* height: 5px;
+	font-size: 2rem;
+	*/
+	/* background-color: #3b3b3b;  */
+	background-color: #2c2c2c;
+	border-radius: 6px 6px 0 0;
+}
+
+.modal-footer {
+	padding: 10px 20px 0px;
+	/* height: 20px; */
+	/* height: 5px;
+	font-size: 2rem;
+	*/
+	/* background-color: #3b3b3b;  */
+	background-color: #2c2c2c;
+	border-radius: 0 0 6px 6px;
+}
+
+
+.close {
+	float: right;
+	font-size: 40px;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff;
+	text-shadow: 0 1px 0 #fff;
+	filter: alpha(opacity=20);
+	opacity: .7;
+	}
