@@ -68,6 +68,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             full2abbrev[vals] = key
     }
 
+    var orders = anno;
     abbrev2full = abbrev;
     tmp = []
     var parseDate = d3.timeParse("%m/%d/%y")
@@ -81,6 +82,8 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
     var ordersByDate = d3.nest()
         .key(function(d){ return d.date; })
         .entries(tmp)
+
+    
     
     annotations = anno
     var request = new XMLHttpRequest()
@@ -138,7 +141,8 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'height':fullHeight * 0.40,
             'width': chartWidth,
             'data': ordersByDate,
-            'marker': tmp
+            'marker': tmp,
+            'raw_orders': orders
         }
 
         var selWidth = parseInt(d3.select("#state-selection").style("width"), 10)
@@ -187,6 +191,13 @@ function update_vis(f){
     bubbles_vis.focus(f);
     legistate_vis.focus(f);
     selector_vis.focus(f);
+}
+
+function update_highlight(state, action){
+    bubbles_vis.highlight(state, action)
+    selector_vis.highlight(state,action)
+    legistate_vis.highlight(state, action)
+    states_vis.highlight(state, action)
 }
 
 function organize_data(){

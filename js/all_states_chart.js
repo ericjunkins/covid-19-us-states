@@ -201,9 +201,9 @@ function states_chart(config){
                 .attr("d", function(d){ return line(d) });
 
         d3.selectAll(".covid-line")
-            .on("mousemove", moved)
-            .on("mouseenter", entered)
-            .on("mouseleave", leave)
+            .on("mousemove", mousemove)
+            .on("mouseenter", mouseover)
+            .on("mouseout", mouseout)
             .on("click", clicked)
     }
     
@@ -281,8 +281,8 @@ function states_chart(config){
         }
     }
 
-    function moved (d){
-        //console.log('moved', d3.event)
+    function mousemove (d){
+        //console.log('mousemove', d3.event)
     }
     
 
@@ -300,6 +300,10 @@ function states_chart(config){
                 .attr("stroke-width", 2.5)
                 .attr("stroke", function(d){ return color(i); })
                 .attr("opacity", 1)
+                .attr("stroke-width", 6.5)
+                .transition().duration(1000)
+                .attr("stroke-width", 2.5)
+
 
             var a = anno[abbrev2full[d]].annotation
             a.color = color(i)
@@ -315,15 +319,17 @@ function states_chart(config){
         update_vis(focus);
     }
 
-    function entered (d,i){
+    function mouseover (d,i){
         document.body.style.cursor = "pointer"
 
-        if (!focus.includes(d[0].state)){
-            d3.select("#path-" + d[0].state)
-                .attr("stroke", "steelblue")
-                .attr("opacity", 1)
-                .attr("stroke-width", 3)
-        }
+        // if (!focus.includes(d[0].state)){
+        //     d3.select("#path-" + d[0].state)
+        //         .attr("stroke", "steelblue")
+        //         .attr("opacity", 1)
+        //         .attr("stroke-width", 3)
+        // }
+        
+        update_highlight(d[0].state, "on")
     }
     
     function clicked(d, i){
@@ -353,14 +359,25 @@ function states_chart(config){
         update_vis(focus);
     }
 
-    function leave (d, i){
-        if (!focus.includes(d[0].state)){
-            d3.select("#path-" + d[0].state)
-                .attr("stroke", "grey")
-                .attr("stroke-width", 0.5)
-                .attr("opacity", 0.20)
+
+    function display_hover(d, action){
+        if (!focus.includes(d)){
+            d3.select("#path-" + d)
+                .attr("stroke", function(){ return (action == "on" ? "steelblue" : "grey"); })
+                .attr("stroke-width", function(){ return (action == "on" ? 3 : 0.5 ); })
+                .attr("opacity", function(){ return (action == "on" ? 1 : 0.5); })
         }
+    }
+
+    function mouseout (d, i){
+        // if (!focus.includes(d[0].state)){
+        //     d3.select("#path-" + d[0].state)
+        //         .attr("stroke", "grey")
+        //         .attr("stroke-width", 0.5)
+        //         .attr("opacity", 0.20)
+        // }
         document.body.style.cursor = "default"
+        update_highlight(d[0].state, "off")
     }
     
     function formatAxes(){
@@ -474,6 +491,13 @@ function states_chart(config){
         formatAxes();
         return statesChart;
     }
+
+    statesChart.highlight = function(value, action){
+        if(!arguments.length) return highlight;
+        highlight = value;
+        display_hover(value, action);
+        return statesChart;
+    }  
 
     return statesChart;
 }

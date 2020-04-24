@@ -607,7 +607,16 @@ function forcePack(config){
             .style("opacity", 1)
 
         document.body.style.cursor = "pointer"
+        update_highlight(full2abbrev[d.state], 'on')
 
+    }
+
+    function display_hover(d, action){
+        if (!focus.includes(d)){
+            d3.select("#circle-" + d)
+                .attr("stroke", function(){ return (action == "on" ? "steelblue" : "#000"); })
+                .attr("stroke-width", function(){ return (action == "on" ? "3px": "0.5px"); })
+        }
     }
 
     function mousemove(d){
@@ -621,11 +630,7 @@ function forcePack(config){
         .style("left", (d3.mouse(this)[0]+ 175) + "px")
         .style("top", (d3.mouse(this)[1]+50) + "px")
 
-        if (!focus.includes(full2abbrev[d.state])){
-            d3.select("#circle-" + full2abbrev[d.state])
-                .attr("stroke", "steelblue")
-                .attr("stroke-width", "3px")
-        }
+
     }
 
     function mouseout(d){
@@ -633,17 +638,17 @@ function forcePack(config){
             .transition().duration(250)
             .style("opacity", 0)
 
-        if (!focus.includes(full2abbrev[d.state])){
-            d3.select("#circle-" + full2abbrev[d.state])
-                .attr("stroke", "#000")
-                .attr("stroke-width", "0.5px")
-        }
+        // if (!focus.includes(full2abbrev[d.state])){
+        //     d3.select("#circle-" + full2abbrev[d.state])
+        //         .attr("stroke", "#000")
+        //         .attr("stroke-width", "0.5px")
+        // }
         document.body.style.cursor = "default"
-
+        update_highlight(full2abbrev[d.state], "off")
     }
 
     function highlight_focus(){
-
+        
         d3.selectAll(".node-circle")
             .attr("stroke", "#000")
             .attr('stroke-width', "0.5")
@@ -654,6 +659,9 @@ function forcePack(config){
                     return color(i)
                 })
                 .attr("stroke-width", "5px")
+                .attr("r", function(d){ return 3 * a(area2radius(d[severitySelector])); })
+                .transition().duration(1000)
+                .attr("r", function(d){ return a(area2radius(d[severitySelector])); })
         })
 
     }
@@ -742,6 +750,13 @@ function forcePack(config){
         highlight_focus();
         return forcePack;
     }
+
+    forcePack.highlight = function(value, action){
+        if(!arguments.length) return highlight;
+        highlight = value;
+        display_hover(value, action);
+        return forcePack;
+    }  
 
     return forcePack;
 }

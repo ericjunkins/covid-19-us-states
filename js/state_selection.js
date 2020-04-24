@@ -149,25 +149,36 @@ function selector(config){
     }
     function mouseover(d){
         document.body.style.cursor = "pointer"
+        update_highlight(d.state, "on")
     }
 
     function mousemove(d){
-        if (!focus.includes(d.state)){
-            d3.select("#sel-rect-" + d.state)
-                .attr("stroke", "steelblue")
-                .attr("stroke-width", "4px")
-                .attr("opacity", 1)
+        // if (!focus.includes(d.state)){
+        //     d3.select("#sel-rect-" + d.state)
+        //         .attr("stroke", "steelblue")
+        //         .attr("stroke-width", "4px")
+        //         .attr("opacity", 1)
+        // }
+    }
+
+    function display_hover(d, action){
+        if (!focus.includes(d)){
+            d3.select("#sel-rect-" + d)
+                .attr("stroke", function(){ return (action == "on" ? "steelblue": "#000"); })
+                .attr("stroke-width", function(){ return (action == "on" ? "3px": "0"); })
+                .attr("opacity", function(){ return (action == "on" ? 1 : 0.2 ); } )
         }
     }
 
     function mouseout(d){
-        if (!focus.includes(d.state)){
-            d3.select("#sel-rect-" + d.state)
-                .attr("stroke-width", "0px")
-                .attr("opacity", 0.20)
+        // if (!focus.includes(d.state)){
+        //     d3.select("#sel-rect-" + d.state)
+        //         .attr("stroke-width", "0px")
+        //         .attr("opacity", 0.20)
                 
-        }
+        // }
         document.body.style.cursor = "default"
+        update_highlight(d.state, "off");
     }
 
     function clicked(d){
@@ -240,6 +251,15 @@ function selector(config){
         highlight_focus();
         return stateSelection;
     }
+
+    
+    stateSelection.highlight = function(value, action){
+        if(!arguments.length) return highlight;
+        highlight = value;
+        display_hover(value, action);
+        return stateSelection;
+    }  
+
     return stateSelection;
 }
 

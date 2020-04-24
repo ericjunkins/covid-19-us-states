@@ -1,10 +1,12 @@
 function legistate_chart(config){
     var margin = { left:120, right:100, top:80, bottom:60 },
         chartData = config.data,
-        markerData = config.marker;
+        markerData = config.marker,
+        raw_orders = config.raw_orders
 
     var focus = [],
-        focus_markers = [];
+        focus_markers = [],
+        data = [];
 
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
@@ -18,12 +20,15 @@ function legistate_chart(config){
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
 
+    var idTimeFormat = d3.timeFormat("%m%d%y")
+                
 
     var dates = d3.timeParse("%m/%d/%y");
     var ext = d3.extent(chartData, function(d){ return d.key; })
     var min_date = dates(ext[0]),
         max_date = dates(ext[1])
-    
+  
+
     Date.prototype.addDays = function(days) {
         var date = new Date(this.valueOf());
         date.setDate(date.getDate() + days);
@@ -173,7 +178,7 @@ function legistate_chart(config){
     }
 
     function draw_chart(){
-        var data = []
+        data = []
 
         dateArrayStrings.forEach(function(d){
             isDate = false;
@@ -189,7 +194,6 @@ function legistate_chart(config){
             })
             if (! isDate ) data.push({ 'date': d, 'count': 0, "order": 0 })
         })
-
 
         var y1_max = d3.max(data, function(d){ 
             return d.count; })
@@ -219,6 +223,7 @@ function legistate_chart(config){
         rects.enter()
             .append('rect')
             .attr("class", "legis-rect")
+            .attr("id", function(d){ return "rect-" + d.date.replace(new RegExp("/", "g"),""); })
             .attr("x", function(d){
                 return x(d.date); })
             .attr("y", function(d){ 
@@ -238,30 +243,50 @@ function legistate_chart(config){
     }
     
     function mouseover(d){
-
+        var statesHovered = chartData.filter(function(v){
+            return v.key == d.date
+        })[0].values
+        statesHovered.forEach(function(v){
+            update_highlight(v.state, "on")
+        })
+        
+        document.body.style.cursor = "pointer"
     }
 
     function mousemove(d){
-        if (!focus.includes(d.state)){
-            d3.select("#rect-" + d.state)
-                .attr("stroke", "steelblue")
-                .attr("stroke-width", "4px")
-                .attr("opacity", 1)
-        }
+
     }
 
     function mouseout(d){
-        if (!focus.includes(d.state)){
-            d3.select("#rect-" + d.state)
-                .attr("stroke-width", "0px")
-                .attr("opacity", 0.20)
-                
+        var statesHovered = chartData.filter(function(v){
+            return v.key == d.date
+        })[0].values
+        statesHovered.forEach(function(v){
+            update_highlight(v.state, "off")
+        })
+        document.body.style.cursor = "default"
+    }
+
+    function display_hover(d, action){
+        var tmp = idTimeFormat(raw_orders[abbrev2full[d]].date)
+        if (!focus.includes(d)){
+            d3.select("#rect-" + tmp)
+                .attr("stroke", function(){ return (action == "on" ? "steelblue" : "#000"); })
+                .attr("stroke-width", function(){ return (action == "on" ? "3px": "0.5px"); })
+                .attr("opacity", function(){ return (action =="on" ? 1 : 0.2)})
         }
     }
 
     function clicked(d){
-        if (focus.includes(d.state)) removeFromFocus(d.state, i)
-        else add2Focus(d.state,i)
+        var statesHovered = chartData.filter(function(v){
+            return v.key == d.date
+        })[0].values
+        statesHovered.forEach(function(v,i){
+            //update_highlight(v.state, "off")
+            if (focus.includes(v.state)) removeFromFocus(v.state, i)
+            else add2Focus(v.state,i)
+        })
+
     }
   
     function add2Focus(d, i){
@@ -279,9 +304,6 @@ function legistate_chart(config){
             const index = focus.indexOf(d);
             focus.splice(index, 1);
         }
-
-        d3.select("#rect-" + d)
-            .attr("stroke-width", "0")
 
         update_vis(focus);
     }
@@ -303,16 +325,32 @@ function legistate_chart(config){
     }
 
     function draw_markers(){
+        
+        console.log(focus_markers)
         var markers = svg.selectAll("circle")
             .data(focus_markers, function(d){ return d.state})
 
+        markers.exit().remove()
+
+        markers.attr("fill", function(d, i){
+            return color(i);
+        })
+
         markers.enter()
             .append("circle")
+            .attr("id", function(d){ return "legis-circ-" + d.state; })
             .attr("cx", function(d){ return x(d.date) + x.bandwidth()/2; })
             .attr("cy", function(d){ return y1band(d.level) + y1band.bandwidth()/2; })
-            .attr("r", 8)
+            
+
+
+            .attr("r", 40)
+            .attr("fill", function(d, i){ return "#fff"; })
+            .transition().duration(1000)
+            .attr("r", 10)
             .attr("fill", function(d, i){
                 return color(i); })
+
     }
 
     legistateChart.width = function(value){
@@ -352,6 +390,14 @@ function legistate_chart(config){
         highlight_focus();
         return legistateChart;
     }
+
+    legistateChart.highlight = function(value, action){
+        if(!arguments.length) return highlight;
+        highlight = value;
+        display_hover(value, action);
+        return legistateChart;
+    }  
+
     return legistateChart;
 }
 
