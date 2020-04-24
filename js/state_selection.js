@@ -3,8 +3,9 @@ function selector(config){
         states_list = config.states_list,
         full2abbrev = config.full2abbrev
 
-    var focus = [];
 
+    var focus = [];
+    var colorFocus = {};
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
     
@@ -82,7 +83,7 @@ function selector(config){
         .padding(0.03)
 
     var color = d3.scaleOrdinal(d3.schemeDark2);
-    
+    var cur_color = 0;
     function stateSelection(){
         draw_chart();
     }
@@ -153,12 +154,7 @@ function selector(config){
     }
 
     function mousemove(d){
-        // if (!focus.includes(d.state)){
-        //     d3.select("#sel-rect-" + d.state)
-        //         .attr("stroke", "steelblue")
-        //         .attr("stroke-width", "4px")
-        //         .attr("opacity", 1)
-        // }
+
     }
 
     function display_hover(d, action){
@@ -171,24 +167,31 @@ function selector(config){
     }
 
     function mouseout(d){
-        // if (!focus.includes(d.state)){
-        //     d3.select("#sel-rect-" + d.state)
-        //         .attr("stroke-width", "0px")
-        //         .attr("opacity", 0.20)
-                
-        // }
         document.body.style.cursor = "default"
         update_highlight(d.state, "off");
     }
 
     function clicked(d){
-        if (focus.includes(d.state)) removeFromFocus(d.state, i)
-        else add2Focus(d.state,i)
+        if (focus.includes(d.state)) update_focus(d.state, "remove")
+        else update_focus(d.state, "add")
     }
   
     function add2Focus(d, i){
-        if (!focus.includes(d)) focus.push(d)
-        update_vis(focus);
+        if (!focus.includes(d)){
+            focus.push(d)
+            d3.select("#sel-rect-" + d)
+                .attr("fill", "#fff")
+                .attr("x", function(d){ return x(d.x) - x.bandwidth()/4; })
+                .attr("width", function(d){ return x.bandwidth()*1.5; })
+                .attr("stroke-width", 0)
+                .attr("opacity", 1)
+                .transition().duration(750)
+                .attr("fill", color(cur_color))
+                .attr("x", function(d){ return x(d.x); })
+                .attr("width", x.bandwidth())
+            cur_color += 1;
+            
+        } 
     }
 
     function removeFromFocus(d, i){
@@ -196,21 +199,25 @@ function selector(config){
             const index = focus.indexOf(d);
             focus.splice(index, 1);
         }
-        update_vis(focus);
+
+        d3.select("#sel-rect-" + d)
+            .attr("opacity", 0.2)
+            .attr("fill", "grey")
+
+        //update_vis(focus);
     }
 
     function highlight_focus(){
-        d3.selectAll(".selection-rect")
-            .attr('stroke-width', "0")
-            .attr("fill", "grey")
-            .attr("opacity", 0.20)
 
         focus.forEach(function(d, i){
             d3.select("#sel-rect-" + d)
+                .transition().duration(1000)
                 .attr("fill", function(d){
                     return color(i)
                 })
-                .attr("opacity", "1")
+                .attr("x", function(d){ return x(d.x); })
+                .attr("width", x.bandwidth())
+                
         })
     }
 
@@ -258,7 +265,14 @@ function selector(config){
         highlight = value;
         display_hover(value, action);
         return stateSelection;
-    }  
+    }
+    
+    stateSelection.addFocus = function(value, action){
+        if(!arguments.length) return addFocus;
+        if (action == "add") add2Focus(value)
+        else if (action == "remove") removeFromFocus(value)
+        return stateSelection;
+    }
 
     return stateSelection;
 }

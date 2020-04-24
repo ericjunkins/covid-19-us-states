@@ -13,7 +13,7 @@ var parseTime = d3.timeParse("%Y%m%d");
 var formatTime = d3.timeFormat("%m/%d/%y");
 var selection_vis;
 var circle_vis;
-
+var ordersByState = [];
 var promises = [
     d3.json("data/abbreviations.json"),
     d3.json("data/stay_at_home.json"),
@@ -104,7 +104,9 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             if(d.death == null){d.death = 0}
             if(d.pending == null){d.pending = 0}
         })
-
+        
+        init_display();
+        console.log(ordersByState)
         let fullHeight = window.innerHeight;
         chartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
         var allStatesConfig = {
@@ -115,7 +117,8 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'anno': anno,
             'abbrev2full': abbrev2full,
             'duration': 250,
-            'selection': '#slip-chart'
+            'selection': '#slip-chart',
+            'orderByState': ordersByState
         }
 
         currentWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
@@ -158,7 +161,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             selHeight = fullHeight * 0.1
             rows = 2
         } 
-        console.log('selHeight', selHeight)
+
         var selectionConfig = {
             'height':selHeight,
             'width': selWidth,
@@ -174,7 +177,6 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         legistate_vis = legistate_chart(legistateConfig)
         selector_vis = selector(selectionConfig);
         bubbles_vis();
-        init_display();
         legistate_vis();
         states_vis();
         selector_vis();
@@ -187,10 +189,17 @@ function init_display(){
 }
 
 function update_vis(f){
-    states_vis.focus(f);
-    bubbles_vis.focus(f);
-    legistate_vis.focus(f);
-    selector_vis.focus(f);
+    // states_vis.focus(f);
+    // bubbles_vis.focus(f);
+    // legistate_vis.focus(f);
+    //selector_vis.focus(f);
+}
+
+function update_focus(state, action){
+    selector_vis.addFocus(state, action);
+    bubbles_vis.addFocus(state, action);
+    states_vis.addFocus(state, action);
+    legistate_vis.addFocus(state, action);
 }
 
 function update_highlight(state, action){
@@ -209,8 +218,10 @@ function organize_data(){
         return d.date;
     })
 
-    var x = states_vis.x(),
-        y = states_vis.y()
+    // var x = states_vis.x(),
+    //     y = states_vis.y()
+
+    
     const entries = Object.entries(data_by_states);
     for (const [key, vals] of entries){
         var window = []
@@ -222,8 +233,18 @@ function organize_data(){
             }
             var total = (window.length == 1 ? window[0] : d3.sum(window))
             data_by_states[key][i]['binnedPositiveIncrease'] = total
+
+
             if (annotations[abbrev2full[key]].date != null){
                 if (vals[i].date.getTime() == annotations[abbrev2full[key]].date.getTime()){
+                    ordersByState.push({
+                        'state': key,
+                        'binnedPositiveIncrease': vals[i].binnedPositiveIncrease,
+                        'positive': vals[i].positive,
+                        'orders' : { 
+                                    '0' : vals[i].date
+                                }
+                    })
                     annotations[abbrev2full[key]]['binnedPositiveIncrease'] = vals[i].binnedPositiveIncrease
                     annotations[abbrev2full[key]]['positive'] = vals[i].positive
                     annotations[abbrev2full[key]]['annotation'] = {
@@ -236,8 +257,8 @@ function organize_data(){
                             'endScale': 10
                         },
                         'disable': [],
-                        'x': x(vals[i].positive),
-                        'y': y(vals[i].binnedPositiveIncrease),
+                        // 'x': x(vals[i].positive),
+                        // 'y': y(vals[i].binnedPositiveIncrease),
                         'dy': 0,
                         'dx': 0
                     }
@@ -279,8 +300,8 @@ function organize_data(){
             },
 
             'disable': ["subject", "connector"],
-            'x': x(1),
-            'y': y(1),
+            // 'x': x(1),
+            // 'y': y(1),
             'dy': 0,
             'dx': 30
         }

@@ -2,8 +2,8 @@ function states_chart(config){
     var margin = { left:120, right:100, top:100, bottom:60 }
     let data_list;
     var anno = config.anno;
-    var abbrev2full = config.abbrev2full;
-
+    var abbrev2full = config.abbrev2full,
+        ordersList = config.orderByState;
     
     var focus = [],
         axesSelector = "log";
@@ -19,6 +19,8 @@ function states_chart(config){
             .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
+    var orderGroup = svg.append("g")
+        .attr("class", "all-orders")
     
     var xLog = d3.scaleLog()
         .domain([1, 1000000])
@@ -72,6 +74,7 @@ function states_chart(config){
     }
 
     var color = d3.scaleOrdinal(d3.schemeDark2);
+    var cur_color = 0;
     
     // var x_axis = d3.axisBottom(x).ticks(10, ",.1d")
     // var y_axis = d3.axisLeft(y).ticks(8, ",.1d")
@@ -141,24 +144,6 @@ function states_chart(config){
         //.curve(d3.curveBasis)
         .curve(d3.curveCardinal.tension(0.5))
     
-    var makeAnnotations = d3.annotation()
-        .type(d3.annotationLabel)
-    
-    var line_annotations = d3.annotation()
-        .type(d3.annotationLabel)
-    
-    d3.select("svg")
-        .append("g")
-            .attr("class", "annotation-group")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .call(makeAnnotations)
-    d3.select("svg")
-        .append("g")
-            .attr("class", "line-labels")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .call(line_annotations)
-    
-
     function statesChart(){
         draw_chart();
     }
@@ -166,10 +151,6 @@ function states_chart(config){
     function draw_chart(data){
         get_lines_data();
         formatAxes();
-        //draw_paths()
-        //draw_stay_home_dots();
-        //draw_leading_dots();
-        //draw_annotations(line_labels, 'line');
     }
     
     function draw_paths(){
@@ -207,33 +188,21 @@ function states_chart(config){
             .on("click", clicked)
     }
     
-    function draw_stay_home_dots(){
-        dot = dots.selectAll("circle")
-            .data(stayHomeDots, function(d){ return d.state})
-    
-        dot.exit().remove()
-    
-        dot
-            .style('fill', function(d,i){ return colors[d.state]; })
-            .attr("opacity", 1)
-            .attr('cx', function(d){ return x((d.x == 0 ? 1 : d.x))})
-            .attr("cy", function(d){ return y((d.y == 0 ? 1 : d.y))})
-            .attr("r", 8.5)
-    
-        dot.enter()
-            .append("circle")
-            .attr("class", "stayHomeDot")
-            .attr("id", "stayHome-" + d.state)
-            .attr("opacity", 1)
-            .style('fill', function(d,i){ return colors[d.state]; })
-            .attr('cx', function(d){ return x((d.x == 0 ? 1 : d.x))})
-            .attr("cy", function(d){ return y((d.y == 0 ? 1 : d.y))})
-            .attr("r",40)
-            .transition().duration(750)
-                .attr("r", 8.5)
+    function draw_orders(){
+        orders = orderGroup.selectAll("circle")
+            .data(ordersList)
+
+        orders.enter()
+            .append('circle')
+            .attr("class", "order-circle")
+            .attr("id", function(d){ return "order-circ-" + d.state; })
+            .attr("fill", "#fff")
+            .attr('r', 12)
+            .attr("cx", function(d){ return x(d.positive); })
+            .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
+            .attr("opacity", 0)
+
     }
-
-
     
     function get_lines_data(){
         data_list = []
@@ -269,76 +238,46 @@ function states_chart(config){
         yLinear.domain([0, maxY])
     }
 
-    function draw_annotations(anno, type){
-        if (type == 'line'){
-            line_annotations
-                .type(d3.annotationLabel)
-                .annotations(anno)
-        } else  if (type == 'dot'){
-            makeAnnotations
-                .type(d3.annotationCallout)
-                .annotations(anno)
-        }
-    }
-
     function mousemove (d){
         //console.log('mousemove', d3.event)
     }
     
-
-    function highlight_focus(){
-        var tmp = []
-
-        d3.selectAll(".covid-line")
-            .attr("opacity", 0.5)
-            .attr("stroke-width", 0.5)
-            .attr("stroke", "grey")
-            .attr("opacity", 0.20)
-
-        focus.forEach(function(d, i){
-            d3.select("#path-" + d)
-                .attr("stroke-width", 2.5)
-                .attr("stroke", function(d){ return color(i); })
-                .attr("opacity", 1)
-                .attr("stroke-width", 6.5)
-                .transition().duration(1000)
-                .attr("stroke-width", 2.5)
-
-
-            var a = anno[abbrev2full[d]].annotation
-            a.color = color(i)
-            a.disable = ['note']
-            tmp.push(a)
-        })
-        draw_annotations(tmp, 'dot')
-    }
-
     function add2Focus(d, i){
-        if (!focus.includes(d)) focus.push(d)
+        if (!focus.includes(d)){
+            focus.push(d)
+            d3.select("#path-" + d)
+                .attr("stroke", "#fff")
+                .attr("opacity", 1)
+                .attr("stroke-width", 8.5)
+                .transition().duration(750)
+                .attr("stroke-width", 2.5)
+                .attr("stroke", color(cur_color))
+
+            d3.select("#order-circ-" + d)
+                .attr("opacity", 1)
+                .attr("r", 30)
+                .attr("fill", "#fff")
+                .transition().duration(750)
+                .attr("fill", color(cur_color))
+                .attr("r", 12)
+
+            cur_color += 1;
+        } 
         //highlight_focus();
-        update_vis(focus);
+        //update_vis(focus);
     }
 
     function mouseover (d,i){
         document.body.style.cursor = "pointer"
-
-        // if (!focus.includes(d[0].state)){
-        //     d3.select("#path-" + d[0].state)
-        //         .attr("stroke", "steelblue")
-        //         .attr("opacity", 1)
-        //         .attr("stroke-width", 3)
-        // }
-        
         update_highlight(d[0].state, "on")
     }
     
     function clicked(d, i){
-        if (focus.includes(d[0].state)) removeFromFocus(d[0].state, i)
-        else add2Focus(d[0].state,i)
+        if (focus.includes(d[0].state)) update_highlight(d[0].state, "remove")
+        else update_highlight(d[0].state, "add")
     }
 
     function removeFromFocus(d, i){
-        var tmp = [];
         if (focus.includes(d)){
             const index = focus.indexOf(d);
             focus.splice(index, 1);
@@ -349,14 +288,9 @@ function states_chart(config){
             .attr("stroke-width", 0.5)
             .attr("opacity", 0.20)
 
+        d3.select("#order-circ-" + d)
+            .attr("opacity", 0)
 
-        focus.forEach(function(d){
-            var a = anno[abbrev2full[d]].annotation
-            a.color = 'yellow'
-            tmp.push(a)
-        })
-        draw_annotations(tmp, 'dot')
-        update_vis(focus);
     }
 
 
@@ -366,16 +300,15 @@ function states_chart(config){
                 .attr("stroke", function(){ return (action == "on" ? "steelblue" : "grey"); })
                 .attr("stroke-width", function(){ return (action == "on" ? 3 : 0.5 ); })
                 .attr("opacity", function(){ return (action == "on" ? 1 : 0.5); })
+
+            d3.select("#order-circ-" + d)
+                .attr("fill", function(){ return (action == "on" ? "steelblue" : "grey"); })
+                .attr("opacity", function(){ return (action == "on" ? 1 : 0); })
         }
     }
 
     function mouseout (d, i){
-        // if (!focus.includes(d[0].state)){
-        //     d3.select("#path-" + d[0].state)
-        //         .attr("stroke", "grey")
-        //         .attr("stroke-width", 0.5)
-        //         .attr("opacity", 0.20)
-        // }
+
         document.body.style.cursor = "default"
         update_highlight(d[0].state, "off")
     }
@@ -406,6 +339,7 @@ function states_chart(config){
 
         }
         draw_paths();
+        draw_orders();
     }
 
     statesChart.width = function(value){
@@ -487,7 +421,6 @@ function states_chart(config){
     statesChart.axesSelector = function(value){
         if(!arguments.length) return axesSelector;
         axesSelector = value;
-        console.log("changing axes")
         formatAxes();
         return statesChart;
     }
@@ -498,6 +431,13 @@ function states_chart(config){
         display_hover(value, action);
         return statesChart;
     }  
+
+    statesChart.addFocus = function(value, action){
+        if(!arguments.length) return addFocus;
+        if (action == "add") add2Focus(value)
+        else if (action == "remove") removeFromFocus(value)
+        return statesChart;
+    }
 
     return statesChart;
 }

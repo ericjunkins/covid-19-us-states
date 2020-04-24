@@ -45,14 +45,14 @@ function forcePack(config){
         .attr('class', "axes")
 
     var color = d3.scaleOrdinal(d3.schemeDark2);
-
+    var cur_color = 0;
     svg.append('text')
         .attr("class", "title-text")
         .attr("transform", "translate(" + (width /2) + "," + 0 + ")")
         .attr("x", 0)
         .attr("y", -15)
         .attr("text-anchor", "middle")
-        .text("States Codid-19 Severity")
+        .text("States Covid-19 Severity")
 
 
     var today = new Date();
@@ -487,8 +487,6 @@ function forcePack(config){
             .attr("font-size", "1.3rem")
             .text(function(d){ return d.text})
 
-            
-        highlight_focus();
 
     }
 
@@ -647,34 +645,24 @@ function forcePack(config){
         update_highlight(full2abbrev[d.state], "off")
     }
 
-    function highlight_focus(){
-        
-        d3.selectAll(".node-circle")
-            .attr("stroke", "#000")
-            .attr('stroke-width', "0.5")
-
-        focus.forEach(function(d, i){
-            d3.select("#circle-" + d)
-                .attr("stroke", function(d){
-                    return color(i)
-                })
-                .attr("stroke-width", "5px")
-                .attr("r", function(d){ return 3 * a(area2radius(d[severitySelector])); })
-                .transition().duration(1000)
-                .attr("r", function(d){ return a(area2radius(d[severitySelector])); })
-        })
-
-    }
 
     function add2Focus(d, i){
-        if (!focus.includes(d)) focus.push(d)
-        // highlight_focus();
-        update_vis(focus);
+        if (!focus.includes(d)){
+            focus.push(d)
+            d3.select("#circle-" + d)
+                .attr("stroke-width", 5)
+                .attr("r", function(d){ return 1.5 * a.range()[1]; })
+                .attr("stroke", function(d){ return "#fff"})
+                .transition().duration(1000)
+                .attr("r", function(d){ return a(area2radius(d[severitySelector])); })
+                .attr("stroke", color(cur_color))
+            cur_color += 1;
+        } 
     }
     
     function clicked(d, i){
-        if (focus.includes(full2abbrev[d.state])) removeFromFocus(full2abbrev[d.state], i)
-        else add2Focus(full2abbrev[d.state],i)
+        if (focus.includes(full2abbrev[d.state])) update_focus(full2abbrev[d.state], "remove")
+        else update_focus(full2abbrev[d.state], "add")
     }
 
     function removeFromFocus(d, i){
@@ -747,7 +735,6 @@ function forcePack(config){
     forcePack.focus = function(value){
         if(!arguments.length) return focus;
         focus = value;
-        highlight_focus();
         return forcePack;
     }
 
@@ -757,6 +744,14 @@ function forcePack(config){
         display_hover(value, action);
         return forcePack;
     }  
+
+    forcePack.addFocus = function(value, action){
+        if(!arguments.length) return addFocus;
+        if (action == "add") add2Focus(value)
+        else if (action == "remove") removeFromFocus(value)
+        return forcePack;
+    }
+
 
     return forcePack;
 }

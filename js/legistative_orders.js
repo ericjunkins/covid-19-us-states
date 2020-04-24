@@ -29,6 +29,9 @@ function legistate_chart(config){
         max_date = dates(ext[1])
   
 
+    // console.log(chartData)
+    // console.log(markerData)
+
     Date.prototype.addDays = function(days) {
         var date = new Date(this.valueOf());
         date.setDate(date.getDate() + days);
@@ -116,6 +119,7 @@ function legistate_chart(config){
     }
         
     var color = d3.scaleOrdinal(d3.schemeDark2);
+    var cur_color = 0;
     
     var x_axis = d3.axisBottom(x)
         .tickValues(x.domain().filter(function(d,i){ return !(i%2)}))
@@ -226,19 +230,46 @@ function legistate_chart(config){
             .attr("id", function(d){ return "rect-" + d.date.replace(new RegExp("/", "g"),""); })
             .attr("x", function(d){
                 return x(d.date); })
-            .attr("y", function(d){ 
-                var s = (d.order == 0 ? y1 : y2)
-                return s(d.count); })
             .attr("width", w)
-            .attr("height", function(d){ 
-                var s = (d.order == 0 ? y1 : y2)
-                return s(0) - s(d.count); })
+
             .attr("fill", "grey")
             .attr("opacity", 0.20)
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseout", mouseout)
                 .on("click", clicked)
+
+            .attr("y", y1(0))
+            .attr("height", 0)
+            .transition().duration(1000)
+            .attr("y", function(d){ 
+                var s = (d.order == 0 ? y1 : y2)
+                return s(d.count); })
+            .attr("height", function(d){ 
+                var s = (d.order == 0 ? y1 : y2)
+                return s(0) - s(d.count); })
+
+        var focus_markers = []
+        markerData.forEach(function(d){
+            var collisions = focus_markers.filter(function(v){
+                return v.date == d.date; })
+            d.level = String(collisions.length)
+            focus_markers.push(d)
+        })
+
+        var circles = svg.selectAll("circle")
+            .data(focus_markers)
+
+        circles.enter()
+            .append("circle")
+            .attr("class", "legis-lockdown-circ")
+            .attr("id", function(d){ return "legis-circ-" + d.state; })
+            .attr("cx", function(d){ return x(d.date) + x.bandwidth()/2; })
+            .attr("cy", function(d){ return y1band(d.level) + y1band.bandwidth()/2; })
+            .attr("r", 10)
+            .attr("opacity", 0)
+            .style("visibility", "hidden")
+
 
     }
     
@@ -269,12 +300,12 @@ function legistate_chart(config){
 
     function display_hover(d, action){
         var tmp = idTimeFormat(raw_orders[abbrev2full[d]].date)
-        if (!focus.includes(d)){
-            d3.select("#rect-" + tmp)
-                .attr("stroke", function(){ return (action == "on" ? "steelblue" : "#000"); })
-                .attr("stroke-width", function(){ return (action == "on" ? "3px": "0.5px"); })
-                .attr("opacity", function(){ return (action =="on" ? 1 : 0.2)})
-        }
+        
+        d3.select("#rect-" + tmp)
+            .attr("stroke", function(){ return (action == "on" ? "steelblue" : "#000"); })
+            .attr("stroke-width", function(){ return (action == "on" ? "3px": "0.5px"); })
+            .attr("opacity", function(){ return (action =="on" ? 1 : 0.2)})
+        
     }
 
     function clicked(d){
@@ -282,21 +313,27 @@ function legistate_chart(config){
             return v.key == d.date
         })[0].values
         statesHovered.forEach(function(v,i){
-            //update_highlight(v.state, "off")
-            if (focus.includes(v.state)) removeFromFocus(v.state, i)
-            else add2Focus(v.state,i)
+            if (focus.includes(v.state)) update_focus(v.state, "remove")
+            else update_focus(v.state, 'add')
         })
 
     }
   
     function add2Focus(d, i){
         if (!focus.includes(d)){
-            var dates = focus.map(function(d){
-                return d.date
-            })
             focus.push(d)
+            d3.select("#legis-circ-" + d)
+                .attr("r", 20)
+                .attr("opacity", 1)
+                .attr("fill", "#fff")
+                .transition().duration(1000)
+                .attr("r", 10)
+                .attr("fill", color(cur_color))
+                
+                .style("visibility", "visible")
+
         }
-        update_vis(focus);
+        cur_color += 1;
     }
 
     function removeFromFocus(d, i){
@@ -304,36 +341,37 @@ function legistate_chart(config){
             const index = focus.indexOf(d);
             focus.splice(index, 1);
         }
-
-        update_vis(focus);
+        
+        d3.select("#legis-circ-" + d)
+            .attr("opacity", 0)
     }
 
     function highlight_focus(){
-        var dates = [];
+
+        draw_markers();
+    }
+
+    function draw_markers(){
         focus_markers = [];
         focus.forEach(function(d){
             markerData.forEach(function(v){
                 if (v.state == d){
                     var collisions = focus_markers.filter(function(k){ return k.date == v.date}).length
                     v.level = String(collisions)                   
+                    v.color = cur_color;
                     focus_markers.push(v)
+                    cur_color += 1;
                 }
             })
-            
         })
-        draw_markers();
-    }
 
-    function draw_markers(){
-        
-        console.log(focus_markers)
         var markers = svg.selectAll("circle")
             .data(focus_markers, function(d){ return d.state})
 
         markers.exit().remove()
 
         markers.attr("fill", function(d, i){
-            return color(i);
+            return color(d.color);
         })
 
         markers.enter()
@@ -341,16 +379,14 @@ function legistate_chart(config){
             .attr("id", function(d){ return "legis-circ-" + d.state; })
             .attr("cx", function(d){ return x(d.date) + x.bandwidth()/2; })
             .attr("cy", function(d){ return y1band(d.level) + y1band.bandwidth()/2; })
-            
-
 
             .attr("r", 40)
             .attr("fill", function(d, i){ return "#fff"; })
             .transition().duration(1000)
             .attr("r", 10)
             .attr("fill", function(d, i){
-                return color(i); })
-
+                return color(d.color); })
+        
     }
 
     legistateChart.width = function(value){
@@ -397,6 +433,13 @@ function legistate_chart(config){
         display_hover(value, action);
         return legistateChart;
     }  
+
+    legistateChart.addFocus = function(value, action){
+        if(!arguments.length) return addFocus;
+        if (action == "add") add2Focus(value)
+        else if (action == "remove") removeFromFocus(value)
+        return legistateChart;
+    }
 
     return legistateChart;
 }
