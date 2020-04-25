@@ -106,11 +106,14 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         })
         
         init_display();
-        console.log(ordersByState)
         let fullHeight = window.innerHeight;
+        var leftRowHeight = fullHeight * 0.71
+        var row1Height = fullHeight *0.39
+        var row2Height = fullHeight *0.295
+
         chartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
         var allStatesConfig = {
-            'height':fullHeight * 0.44,
+            'height': row1Height,
             'width': chartWidth,
             'parseDate': parseDate,
             'state_data': states_time_data,
@@ -122,10 +125,10 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         }
 
         currentWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
-        var forcePackWidth = currentWidth * 0.9
+        var forcePackWidth = currentWidth * 0.95
 
         var bubblesConfig = {
-            'height':fullHeight * 0.8,
+            'height':leftRowHeight,
             'width': forcePackWidth,
             'anno': anno,
             'regions': regions, 
@@ -140,8 +143,10 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'political_aff': pol
         }
 
+
+
         var legistateConfig = {
-            'height':fullHeight * 0.40,
+            'height': row2Height,
             'width': chartWidth,
             'data': ordersByDate,
             'marker': tmp,
@@ -158,7 +163,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             rows = 3
         }
         else{
-            selHeight = fullHeight * 0.1
+            selHeight = fullHeight * 0.09
             rows = 2
         } 
 
@@ -176,6 +181,22 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         bubbles_vis = forcePack(bubblesConfig);
         legistate_vis = legistate_chart(legistateConfig)
         selector_vis = selector(selectionConfig);
+
+
+        var placeHolder1Config = {
+            'height':row1Height,
+            'width': parseInt(d3.select("#placeholder1").style("width"), 10),
+            'selection': '#placeholder1'
+        }
+
+        var placeHolder2Config = {
+            'height': row2Height,
+            'width': parseInt(d3.select("#placeholder2").style("width"), 10),
+            'selection': '#placeholder2'
+        }
+
+        placeHolder1_vis = placeholder_chart(placeHolder1Config)
+        placeHolder2_vis = placeholder_chart(placeHolder2Config)
         bubbles_vis();
         legistate_vis();
         states_vis();
@@ -312,4 +333,4 @@ function organize_data(){
 function selection_init(){
     selection_vis.states(d3.keys(data_by_states))
     selection_vis();
-}
+} 

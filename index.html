@@ -10,8 +10,10 @@
         <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
         <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
         <!-- Custom CSS -->
-        <link rel="stylesheet" href="css/style.css">        
+        <link rel="stylesheet" href="css/style.css">   
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 
@@ -20,7 +22,7 @@
     <!-- Bootstrap grid setup -->
     <section id="title">
         <div class="container-fluid">
-            <h1 style="margin-bottom: 0px;" class="title_text">Coronavirus COVID-19 US States Data </h1>
+            <h1 style="margin-bottom: 15px; margin-top: 5px" class="title_text">Coronavirus COVID-19 US States Data </h1>
         </div>
     </section>
     <section id="time-graph">
@@ -28,72 +30,116 @@
         <!--<div class="row" style="height: 100px;">-->
         <div class="row">
             <div class="col-sm-12">
-                <div id="state-selection"></div>
+                <div class = "bounding" style="background-color: rgb(34, 34, 34)">
+                    <div id="state-selection"></div>
+                </div>
             </div>
         </div>
 
         <!--<div class="row" style="height: 1250px;">-->
-        <div class="row">
-            <div class="col-lg-4" id="bubbles-area">
-                <div class="">
+        <div class="row" style="margin-top: 30px;" >
+            <div class="col-lg-3" id="bubbles-area">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                        <h2 class="section-title"> State Severity </h2>
+                        <a class="btn" id="bubbles-help">
+                            <i class="fa fa-question-circle help-button" id ="bubbles-help-icon" style="font-size: 2.3rem;"></i>
+                        </a>
+                        <!-- Severity Filtering Buttons -->
+                        <div class ="row" style="text-align: center; padding:0 20px 15px;">
+                            <div class="col-sm-4">
+                                <h5> Severity (radius) </h5>
+                                <select class="select-css" id="severity-select">
+                                    <option value="cases">Total Cases</option>
+                                    <option value="cases_per_capita">Cases Per Capita</option>
+                                    <option value="deaths">Total Deaths</option>
+                                    <option value="deaths_per_capita">Deaths per Capita</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <h5> Grouping (y-axis)</h5>
+                                <select class="select-css" id="group-select">
+                                    <option value="population">Population</option>
+                                    <option value="region">Region</option>
+                                    <option value="urban">Percent Urban</option>
+                                    <option value="political_aff">Political</option>
+                                    
+                                </select>
+                            </div>
+                            <div class="col-sm-4" >     
+                                <h5> Time (color) </h5>                       
+                                <select class="select-css" id="color-select">
+                                    <option value="state_hundred">States's 100th Case</option>
+                                    <option value="us_hundred_case">US 100th Case</option>
+                                    <option value="us_first_case">US 1st Case</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class = "row" >
                         <div id="northwest-region"></div>
                     </div>
-                    <div class ="row" style="text-align: center">
-                        
-                        <div class="col-sm-3" style="margin-left: 15%;">
-                            <h4> Severity (radius) </h4>
-                            <select class="select-css" id="severity-select">
-                                <option value="cases">Total Cases</option>
-                                <option value="cases_per_capita">Cases Per Capita</option>
-                                <option value="deaths">Total Deaths</option>
-                                <option value="deaths_per_capita">Deaths per Capita</option>
-                            </select>
+
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="row" style="padding: 0">
+                    <div class="col-lg-12">
+                        <div class="bounding">
+                            <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                                <h2 class="section-title"> Covid-19 Trajectory </h2>
+                                    <a class="btn" id="chart-help">
+                                        <i class="fa fa-question-circle help-button" id ="chart-help-icon" style="font-size: 2.3rem;"></i>
+                                    </a>
+                            </div>
+                            <div id="chart-area"></div>
                         </div>
-                        <div class="col-sm-3">
-                            <h4> Grouping (y-axis)</h4>
-                            <select class="select-css" id="group-select">
-                                <option value="population">Population</option>
-                                <option value="region">Region</option>
-                                <option value="urban">Percent Urban</option>
-                                <option value="political_aff">Political</option>
-                                
-                            </select>
-                        </div>
-                        <div class="col-sm-3" >     
-                            <h4> Time (color) </h4>                       
-                            <select class="select-css" id="color-select">
-                                <option value="state_hundred">States's 100th Case</option>
-                                <option value="us_hundred_case">US 100th Case</option>
-                                <option value="us_first_case">US 1st Case</option>
-                            </select>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 30px;">
+                    <div class="col-lg-12">
+                        <div class="bounding">
+                            <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                                <h2 class="section-title"> State-Issued Orders </h2>
+                                    <a class="btn" id="orders-help">
+                                        <i class="fa fa-question-circle help-button" id ="orders-help-icon" style="font-size: 2.3rem;"></i>
+                                    </a>
+                            </div>
+                            <div id="legis-chart"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-8">
-                <div class="row">   
-                    <div class="col-sm-4" style="position: relative; left: 20%;">
-                        <!--
-                        <h4> Axes Selection </h4>
-                            <select class="select-css" id="axes-select">
-                                <option value="log">Logarithmic</option>
-                                <option value="linear">Linear</option>
-                            </select>
-                            -->
+
+            <div class="col-lg-2">
+                <div class="row" style="padding: 0">
+                    <div class="col-lg-12">
+                        <div class="bounding">
+                            <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                                <h2 class="section-title"> Placeholder 1 </h2>
+                                    <a class="btn" id="ph1-help">
+                                        <i class="fa fa-question-circle help-button" id ="ph1-help-icon" style="font-size: 2.3rem;"></i>
+                                    </a>
+                            </div>
+                            <div id="placeholder1"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" style="margin-top: 30px;">
                     <div class="col-lg-12">
-                        <div id="chart-area"></div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div id="legis-chart"></div>
+                        <div class="bounding">
+                            <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                                <h2 class="section-title"> Placeholder 2 </h2>
+                                    <a class="btn" id="ph2-help">
+                                        <i class="fa fa-question-circle help-button" id ="ph2-help-icon" style="font-size: 2.3rem;"></i>
+                                    </a>
+                            </div>
+                            <div id="placeholder2"></div>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <div id="div_template"></div>
@@ -298,6 +344,7 @@
     <script src="js/state_selection.js"></script>
     <script src="js/forcePack.js"></script>
     <script src="js/legistative_orders.js"></script>
+    <script src="js/placeholder.js"></script>
     <script src="js/main.js"></script>
     
 </body>

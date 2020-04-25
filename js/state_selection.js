@@ -1,5 +1,5 @@
 function selector(config){
-    var margin = { left:20, right:20, top:35, bottom:0 },
+    var margin = { left:10, right:50, top:10, bottom:10 },
         states_list = config.states_list,
         full2abbrev = config.full2abbrev
 
@@ -22,7 +22,7 @@ function selector(config){
 
     var icons_loc = svg.append("g")
         .attr("class", "states-icons")
-        .attr("transform", "translate(" + (width - 5) + ",-15)")
+        .attr("transform", "translate(" + (width + margin.right*0.5) + ",25)")
     
     icons_loc.append("text")
         .attr("font-family", "FontAwesome")
@@ -31,6 +31,7 @@ function selector(config){
         .attr("y", 0)
         .attr("text-anchor", "middle")
         .attr("fill", "lightsteelblue")
+        .attr("text-anchor", "middle")
         .attr("opacity", 0.5)
         .text("\uf059")
         .on("click", helpIconClick)

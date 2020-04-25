@@ -1,5 +1,5 @@
 function legistate_chart(config){
-    var margin = { left:120, right:100, top:80, bottom:60 },
+    var margin = { left:120, right:60, top:30, bottom:80 }
         chartData = config.data,
         markerData = config.marker,
         raw_orders = config.raw_orders
@@ -37,13 +37,6 @@ function legistate_chart(config){
         date.setDate(date.getDate() + days);
         return date;
     }
-    
-    svg.append('text')
-        .attr("class", "title-text")
-        .attr("transform", "translate(" + (width * 0.15) + "," + 0 + ")")
-        .attr("x", 0)
-        .attr("y", -15)
-        .text("Legislative Orders")
 
     var today = new Date();
 
@@ -84,45 +77,23 @@ function legistate_chart(config){
         .domain([0,1])
         .range([height/2 - height * 0.05, 0])
 
-
-    var icons_loc = svg.append("g")
-        .attr("class", "states-icons")
-        .attr("transform", "translate(" + (width - 5) + ",0)")
-    
-    icons_loc.append("text")
-        .attr("font-family", "FontAwesome")
-        .attr("font-size", "3rem")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("text-anchor", "middle")
-        .attr("fill", "lightsteelblue")
-        .attr("opacity", 0.5)
-        .text("\uf059")
-        .on("click", helpIconClick)
-        .on("mouseover", helpIconHover)
-        .on("mouseout", helpIconLeave)
-
-    function helpIconClick(d){
-        $("#legisModal").modal();
-    }
-
-    function helpIconHover(d){
-        document.body.style.cursor = "pointer"
-        d3.select(this).attr("fill", "#d1d134")
-            .attr("opacity", 1)
-    }
-
-    function helpIconLeave(d){
-        d3.select(this).attr("fill", "lightsteelblue")
-            .attr("opacity", 0.5)
-            document.body.style.cursor = "default"
-    }
+    $("#orders-help")
+        .click(function(){
+            $("#legisModal").modal();
+        })
+        .mouseover(function(){
+            $("#orders-help-icon").css("color", "yellow").css("opacity", 1)
+        })
+        .mouseout(function(){
+            $("#orders-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
+        })
         
     var color = d3.scaleOrdinal(d3.schemeDark2);
     var cur_color = 0;
     
     var x_axis = d3.axisBottom(x)
-        .tickValues(x.domain().filter(function(d,i){ return !(i%2)}))
+        .tickValues(x.domain().filter(function(d,i){ return !(i%7)}))
+        // .ticks(4)
         .tickPadding(10)
     var x_axis2 = d3.axisBottom(x).tickValues(x.domain().filter(function(d,i){ return }));
     var legis_y_axis = d3.axisLeft()
@@ -214,10 +185,10 @@ function legistate_chart(config){
 
         
 
-        legis_y_axis.scale(y1).ticks(6)
+        legis_y_axis.scale(y1).ticks(5)
         legisYaxisCall1.call(legis_y_axis);
 
-        legis_y_axis2.scale(y2).ticks(6)
+        legis_y_axis2.scale(y2).ticks(5)
         legisYaxisCall2.call(legis_y_axis2);
 
         var rects = svg.selectAll("rect")

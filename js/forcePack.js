@@ -1,5 +1,5 @@
 function forcePack(config){
-    var margin = { left:160, right:20, top:100, bottom:120 }
+    var margin = { left:140, right:10, top:20, bottom:120 }
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right,
         selection = config.selection,
@@ -32,7 +32,7 @@ function forcePack(config){
             .attr("width", width + margin.right + margin.left)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                .attr("transform", "translate(" + (0 + margin.left) + "," + margin.top + ")")
 
     var axisLabels = svg.append("g")
         .attr("class", "axis-labels")
@@ -46,50 +46,29 @@ function forcePack(config){
 
     var color = d3.scaleOrdinal(d3.schemeDark2);
     var cur_color = 0;
-    svg.append('text')
-        .attr("class", "title-text")
-        .attr("transform", "translate(" + (width /2) + "," + 0 + ")")
-        .attr("x", 0)
-        .attr("y", -15)
-        .attr("text-anchor", "middle")
-        .text("States Covid-19 Severity")
+    // svg.append('text')
+    //     .attr("class", "title-text")
+    //     .attr("transform", "translate(" + (width /2) + "," + 0 + ")")
+    //     .attr("x", 0)
+    //     .attr("y", -15)
+    //     .attr("text-anchor", "middle")
+    //     .text("States Covid-19 Severity")
 
 
     var today = new Date();
     var radius_max = width * 0.1
- 
-    var icons_loc = svg.append("g")
-        .attr("class", "states-icons")
-        .attr("transform", "translate(" + (width - 5) + ",-15)")
-    
-    icons_loc.append("text")
-        .attr("font-family", "FontAwesome")
-        .attr("font-size", "3rem")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("text-anchor", "middle")
-        .attr("fill", "lightsteelblue")
-        .attr("opacity", 0.5)
-        .text("\uf059")
-        .on("click", helpIconClick)
-        .on("mouseover", helpIconHover)
-        .on("mouseout", helpIconLeave)
 
-    function helpIconClick(d){
-        $("#bubblesModal").modal();
-    }
 
-    function helpIconHover(d){
-        document.body.style.cursor = "pointer"
-        d3.select(this).attr("fill", "#d1d134")
-            .attr("opacity", 1)
-    }
-
-    function helpIconLeave(d){
-        d3.select(this).attr("fill", "lightsteelblue")
-            .attr("opacity", 0.5)
-            document.body.style.cursor = "default"
-    }
+    $("#bubbles-help")
+        .click(function(){
+            $("#bubblesModal").modal();
+        })
+        .mouseover(function(){
+            $("#bubbles-help-icon").css("color", "yellow").css("opacity", 1)
+        })
+        .mouseout(function(){
+            $("#bubbles-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
+        })
 
 
     var a = d3.scaleLinear()
@@ -138,7 +117,7 @@ function forcePack(config){
         .attr("height", height)
         .attr("stroke", "#fff")
         .attr("fill", "none")
-        .attr("stroke-wdith", "2px")
+        .attr("stroke-wdith", "1px")
 
     var mask = svg.append("defs")
         .append("clipPath")
@@ -161,7 +140,7 @@ function forcePack(config){
         .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
         .attr("x", -height/2)
-        .attr("y", -105)
+        .attr("y", -85)
         
     var gridlines = grid.append("g")
         .attr("class", "grid")

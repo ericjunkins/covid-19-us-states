@@ -1,5 +1,5 @@
 function states_chart(config){
-    var margin = { left:120, right:100, top:100, bottom:60 }
+    var margin = { left:120, right:60, top:30, bottom:80 }
     let data_list;
     var anno = config.anno;
     var abbrev2full = config.abbrev2full,
@@ -40,38 +40,16 @@ function states_chart(config){
     var x = xLog;
     var y = yLog;
     
-    var icons_loc = svg.append("g")
-        .attr("class", "states-icons")
-        .attr("transform", "translate(" + (width) + ",0)")
-    
-    icons_loc.append("text")
-        .attr("font-family", "FontAwesome")
-        .attr("font-size", "3rem")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("text-anchor", "middle")
-        .attr("fill", "lightsteelblue")
-        .attr("opacity", 0.5)
-        .text("\uf059")
-        .on("click", helpIconClick)
-        .on("mouseover", helpIconHover)
-        .on("mouseout", helpIconLeave)
-
-    function helpIconClick(d){
-        $("#logChartModal").modal();
-    }
-
-    function helpIconHover(d){
-        document.body.style.cursor = "pointer"
-        d3.select(this).attr("fill", "#d1d134")
-            .attr("opacity", 1)
-    }
-
-    function helpIconLeave(d){
-        d3.select(this).attr("fill", "lightsteelblue")
-            .attr("opacity", 0.5)
-            document.body.style.cursor = "default"
-    }
+    $("#chart-help")
+        .click(function(){
+            $("#logChartModal").modal();
+        })
+        .mouseover(function(){
+            $("#chart-help-icon").css("color", "yellow").css("opacity", 1)
+        })
+        .mouseout(function(){
+            $("#chart-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
+        })
 
     var color = d3.scaleOrdinal(d3.schemeDark2);
     var cur_color = 0;
@@ -84,13 +62,6 @@ function states_chart(config){
     
     var labels = svg.append('g')
         .attr("class", "labels")
-
-    svg.append('text')
-        .attr("class", "title-text")
-        .attr("transform", "translate(" + (width * 0.15) + "," + 0 + ")")
-        .attr("x", 0)
-        .attr("y", -15)
-        .text("Covid-19 Trajectory")
 
     xAxisCall = labels.append("g")
         .attr("transform", "translate(0," + height + ")")
@@ -113,8 +84,8 @@ function states_chart(config){
     svg.append("text")
         .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - 100)
-        .attr("x", 0 - (height/2))
+        .attr("y", - 100)
+        .attr("x", - (height/2))
         .attr("dy", "1em")
         .text("New Confirmed Cases")
     
