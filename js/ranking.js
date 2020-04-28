@@ -156,17 +156,18 @@ function ranking_chart(config){
     }
 
     function add2Focus(d, i){
-        console.log(y(d.state, d))
         if (!focus.includes(d)){
             focus.push(d)
             d3.select("#rank-rect-" + d)
                 .attr("fill", "#fff")
                 .attr("stroke-width", 0)
                 .attr("opacity", 1)
-                //.attr("height", y.bandwidth() * 1.5)
+                .attr("height", y.bandwidth() * 1.5)
+                .attr("y", function(){ return y(d) - y.bandwidth()/4})
                 .transition().duration(dur)
                 .attr("fill", color(cur_color))
-                //.attr("height", y.bandwidth())
+                .attr("height", y.bandwidth())
+                .attr("y", y(d))
             cur_color += 1;
             
         } 

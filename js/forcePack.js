@@ -420,6 +420,10 @@ function forcePack(config){
                 .attr("x", function(d){ return d.y; })
                 .text(function(d){
                     if (a(area2radius(d[severitySelector])) >= 14) return full2abbrev[d.state]; })
+                .attr("fill", (function(d){
+                    console.log(d[timeSelector])
+                    return (d[timeSelector] >= 10 ? "#fff" : "#000"); 
+                }))
 
 
         d3.selectAll(".node-circle")
@@ -630,7 +634,7 @@ function forcePack(config){
             focus.push(d)
             d3.select("#circle-" + d)
                 .attr("stroke-width", 5)
-                .attr("r", function(d){ return 1.5 * a.range()[1]; })
+                .attr("r", function(d){ return 1.2 * a.range()[1]; })
                 .attr("stroke", function(d){ return "#fff"})
                 .transition().duration(1000)
                 .attr("r", function(d){ return a(area2radius(d[severitySelector])); })
