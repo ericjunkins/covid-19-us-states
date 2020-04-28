@@ -15,8 +15,8 @@ function ranking_chart(config){
     document.getElementById("outter1").setAttribute("style", "width:" + (width +margin.left + margin.right) + "px");
     document.getElementById("outter1").setAttribute("style", "height:" + (height + margin.top + margin.bottom) + "px");
 
-    document.getElementById("placeholder1").setAttribute("style", "width:" + (width +margin.left + margin.right) + "px");
-    document.getElementById("placeholder1").setAttribute("style", "height:" + (height + margin.top) + "px");
+    document.getElementById("ranking").setAttribute("style", "width:" + (width +margin.left + margin.right) + "px");
+    document.getElementById("ranking").setAttribute("style", "height:" + (height + margin.top) + "px");
     
     const outerSvg = d3.select("#outter1").append('svg')
         .attr("width", width + margin.left + margin.right)

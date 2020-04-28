@@ -230,8 +230,8 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
 
         var rankingConfig = {
             'height':row1Height,
-            'width': parseInt(d3.select("#placeholder1").style("width"), 10),
-            'selection': '#placeholder1',
+            'width': parseInt(d3.select("#ranking").style("width"), 10),
+            'selection': '#ranking',
             'currentData': current,
             'duration': duration
         }

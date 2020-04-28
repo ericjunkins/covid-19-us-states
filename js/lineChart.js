@@ -28,11 +28,11 @@ function line_chart(config){
     
     //Set scales    
     var xLog = d3.scaleLog()
-        .domain([1, 1000000])
+        .domain([10, 1000000])
         .range([0,width])
 
     var yLog = d3.scaleLog()
-        .domain([1, 100000])
+        .domain([10, 100000])
         .range([height, 0])
 
     var xLinear = d3.scaleLinear()
@@ -46,10 +46,18 @@ function line_chart(config){
     var y = yLog;
     
 
-    
     var x_axis = d3.axisBottom().tickPadding(8);
     var y_axis = d3.axisLeft().tickPadding(8);
     
+    var zoom = d3.zoom()
+        .scaleExtent([1, Infinity])
+        .translateExtent([[0, 0], [width, height]])
+        .extent([[0, 0], [width, height]])
+        .on("zoom", zoomed);
+
+
+
+
     var labels = svg.append('g')
         .attr("class", "labels")
 
@@ -79,17 +87,20 @@ function line_chart(config){
         .text("Total Confirmed Cases")
     
     line = d3.line()
-        .x(function(d){ 
+        .x(function(d){
+            if (d.positive < 10){
+                d.positive = 10
+            }
             var val = (d.positive == 0 ? 1 : d.positive)
             return x(val); })
         .y(function(d){
-            if (d.binnedPositiveIncrease < 1){
-                d.binnedPositiveIncrease = 1
+            if (d.binnedPositiveIncrease < 10){
+                d.binnedPositiveIncrease = 10
             }
             var val = (d.binnedPositiveIncrease == 0 ? 1 : d.binnedPositiveIncrease)
             return y(val)
         })
-        .curve(d3.curveCardinal.tension(0.5))
+        //.curve(d3.curveCardinal.tension(0.5))
     
     function lineChart(){
         draw_chart();
@@ -101,10 +112,20 @@ function line_chart(config){
     }
     
     function draw_paths(){
+        // svg.append("rect")
+        //     .attr("class", "zoom")
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //     //.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        //     .attr("fill", 'grey')
+        //     .attr("opacity", 0)
+        //     .call(zoom)
+
         // Draw paths
         lines = svg.selectAll(".covid-line")
             .data(data_list, function(d){ return d[0].state })
 
+        
     
         lines.exit().remove()
     
@@ -129,6 +150,7 @@ function line_chart(config){
             .on("mouseenter", mouseover)
             .on("mouseout", mouseout)
             .on("click", clicked)
+
     }
     
     function draw_orders(){
@@ -276,8 +298,8 @@ function line_chart(config){
             x = xLog;
             y = yLog;
 
-            x_axis.scale(x).ticks(10, ",.1d")
-            y_axis.scale(y).ticks(8, ",.1d")
+            x_axis.scale(x).ticks(8, ",.1d")
+            y_axis.scale(y).ticks(6, ",.1d")
 
             xAxisCall.call(x_axis)
             yAxisCall.call(y_axis)
@@ -295,6 +317,20 @@ function line_chart(config){
         draw_paths();
         draw_orders();
     }
+
+    function zoomed() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+        var t = d3.event.transform;
+        console.log(t)
+        x.domain((t.rescaleX(x).domain()))
+        y.domain((t.rescaleY(y).domain()))
+        draw_chart();
+        //xAxisCall.call(x_axis)
+        // x.domain(t.rescaleX(x2).domain());
+        // Line_chart.select(".line").attr("d", line);
+        // focus.select(".axis--x").call(xAxis);
+        // context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+      }
 
 
     // Getters & Setters for vis
