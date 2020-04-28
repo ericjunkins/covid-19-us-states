@@ -1,6 +1,6 @@
 let full2abbrev = {};
 let abbrev2full = {};
-let states_vis;
+let line_vis;
 let states_time_data;
 let data_by_states;
 let date_range;
@@ -14,6 +14,8 @@ var formatTime = d3.timeFormat("%m/%d/%y");
 var selection_vis;
 var circle_vis;
 var ordersByState = [];
+
+//Promises for local files to read in
 var promises = [
     d3.json("data/abbreviations.json"),
     d3.json("data/stay_at_home.json"),
@@ -22,11 +24,42 @@ var promises = [
     d3.json('data/us_urban_pop.json'),
     d3.json('data/2016_election_affiliation.json')
 ]
-
-var table = document.getElementById("selection-table")
-
 Promise.all(promises).then(ready)
 
+
+//Initilize buttons and dropdown menus
+$("#chart-help")
+    .click(function(){
+        $("#logChartModal").modal();
+    })
+    .mouseover(function(){
+        $("#chart-help-icon").css("color", "yellow").css("opacity", 1)
+    })
+    .mouseout(function(){
+        $("#chart-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
+    })
+
+$("#bubbles-help")
+    .click(function(){
+        $("#bubblesModal").modal();
+    })
+    .mouseover(function(){
+        $("#bubbles-help-icon").css("color", "yellow").css("opacity", 1)
+    })
+    .mouseout(function(){
+        $("#bubbles-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
+    })
+
+$("#orders-help")
+    .click(function(){
+        $("#legisModal").modal();
+    })
+    .mouseover(function(){
+        $("#orders-help-icon").css("color", "yellow").css("opacity", 1)
+    })
+    .mouseout(function(){
+        $("#orders-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
+    })
         
 var severityDropdown = d3.select("#severity-select")
     .on("change", dropdownChange)
@@ -52,12 +85,15 @@ function dropdownChange(){
     else if (id == "color-select"){
         bubbles_vis.timeSelector(sel);
     } else if (id == "axes-select"){
-        states_vis.axesSelector(sel);
+        line_vis.axesSelector(sel);
     }
-    //console.log(d3.select(this).property('value'))
 }
 
+//Once all local data is loaded in....
 function ready([abbrev, anno, regions, census, urban_pop, pol]){
+
+    //Reorganize the data appropriately
+
     var duration = 1000;
     census.forEach(function(d){
         d.Population = +d.Population;
@@ -84,9 +120,9 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         .key(function(d){ return d.date; })
         .entries(tmp)
 
-    
-    
     annotations = anno
+
+    //Get historical data from API
     var request = new XMLHttpRequest()
     request.open("GET", "https://covidtracking.com/api/v1/states/daily.json", true)
     request.onload = function(){ 
@@ -117,27 +153,43 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         })
 
         init_display();
+
+
+        //Initialize all viz heights/widths for each chart
         let fullHeight = window.innerHeight;
         var leftRowHeight = fullHeight * 0.71
         var row1Height = fullHeight *0.39
         var row2Height = fullHeight *0.295
 
-        chartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
-        var allStatesConfig = {
+        lineChartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
+        bubblesWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
+        var forcePackWidth = bubblesWidth * 0.95
+
+        var selWidth = parseInt(d3.select("#state-selection").style("width"), 10)
+        if ( selWidth <= 768){
+            selHeight = fullHeight * 0.22
+            rows = 4
+        }
+        else if ( 768 <= selWidth && selWidth <= 992) {
+            selHeight = fullHeight * 0.17
+            rows = 3
+        }
+        else{
+            selHeight = fullHeight * 0.09
+            rows = 2
+        }
+
+        var lineChartconfig = {
             'height': row1Height,
-            'width': chartWidth,
+            'width': lineChartWidth,
             'parseDate': parseDate,
-            'state_data': states_time_data,
+            'state_data': data_by_states,
             'anno': anno,
             'abbrev2full': abbrev2full,
-            'duration': 250,
-            'selection': '#slip-chart',
+            'selection': '#chart-area',
             'orderByState': ordersByState,
             'duration': duration
         }
-
-        currentWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
-        var forcePackWidth = currentWidth * 0.95
 
         var bubblesConfig = {
             'height':leftRowHeight,
@@ -156,9 +208,9 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'duration': duration
         }
 
-        var legistateConfig = {
+        var ordersConfig = {
             'height': row2Height,
-            'width': chartWidth,
+            'width': lineChartWidth,
             'data': ordersByDate,
             'marker': tmp,
             'raw_orders': orders,
@@ -166,35 +218,15 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'duration': duration
         }
 
-        var selWidth = parseInt(d3.select("#state-selection").style("width"), 10)
-        if ( selWidth <= 768){
-            selHeight = fullHeight * 0.22
-            rows = 4
-        }
-        else if ( 768 <= selWidth && selWidth <= 992) {
-            selHeight = fullHeight * 0.17
-            rows = 3
-        }
-        else{
-            selHeight = fullHeight * 0.09
-            rows = 2
-        } 
-
         var selectionConfig = {
             'height':selHeight,
             'width': selWidth,
             'states_list': d3.values(abbrev),
             'selection': '#state-selection',
             'full2abbrev': full2abbrev,
-            'rows': rows
+            'rows': rows,
+            'duration': duration
         }
-
-
-        states_vis = states_chart(allStatesConfig);
-        bubbles_vis = forcePack(bubblesConfig);
-        legistate_vis = legistate_chart(legistateConfig)
-        selector_vis = selector(selectionConfig);
-
 
         var rankingConfig = {
             'height':row1Height,
@@ -210,17 +242,26 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'selection': '#placeholder2'
         }
 
+
+        //Initialize all charts with their configurations
+        line_vis = line_chart(lineChartconfig);
+        bubbles_vis = bubbles_chart(bubblesConfig);
+        legistate_vis = orders_chart(ordersConfig)
+        selector_vis = selector(selectionConfig);
         ranking_vis = ranking_chart(rankingConfig)
         placeHolder2_vis = placeholder_chart(placeHolder2Config)
+
+
+        //Build each vis
         bubbles_vis();
         legistate_vis();
-        states_vis();
+        line_vis();
         selector_vis();
         ranking_vis();
     }
     request.send()
 
-
+    //Get current data from API
     var currendDataRequest = new XMLHttpRequest()
     currendDataRequest.open("GET", "https://covidtracking.com/api/v1/states/current.json", true)
     currendDataRequest.onload = function(){ 
@@ -236,25 +277,27 @@ function init_display(){
 }
 
 function update_vis(f){
-    // states_vis.focus(f);
+    // line_vis.focus(f);
     // bubbles_vis.focus(f);
     // legistate_vis.focus(f);
     //selector_vis.focus(f);
 }
 
 function update_focus(state, action){
+    //Updates the Focus view of each individual chart
     selector_vis.addFocus(state, action);
     bubbles_vis.addFocus(state, action);
-    states_vis.addFocus(state, action);
+    line_vis.addFocus(state, action);
     legistate_vis.addFocus(state, action);
     ranking_vis.addFocus(state, action)
 }
 
 function update_highlight(state, action){
+    //Updates the highlight view (mouseover) of each individual chart
     bubbles_vis.highlight(state, action)
     selector_vis.highlight(state,action)
     legistate_vis.highlight(state, action)
-    states_vis.highlight(state, action)
+    line_vis.highlight(state, action)
     ranking_vis.highlight(state, action)
 }
 
@@ -266,10 +309,6 @@ function organize_data(){
     date_range = d3.extent(states_time_data, function(d){
         return d.date;
     })
-
-    // var x = states_vis.x(),
-    //     y = states_vis.y()
-
     
     const entries = Object.entries(data_by_states);
     for (const [key, vals] of entries){
@@ -356,9 +395,3 @@ function organize_data(){
         }
     }
 }
-
-
-function selection_init(){
-    selection_vis.states(d3.keys(data_by_states))
-    selection_vis();
-} 

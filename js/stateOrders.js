@@ -1,4 +1,4 @@
-function legistate_chart(config){
+function orders_chart(config){
     var margin = { left:120, right:200, top:15, bottom:70 }
         chartData = config.data,
         markerData = config.marker,
@@ -32,9 +32,6 @@ function legistate_chart(config){
         max_date = dates(ext[1])
   
 
-    // console.log(chartData)
-    // console.log(markerData)
-
     Date.prototype.addDays = function(days) {
         var date = new Date(this.valueOf());
         date.setDate(date.getDate() + days);
@@ -63,12 +60,10 @@ function legistate_chart(config){
         dateArrayStrings.push(formatTime(d));
     })
 
-
-
+    //Set Scales
     var x = d3.scaleBand()
         .domain(dateArrayStrings)
         .range([0,width])
-
     
     var y1 = d3.scaleLinear()
         .range([height, height/2 + height * 0.05])
@@ -80,16 +75,6 @@ function legistate_chart(config){
         .domain([0,1])
         .range([height/2 - height * 0.05, 0])
 
-    $("#orders-help")
-        .click(function(){
-            $("#legisModal").modal();
-        })
-        .mouseover(function(){
-            $("#orders-help-icon").css("color", "yellow").css("opacity", 1)
-        })
-        .mouseout(function(){
-            $("#orders-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
-        })
         
     var color = d3.scaleOrdinal(d3.schemeDark2);
     var cur_color = 0;
@@ -151,7 +136,7 @@ function legistate_chart(config){
         .attr("class", "axis-label")
         .text("Date")
 
-    function legistateChart(){
+    function ordersChart(){
         missing_points();
         draw_chart();
     }
@@ -504,59 +489,59 @@ function legistate_chart(config){
         
     }
 
-    legistateChart.width = function(value){
+    ordersChart.width = function(value){
         if (!arguments.length) return width;
         width = value;
-        return legistateChart;
+        return ordersChart;
     }
 
-    legistateChart.height = function(value){
+    ordersChart.height = function(value){
         if (!arguments.length) return height;
         height = value;
-        return legistateChart;
+        return ordersChart;
     }
 
-    legistateChart.x = function(value){
+    ordersChart.x = function(value){
         if(!arguments.length) return x;
         x = value;
-        return legistateChart;
+        return ordersChart;
     }
 
-    legistateChart.y = function(value){
+    ordersChart.y = function(value){
         if(!arguments.length) return y;
         y = value;
-        return legistateChart;
+        return ordersChart;
     }
 
-    legistateChart.display_states = function(value){
+    ordersChart.display_states = function(value){
         if(!arguments.length) return display_states;
         display_states = value;
         update_display_data();
-        return legistateChart;
+        return ordersChart;
     }
 
-    legistateChart.focus = function(value){
+    ordersChart.focus = function(value){
         if(!arguments.length) return focus;
         focus = value;
         highlight_focus();
-        return legistateChart;
+        return ordersChart;
     }
 
-    legistateChart.highlight = function(value, action){
+    ordersChart.highlight = function(value, action){
         if(!arguments.length) return highlight;
         highlight = value;
         display_hover(value, action);
-        return legistateChart;
+        return ordersChart;
     }  
 
-    legistateChart.addFocus = function(value, action){
+    ordersChart.addFocus = function(value, action){
         if(!arguments.length) return addFocus;
         if (action == "add") add2Focus(value)
         else if (action == "remove") removeFromFocus(value)
-        return legistateChart;
+        return ordersChart;
     }
 
-    return legistateChart;
+    return ordersChart;
 }
 
 

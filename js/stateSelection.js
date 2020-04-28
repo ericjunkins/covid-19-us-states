@@ -3,12 +3,13 @@ function selector(config){
         states_list = config.states_list,
         full2abbrev = config.full2abbrev
 
-
     var focus = [];
-    var colorFocus = {};
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
-    
+
+    var color = d3.scaleOrdinal(d3.schemeDark2);
+    var cur_color = 0;
+      
     // append the svg object to the body of the page
     var svg = d3.select(config.selection)
         .append("svg")
@@ -58,16 +59,10 @@ function selector(config){
     var num_rows = config.rows;
     var items_per_row = Math.ceil((states_list.length)/num_rows)
 
-
-
-    
     var xBand = [];
     for (var i=0; i<items_per_row; ++i){
         xBand.push(String(i));
     }
-
-
-
 
     var yBand = [];
     for (var i=0; i< num_rows; ++i){
@@ -83,8 +78,7 @@ function selector(config){
         .range([0, width])
         .padding(0.03)
 
-    var color = d3.scaleOrdinal(d3.schemeDark2);
-    var cur_color = 0;
+
     function stateSelection(){
         draw_chart();
     }

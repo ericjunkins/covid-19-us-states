@@ -1,4 +1,4 @@
-function forcePack(config){
+function bubbles_chart(config){
     var margin = { left:140, right:10, top:20, bottom:120 }
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right,
@@ -17,6 +17,9 @@ function forcePack(config){
         focus = [];
 
 
+    var color = d3.scaleOrdinal(d3.schemeDark2);
+    var cur_color = 0;
+
     var max_pop = 40000000,
         min_pop = 0,
         max_urban = 100,
@@ -25,7 +28,9 @@ function forcePack(config){
     var usFirstCase = new Date(2020, 0, 21),
         usHundredCase = new Date(2020, 2, 5);
 
-    
+    var today = new Date();
+    var radius_max = width * 0.1
+        
     // append the svg object to the body of the page
     var svg = d3.select(selection)
         .append("svg")
@@ -37,40 +42,13 @@ function forcePack(config){
     var axisLabels = svg.append("g")
         .attr("class", "axis-labels")
 
-
     var axes= svg.append("g")
         .attr("class", "axis axis--y axisWhite")
     
     var grid = svg.append("g")
         .attr('class', "axes")
 
-    var color = d3.scaleOrdinal(d3.schemeDark2);
-    var cur_color = 0;
-    // svg.append('text')
-    //     .attr("class", "title-text")
-    //     .attr("transform", "translate(" + (width /2) + "," + 0 + ")")
-    //     .attr("x", 0)
-    //     .attr("y", -15)
-    //     .attr("text-anchor", "middle")
-    //     .text("States Covid-19 Severity")
-
-
-    var today = new Date();
-    var radius_max = width * 0.1
-
-
-    $("#bubbles-help")
-        .click(function(){
-            $("#bubblesModal").modal();
-        })
-        .mouseover(function(){
-            $("#bubbles-help-icon").css("color", "yellow").css("opacity", 1)
-        })
-        .mouseout(function(){
-            $("#bubbles-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
-        })
-
-
+    //Set Scales
     var a = d3.scaleLinear()
         .range([0, radius_max])
 
@@ -82,7 +60,6 @@ function forcePack(config){
         .domain(["Republican", "Democratic", "Other"])
         .range(yOrdinalRegion.range())
 
-
     var yLinearPop = d3.scaleLinear()
         .range([height - radius_max, radius_max])
 
@@ -93,11 +70,11 @@ function forcePack(config){
     var colorScale = d3.scaleSequential(d3.interpolateReds)
         .domain([-3,20])
 
-
+    //Default to Population Sorted
     var y = yLinearPop;
     var yAxis = d3.axisLeft();
 
-
+    //Setup tooltip
     var tooltip =  d3.select("#div_template")
         .append("div")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
@@ -119,6 +96,7 @@ function forcePack(config){
         .attr("fill", "none")
         .attr("stroke-wdith", "1px")
 
+    //Mask area for bubbles to be in
     var mask = svg.append("defs")
         .append("clipPath")
         .attr("id", "bubble-mask")
@@ -165,7 +143,7 @@ function forcePack(config){
         .attr("fill", d3.interpolateReds(0.9))
         .attr("opacity", 0.3)
 
-        severityLegend.append("circle")
+    severityLegend.append("circle")
         .attr("cx", sevX)
         .attr("cy", sevY)
         .attr("r", sevR)
@@ -181,6 +159,7 @@ function forcePack(config){
         .attr("text-anchor", "middle")
 
 
+    //Setup force simulation for bubbles
     var simulation = d3.forceSimulation()
         .force("forceX", d3.forceX().strength(function(d){ return (groupSelector == "region"  || groupSelector == "political_aff" ? 0.5 : 0.2)}).x((width/2)))
         .force("forceY", d3.forceY().strength(5).y(
@@ -192,12 +171,10 @@ function forcePack(config){
         .force("charge", d3.forceManyBody().strength(-50));
 
 
-
-
+    //Initialize legend section
     colorLegend = legends.append("g")
         .attr("class", "time-legend")
         .attr("transform", "translate(" + width * 0.43 + "," + 45 + ")")
-
 
     var c = [];
     var color_text_labels = [],
@@ -205,8 +182,6 @@ function forcePack(config){
 
     svg_init();
     initilize();
-
-
 
     function svg_init(){
         var legendW = width * 0.05
@@ -270,11 +245,12 @@ function forcePack(config){
             .attr("text-anchor", "middle")
     }
 
-    function forcePack(){
+    function bubblesChart(){
         draw_vis(chart_data);
     }
 
     function initilize(){
+        //Setup data in aggregated format
         var data = d3.nest()
             .key(function(d){ return d.state; })
             .object(states_data)
@@ -327,6 +303,7 @@ function forcePack(config){
     }
 
     function sevTextFormat(t){
+        //Format text for the severity legend
         t = t * 2 * 0.8
         if (severitySelector == "cases"){
             //return numberWithCommas(Math.round(t/1000) *1000)  + " Cases";
@@ -344,42 +321,10 @@ function forcePack(config){
     }
 
     function numberWithCommas(num) {
+        //Retuns number seperated by commas
         if (typeof(num) == "string") return num
         if (num > 1) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         else return num.toExponential(1)
-    }
-
-    function wrap(text, width) {
-        text.each(function () {
-            var text = d3.select(this),
-                words = text.text().split(/\s+/).reverse(),
-                word,
-                line = [],
-                lineNumber = 0,
-                lineHeight = 1.1, // ems
-                x = text.attr("x"),
-                y = text.attr("y"),
-                dy = 0, //parseFloat(text.attr("dy")),
-                tspan = text.text(null)
-                            .append("tspan")
-                            .attr("x", x)
-                            .attr("y", y)
-                            .attr("dy", dy + "em");
-            while (word = words.pop()) {
-                line.push(word);
-                tspan.text(line.join(" "));
-                if (tspan.node().getComputedTextLength() > width) {
-                    line.pop();
-                    tspan.text(line.join(" "));
-                    line = [word];
-                    tspan = text.append("tspan")
-                                .attr("x", x)
-                                .attr("y", y)
-                                .attr("dy", ++lineNumber * lineHeight + dy + "em")
-                                .text(word);
-                }
-            }
-        });
     }
 
     function draw_vis(data){
@@ -481,6 +426,7 @@ function forcePack(config){
     }
 
     function format_yAxis(){
+        //Update the Y axis scales based on input selection
         if (groupSelector == "population"){
             y = yLinearPop
 
@@ -625,12 +571,6 @@ function forcePack(config){
         tooltip
             .transition().duration(250)
             .style("opacity", 0)
-
-        // if (!focus.includes(full2abbrev[d.state])){
-        //     d3.select("#circle-" + full2abbrev[d.state])
-        //         .attr("stroke", "#000")
-        //         .attr("stroke-width", "0.5px")
-        // }
         document.body.style.cursor = "default"
         update_highlight(full2abbrev[d.state], "off")
     }
@@ -668,82 +608,84 @@ function forcePack(config){
         update_vis(focus);
     }
 
-    forcePack.width = function(value){
+
+    //Getters & Setters for Vis
+    bubblesChart.width = function(value){
         if (!arguments.length) return width;
         width = value;
-        return forcePack;
+        return bubblesChart;
     }
 
-    forcePack.height = function(value){
+    bubblesChart.height = function(value){
         if (!arguments.length) return height;
         height = value;
-        return forcePack;
+        return bubblesChart;
     }
 
-    forcePack.states = function(value){
+    bubblesChart.states = function(value){
         if (!arguments.length) return states;
         states = value;
-        return forcePack;  
+        return bubblesChart;  
     }
 
-    forcePack.colors = function(value){
+    bubblesChart.colors = function(value){
         if (!arguments.length) return colors;
         colors = value;
-        return forcePack;  
+        return bubblesChart;  
     }
 
-    forcePack.anno = function(value){
+    bubblesChart.anno = function(value){
         if (!arguments.length) return anno;
         anno = value;
-        return forcePack;  
+        return bubblesChart;  
     }
 
-    forcePack.groupSelector = function(value){
+    bubblesChart.groupSelector = function(value){
         if (!arguments.length) return groupSelector;
         groupSelector = value;
         format_yAxis();
-        forcePack();
-        return forcePack;  
+        bubblesChart();
+        return bubblesChart;  
     }
     
-    forcePack.severitySelector = function(value){
+    bubblesChart.severitySelector = function(value){
         if (!arguments.length) return severitySelector;
         severitySelector = value;
         format_area();
-        forcePack();
-        return forcePack;  
+        bubblesChart();
+        return bubblesChart;  
     }   
 
-    forcePack.timeSelector = function(value){
+    bubblesChart.timeSelector = function(value){
         if(!arguments.length) return timeSelector;
         timeSelector = value;
         format_timeScale();
-        forcePack();
-        return forcePack();
+        bubblesChart();
+        return bubblesChart();
     }
     
-    forcePack.focus = function(value){
+    bubblesChart.focus = function(value){
         if(!arguments.length) return focus;
         focus = value;
-        return forcePack;
+        return bubblesChart;
     }
 
-    forcePack.highlight = function(value, action){
+    bubblesChart.highlight = function(value, action){
         if(!arguments.length) return highlight;
         highlight = value;
         display_hover(value, action);
-        return forcePack;
+        return bubblesChart;
     }  
 
-    forcePack.addFocus = function(value, action){
+    bubblesChart.addFocus = function(value, action){
         if(!arguments.length) return addFocus;
         if (action == "add") add2Focus(value)
         else if (action == "remove") removeFromFocus(value)
-        return forcePack;
+        return bubblesChart;
     }
 
 
-    return forcePack;
+    return bubblesChart;
 }
 
 
