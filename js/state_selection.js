@@ -181,6 +181,7 @@ function selector(config){
         if (!focus.includes(d)){
             focus.push(d)
             d3.select("#sel-rect-" + d)
+                .raise()
                 .attr("fill", "#fff")
                 .attr("x", function(d){ return x(d.x) - x.bandwidth()/4; })
                 .attr("width", function(d){ return x.bandwidth()*1.5; })

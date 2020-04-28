@@ -100,7 +100,6 @@ function ranking_chart(config){
 
     function draw_chart(data){
         
-          
         var rects = chart.selectAll("rect")
             .data(currentData)
 
@@ -159,6 +158,7 @@ function ranking_chart(config){
         if (!focus.includes(d)){
             focus.push(d)
             d3.select("#rank-rect-" + d)
+                .raise()
                 .attr("fill", "#fff")
                 .attr("stroke-width", 0)
                 .attr("opacity", 1)

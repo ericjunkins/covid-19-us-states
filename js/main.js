@@ -132,7 +132,8 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'abbrev2full': abbrev2full,
             'duration': 250,
             'selection': '#slip-chart',
-            'orderByState': ordersByState
+            'orderByState': ordersByState,
+            'duration': duration
         }
 
         currentWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
@@ -151,7 +152,8 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'selection': '#northwest-region',
             'dateSelector': 'state_hundred',
             'urban': urban_pop,
-            'political_aff': pol
+            'political_aff': pol,
+            'duration': duration
         }
 
         var legistateConfig = {

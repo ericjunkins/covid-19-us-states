@@ -155,14 +155,22 @@ function forcePack(config){
         .attr("class", "severity-legend")
         .attr("transform", "translate(" + width * 0.13 + "," + 45 + ")")
 
-    sevR = a.range()[1]*0.6
+    sevR = a.range()[1]*0.7
     sevX = 15
     sevY = 15
     sevScale = severityLegend.append("circle")
         .attr("cx", sevX)
         .attr("cy", sevY)
         .attr("r", sevR)
+        .attr("fill", d3.interpolateReds(0.9))
+        .attr("opacity", 0.3)
+
+        severityLegend.append("circle")
+        .attr("cx", sevX)
+        .attr("cy", sevY)
+        .attr("r", sevR)
         .attr("fill", "none")
+        .attr("opacity", 1)
         .attr("stroke", "#fff")
 
     var sevText = severityLegend.append("text")
@@ -319,7 +327,7 @@ function forcePack(config){
     }
 
     function sevTextFormat(t){
-        t = t * 2 * 0.6
+        t = t * 2 * 0.8
         if (severitySelector == "cases"){
             //return numberWithCommas(Math.round(t/1000) *1000)  + " Cases";
             return numberWithCommas(Math.round(t/1000) *1000)
@@ -421,7 +429,6 @@ function forcePack(config){
                 .text(function(d){
                     if (a(area2radius(d[severitySelector])) >= 14) return full2abbrev[d.state]; })
                 .attr("fill", (function(d){
-                    console.log(d[timeSelector])
                     return (d[timeSelector] >= 10 ? "#fff" : "#000"); 
                 }))
 

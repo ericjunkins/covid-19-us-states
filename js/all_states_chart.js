@@ -3,7 +3,8 @@ function states_chart(config){
     let data_list;
     var anno = config.anno;
     var abbrev2full = config.abbrev2full,
-        ordersList = config.orderByState;
+        ordersList = config.orderByState,
+        dur = config.duration;
     
     var focus = [],
         axesSelector = "log";
@@ -125,18 +126,13 @@ function states_chart(config){
     }
     
     function draw_paths(){
-        lines = svg.selectAll(".line")
+        lines = svg.selectAll(".covid-line")
             .data(data_list, function(d){ return d[0].state })
 
     
         lines.exit().remove()
     
         lines
-            .attr("fill", "none")
-            .attr("opacity", 1)
-            .attr("stroke", 'grey')
-            .attr("stroke-width", 0.5)
-            .attr("opacity", 0.5)
             .attr("d", function(d){ return line(d); });
     
         lines.enter()
@@ -163,12 +159,16 @@ function states_chart(config){
         orders = orderGroup.selectAll("circle")
             .data(ordersList)
 
+        orders
+            .attr("cx", function(d){ return x(d.positive); })
+            .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
+
         orders.enter()
             .append('circle')
             .attr("class", "order-circle")
             .attr("id", function(d){ return "order-circ-" + d.state; })
             .attr("fill", "#fff")
-            .attr('r', 12)
+            .attr('r', 10)
             .attr("cx", function(d){ return x(d.positive); })
             .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
             .attr("opacity", 0)
@@ -217,25 +217,25 @@ function states_chart(config){
         if (!focus.includes(d)){
             focus.push(d)
             d3.select("#path-" + d)
+                .raise()
                 .attr("stroke", "#fff")
                 .attr("opacity", 1)
                 .attr("stroke-width", 8.5)
-                .transition().duration(750)
+                .transition().duration(dur)
                 .attr("stroke-width", 2.5)
                 .attr("stroke", color(cur_color))
 
             d3.select("#order-circ-" + d)
+                .raise()
                 .attr("opacity", 1)
                 .attr("r", 30)
                 .attr("fill", "#fff")
-                .transition().duration(750)
+                .transition().duration(dur)
                 .attr("fill", color(cur_color))
-                .attr("r", 12)
+                .attr("r", 10)
 
             cur_color += 1;
         } 
-        //highlight_focus();
-        //update_vis(focus);
     }
 
     function mouseover (d,i){
@@ -244,7 +244,6 @@ function states_chart(config){
     }
     
     function clicked(d, i){
-        console.log("clicking", d[0].state)
         if (focus.includes(d[0].state)) update_focus(d[0].state, "remove")
         else update_focus(d[0].state, "add")
     }
@@ -256,11 +255,13 @@ function states_chart(config){
         }
 
         d3.select("path-" + d)
+            .transition().duration(dur)
             .attr("stroke", "grey")
             .attr("stroke-width", 0.5)
             .attr("opacity", 0.20)
 
         d3.select("#order-circ-" + d)
+            .transition().duration(dur)
             .attr("opacity", 0)
 
     }
@@ -269,11 +270,13 @@ function states_chart(config){
     function display_hover(d, action){
         if (!focus.includes(d)){
             d3.select("#path-" + d)
+                .raise()
                 .attr("stroke", function(){ return (action == "on" ? "steelblue" : "grey"); })
                 .attr("stroke-width", function(){ return (action == "on" ? 3 : 0.5 ); })
                 .attr("opacity", function(){ return (action == "on" ? 1 : 0.5); })
 
             d3.select("#order-circ-" + d)
+                .raise()    
                 .attr("fill", function(){ return (action == "on" ? "steelblue" : "grey"); })
                 .attr("opacity", function(){ return (action == "on" ? 1 : 0); })
         }
