@@ -112,11 +112,9 @@ display: block;
 }
 
 
-div#container {
-    height: 700px;
-    width: 400px;
-    border:2px solid #fff;
-    overflow: scroll;
+#placeholder1 {
+	overflow-y: scroll;
+	overflow-x: hidden;
 }
 
 circle-packs {

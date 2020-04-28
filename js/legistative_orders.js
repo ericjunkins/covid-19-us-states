@@ -1,8 +1,11 @@
 function legistate_chart(config){
-    var margin = { left:120, right:60, top:30, bottom:80 }
+    var margin = { left:120, right:200, top:15, bottom:70 }
         chartData = config.data,
         markerData = config.marker,
-        raw_orders = config.raw_orders
+        raw_orders = config.raw_orders,
+        full2abbrev = config.full2abbrev;
+        missingList = [],
+        dur = config.duration;
 
     var focus = [],
         focus_markers = [],
@@ -22,7 +25,7 @@ function legistate_chart(config){
 
     var idTimeFormat = d3.timeFormat("%m%d%y")
                 
-
+    var orderChart = svg.append("g")
     var dates = d3.timeParse("%m/%d/%y");
     var ext = d3.extent(chartData, function(d){ return d.key; })
     var min_date = dates(ext[0]),
@@ -149,7 +152,96 @@ function legistate_chart(config){
         .text("Date")
 
     function legistateChart(){
+        missing_points();
         draw_chart();
+    }
+
+
+    function missing_points(){
+        mWidth = margin.right * 0.7
+        
+        missingG = svg.append("g")
+            .attr("class", "missing")
+            .attr("transform", "translate(" + (width + margin.right*0.15) + ",0)")
+
+
+        missingG.append('text')
+            .attr("x", mWidth/2)
+            .attr('transform', 'translate(0,' + height + ')')
+            .attr("y", 10)
+            .attr("class", "axis-label")
+            .text("Missing Orders")
+
+        var missingData = [{'id': 'lockdown', 'parentId': '', 'size': undefined}]
+        const entries = Object.entries(raw_orders);
+        for (const [key, vals] of entries){
+            if (vals.date == null){
+                missingData.push({
+                'id': full2abbrev[key],
+                'parentId': 'lockdown',
+                'size': 10
+                })
+                missingList.push(full2abbrev[key])
+            }
+        }
+
+        var lockdownPack = missingG.append('g')
+            .attr("transform", "translate(" + 0 + "," + height/2 + ")")
+        
+        const layout = d3.pack()
+            .size([mWidth, height/2])
+            .padding(3)
+
+        const stratData = d3.stratify()(missingData)
+        var roots = d3.hierarchy(stratData)
+            .sum(function (d){ return d.data.size })
+            .sort(function(a, b) { return b.value - a.value })
+        var nodes = roots.descendants()
+
+        layout(roots)
+
+        const slices = lockdownPack.selectAll(".missing-circle")
+            .data(nodes, function(d){ return d.data.id})
+        
+
+        slices.enter()
+            .append("circle")
+                .on("mouseover", missingMouseover)
+                .on("mousemove", missingMousemove)
+                .on("mouseout", missingMouseout)
+                .on("click", missingClicked)
+            .attr("id", function(d){ return "legis-circ-" + d.data.id; })
+            .attr("cx", function(d){ return d.x; })
+            .attr("cy", function(d){ return d.y; })
+            .style("fill", function(d){ return (d.depth == 0 ? 'none' : 'grey'); })
+            .attr("opacity", function(d){ return (d.depth == 0 ? 1 : 0.2); })
+            .attr("r", 0)
+            .transition().duration(dur)
+            .attr("r", function(d){ return d.r; })
+
+        
+
+        const missingTexts = lockdownPack.selectAll("text")
+            .data(nodes)
+            .enter()
+            .append("text")
+                .on("mouseover", missingMouseover)
+                .on("mousemove", missingMousemove)
+                .on("mouseout", missingMouseout)
+                .on("click", missingClicked)
+            .attr("x", function(d){ return d.x; })
+            .attr("y", function(d){ return d.y; })
+            .text(function(d){ 
+                var t = (d.depth != 0 ? d.data.id : "")
+                return t; })
+            
+            .attr("text-anchor", 'middle')
+            .attr("dominant-baseline", 'middle')
+            .attr("fill", "#fff")
+            .attr("font-size", "0.05rem")
+            .transition().duration(dur)
+            .attr("font-size", "1.2rem")
+            
     }
 
     function draw_chart(){
@@ -191,7 +283,7 @@ function legistate_chart(config){
         legis_y_axis2.scale(y2).ticks(5)
         legisYaxisCall2.call(legis_y_axis2);
 
-        var rects = svg.selectAll("rect")
+        var rects = orderChart.selectAll("rect")
             .data(data)
 
         var w = width/data.length * 0.9
@@ -212,7 +304,7 @@ function legistate_chart(config){
 
             .attr("y", y1(0))
             .attr("height", 0)
-            .transition().duration(1000)
+            .transition().duration(dur)
             .attr("y", function(d){ 
                 var s = (d.order == 0 ? y1 : y2)
                 return s(d.count); })
@@ -228,7 +320,7 @@ function legistate_chart(config){
             focus_markers.push(d)
         })
 
-        var circles = svg.selectAll("circle")
+        var circles = orderChart.selectAll("circle")
             .data(focus_markers)
 
         circles.enter()
@@ -244,6 +336,25 @@ function legistate_chart(config){
 
     }
     
+    function missingMouseover(d){
+        document.body.style.cursor = "pointer"
+        update_highlight(d.data.id, 'on')
+    }
+
+    function missingMousemove(d){
+        
+    }
+
+    function missingMouseout(d){
+        update_highlight(d.data.id, 'off')
+        document.body.style.cursor = "default"
+    }
+
+    function missingClicked(d){
+        if (focus.includes(d.data.id)) update_focus(d.data.id, "remove")
+        else update_focus(d.data.id, 'add')
+    }
+
     function mouseover(d){
         var statesHovered = chartData.filter(function(v){
             return v.key == d.date
@@ -270,8 +381,21 @@ function legistate_chart(config){
     }
 
     function display_hover(d, action){
-        var tmp = idTimeFormat(raw_orders[abbrev2full[d]].date)
+        var s = raw_orders[abbrev2full[d]]
+        if (s == undefined) return 
+        var date = raw_orders[abbrev2full[d]].date
         
+        if (date == null){
+            if (!focus.includes(d)){
+                d3.select("#legis-circ-" + d)
+                .attr("stroke", function(){ return (action == "on" ? "steelblue" : "#000"); })
+                .attr("stroke-width", function(){ return (action == "on" ? "3px" : "0"); })
+                .attr("opacity", function(){ return (action =="on" ? 1 : 0.2)})
+            return
+            }
+
+        }
+        var tmp = idTimeFormat(date)
         d3.select("#rect-" + tmp)
             .attr("stroke", function(){ return (action == "on" ? "steelblue" : "#000"); })
             .attr("stroke-width", function(){ return (action == "on" ? "3px": "0.5px"); })
@@ -280,6 +404,7 @@ function legistate_chart(config){
     }
 
     function clicked(d){
+        
         var statesHovered = chartData.filter(function(v){
             return v.key == d.date
         })[0].values
@@ -293,16 +418,25 @@ function legistate_chart(config){
     function add2Focus(d, i){
         if (!focus.includes(d)){
             focus.push(d)
-            d3.select("#legis-circ-" + d)
+
+            if (missingList.includes(d)){
+                d3.select("#legis-circ-" + d)
+                    .attr("opacity", 1)
+                    .style("fill", "#fff")
+                    .attr("stroke-width", 0)
+                    .transition().duration(dur)
+                    .style("fill", color(cur_color))
+            }
+            else {
+                d3.select("#legis-circ-" + d)
                 .attr("r", 20)
                 .attr("opacity", 1)
                 .attr("fill", "#fff")
-                .transition().duration(1000)
+                .transition().duration(dur)
                 .attr("r", 10)
                 .attr("fill", color(cur_color))
-                
                 .style("visibility", "visible")
-
+            }
         }
         cur_color += 1;
     }
@@ -313,7 +447,17 @@ function legistate_chart(config){
             focus.splice(index, 1);
         }
         
+        if (missingList.includes(d)){
+            d3.select("#legis-circ-" + d)
+                .transition().duration(dur)
+                .attr("opacity", 0.2)
+                .style("fill", "grey")
+                .attr("stroke-width", 0)
+            return
+        }
+
         d3.select("#legis-circ-" + d)
+            .transition().duration(dur)
             .attr("opacity", 0)
     }
 
@@ -353,7 +497,7 @@ function legistate_chart(config){
 
             .attr("r", 40)
             .attr("fill", function(d, i){ return "#fff"; })
-            .transition().duration(1000)
+            .transition().duration(dur)
             .attr("r", 10)
             .attr("fill", function(d, i){
                 return color(d.color); })

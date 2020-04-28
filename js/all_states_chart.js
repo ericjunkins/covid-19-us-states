@@ -244,8 +244,9 @@ function states_chart(config){
     }
     
     function clicked(d, i){
-        if (focus.includes(d[0].state)) update_highlight(d[0].state, "remove")
-        else update_highlight(d[0].state, "add")
+        console.log("clicking", d[0].state)
+        if (focus.includes(d[0].state)) update_focus(d[0].state, "remove")
+        else update_focus(d[0].state, "add")
     }
 
     function removeFromFocus(d, i){

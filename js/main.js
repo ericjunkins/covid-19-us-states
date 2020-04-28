@@ -58,6 +58,7 @@ function dropdownChange(){
 }
 
 function ready([abbrev, anno, regions, census, urban_pop, pol]){
+    var duration = 1000;
     census.forEach(function(d){
         d.Population = +d.Population;
     })
@@ -87,7 +88,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
     
     annotations = anno
     var request = new XMLHttpRequest()
-    request.open("GET", "https://covidtracking.com/api/states/daily", true)
+    request.open("GET", "https://covidtracking.com/api/v1/states/daily.json", true)
     request.onload = function(){ 
         states_time_data = JSON.parse(this.response)
         
@@ -105,6 +106,16 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             if(d.pending == null){d.pending = 0}
         })
         
+        var current = d3.nest()
+            .key(function(d){ return d.state; })
+            .entries(states_time_data)
+
+        current.forEach(function(d){
+            d.values = d.values.slice(0,7);
+            d.state = d.key;
+            delete d.key
+        })
+
         init_display();
         let fullHeight = window.innerHeight;
         var leftRowHeight = fullHeight * 0.71
@@ -143,14 +154,14 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'political_aff': pol
         }
 
-
-
         var legistateConfig = {
             'height': row2Height,
             'width': chartWidth,
             'data': ordersByDate,
             'marker': tmp,
-            'raw_orders': orders
+            'raw_orders': orders,
+            'full2abbrev': full2abbrev,
+            'duration': duration
         }
 
         var selWidth = parseInt(d3.select("#state-selection").style("width"), 10)
@@ -183,10 +194,12 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         selector_vis = selector(selectionConfig);
 
 
-        var placeHolder1Config = {
+        var rankingConfig = {
             'height':row1Height,
             'width': parseInt(d3.select("#placeholder1").style("width"), 10),
-            'selection': '#placeholder1'
+            'selection': '#placeholder1',
+            'currentData': current,
+            'duration': duration
         }
 
         var placeHolder2Config = {
@@ -195,14 +208,25 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'selection': '#placeholder2'
         }
 
-        placeHolder1_vis = placeholder_chart(placeHolder1Config)
+        ranking_vis = ranking_chart(rankingConfig)
         placeHolder2_vis = placeholder_chart(placeHolder2Config)
         bubbles_vis();
         legistate_vis();
         states_vis();
         selector_vis();
+        ranking_vis();
     }
     request.send()
+
+
+    var currendDataRequest = new XMLHttpRequest()
+    currendDataRequest.open("GET", "https://covidtracking.com/api/v1/states/current.json", true)
+    currendDataRequest.onload = function(){ 
+        currentData = JSON.parse(this.response)
+        //console.log("currentData:", currentData)
+    }
+    currendDataRequest.send()
+
 }
 
 function init_display(){
@@ -221,6 +245,7 @@ function update_focus(state, action){
     bubbles_vis.addFocus(state, action);
     states_vis.addFocus(state, action);
     legistate_vis.addFocus(state, action);
+    ranking_vis.addFocus(state, action)
 }
 
 function update_highlight(state, action){
@@ -228,6 +253,7 @@ function update_highlight(state, action){
     selector_vis.highlight(state,action)
     legistate_vis.highlight(state, action)
     states_vis.highlight(state, action)
+    ranking_vis.highlight(state, action)
 }
 
 function organize_data(){
