@@ -5,9 +5,11 @@ function line_chart(config){
     var abbrev2full = config.abbrev2full,
         ordersList = config.orderByState,
         dur = config.duration,
-        data = config.state_data;
+        data = config.state_data,
+        defaultColor = config.defaultColor,
+        defaultOpacity = config.defaultOpacity
 
-    var color = d3.scaleOrdinal(d3.schemeDark2);
+    var color = d3.scaleOrdinal(config.scheme);
     var cur_color = 0;   
     var focus = [],
         axesSelector = "log";
@@ -117,7 +119,7 @@ function line_chart(config){
         //     .attr("width", width)
         //     .attr("height", height)
         //     //.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        //     .attr("fill", 'grey')
+        //     .attr("fill", defaultColor)
         //     .attr("opacity", 0)
         //     .call(zoom)
 
@@ -125,8 +127,6 @@ function line_chart(config){
         lines = svg.selectAll(".covid-line")
             .data(data_list, function(d){ return d[0].state })
 
-        
-    
         lines.exit().remove()
     
         lines
@@ -140,9 +140,9 @@ function line_chart(config){
                     return "path-" + d[0].state; 
                 })
                 .attr("fill", "none")
-                .attr("stroke", 'grey')
+                .attr("stroke", defaultColor)
                 .attr("stroke-width", 0.5)
-                .attr("opacity", 0.20)
+                .attr("opacity", defaultOpacity * 2)
                 .attr("d", function(d){ return line(d) });
 
         d3.selectAll(".covid-line")
@@ -217,15 +217,6 @@ function line_chart(config){
         if (!focus.includes(d)){
             focus.push(d)
 
-            d3.select("#order-circ-" + d)
-                .raise()
-                .attr("opacity", 1)
-                .attr("r", 30)
-                .attr("fill", "#fff")
-                .transition().duration(dur)
-                .attr("fill", color(cur_color))
-                .attr("r", 10)
-
             d3.select("#path-" + d)
                 .raise()
                 .attr("stroke", "#fff")
@@ -234,6 +225,15 @@ function line_chart(config){
                 .transition().duration(dur)
                 .attr("stroke-width", 2.5)
                 .attr("stroke", color(cur_color))
+
+            d3.select("#order-circ-" + d)
+                .raise()
+                .attr("opacity", 1)
+                .attr("r", 30)
+                .attr("fill", "#fff")
+                .transition().duration(dur)
+                .attr("fill", color(cur_color))
+                .attr("r", 10)
 
             cur_color += 1;
         } 
@@ -257,11 +257,11 @@ function line_chart(config){
             focus.splice(index, 1);
         }
 
-        d3.select("path-" + d)
+        d3.select("#path-" + d)
             .transition().duration(dur)
-            .attr("stroke", "grey")
+            .attr("stroke", defaultColor)
             .attr("stroke-width", 0.5)
-            .attr("opacity", 0.20)
+            .attr("opacity", defaultOpacity * 2)
 
         d3.select("#order-circ-" + d)
             .transition().duration(dur)
@@ -275,13 +275,13 @@ function line_chart(config){
         if (!focus.includes(d)){
             d3.select("#path-" + d)
                 .raise()
-                .attr("stroke", function(){ return (action == "on" ? "steelblue" : "grey"); })
+                //.attr("stroke", function(){ return (action == "on" ? "steelblue" : defaultColor); })
                 .attr("stroke-width", function(){ return (action == "on" ? 3 : 0.5 ); })
-                .attr("opacity", function(){ return (action == "on" ? 1 : 0.5); })
+                .attr("opacity", function(){ return (action == "on" ? 1 : defaultOpacity * 2); })
 
             d3.select("#order-circ-" + d)
                 .raise()    
-                .attr("fill", function(){ return (action == "on" ? "steelblue" : "grey"); })
+                //.attr("fill", function(){ return (action == "on" ? "steelblue" : defaultColor); })
                 .attr("opacity", function(){ return (action == "on" ? 1 : 0); })
         }
     }
@@ -314,8 +314,9 @@ function line_chart(config){
             yAxisCall.call(y_axis)
 
         }
-        draw_paths();
+        
         draw_orders();
+        draw_paths();
     }
 
     function zoomed() {

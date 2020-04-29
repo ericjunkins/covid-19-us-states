@@ -28,24 +28,56 @@
     <section id="time-graph">
     <div class="container-fluid" id="main-container">
         <div class="row">
-            <div class="col-sm-12">
-                <div class = "bounding" style="background-color: rgb(34, 34, 34)">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div class = "bounding" id="selection-tool">
                     <div id="state-selection"></div>
                 </div>
             </div>
         </div>
 
-        <div class="row" style="margin-top: 30px;" >
-            <div class="col-lg-3" id="bubbles-area">
+        <div class="row" style="margin-top: 30px;">
+            <div class="col-lg-6 left-coloumn">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px;">
+                        <div class="col-sm-3">
+                            <h2 class="section-title"> Covid-19 Trajectory </h2>
+                        </div>
+
+                        <div class="col-sm-6"> </div>
+                        <div class="col-sm-2 cn">
+                            <div class="inner">
+                                <h5> Axis Scale </h5>
+                                <select class="select-css" id="axes-select">
+                                    <option value="log">Logarithmic Scale </option>
+                                    <option value="linear">Linear Scale </option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--
+                        <div class="col-sm-2 inline-buttons" style="height: 100%;">
+                            <select class="select-css" id="axes-select" style="position: relative; top: 15%;">
+                                <option value="log">Logarithmic Scale </option>
+                                <option value="linear">Linear Scale </option>
+                            </select>
+                        </div>
+                        -->
+
+                        <a class="btn" id="chart-help">
+                            <i class="fa fa-question-circle help-button" id ="chart-help-icon" style="font-size: 2.3rem;"></i>
+                        </a>
+                    </div>
+                    <div id="chart-area"></div>
+                </div>
+            </div>
+            <div class="col-lg-6 right-coloumn">
                 <div class="bounding">
                     <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
-                        <h2 class="section-title"> State Severity </h2>
-                        <a class="btn" id="bubbles-help">
-                            <i class="fa fa-question-circle help-button" id ="bubbles-help-icon" style="font-size: 2.3rem;"></i>
-                        </a>
-                        <!-- Severity Filtering Buttons -->
-                        <div class ="row" style="text-align: center; padding:0 20px 15px;">
-                            <div class="col-sm-4">
+                        <div class="col-sm-2">
+                            <h2 class="section-title"> Scatter </h2>
+                        </div>
+                        <div class="col-sm-3"> </div>
+                        <div class="col-sm-2 cn">
+                            <div class="inner">
                                 <h5> Severity (radius) </h5>
                                 <select class="select-css" id="severity-select">
                                     <option value="cases">Total Cases</option>
@@ -54,17 +86,20 @@
                                     <option value="deaths_per_capita">Deaths per Capita</option>
                                 </select>
                             </div>
-                            <div class="col-sm-4">
+                        </div>
+                        <div class="col-sm-2 cn">
+                            <div class="inner">
                                 <h5> Grouping (y-axis)</h5>
                                 <select class="select-css" id="group-select">
-                                    <option value="population">Population</option>
                                     <option value="region">Region</option>
+                                    <option value="population">Population</option>
                                     <option value="urban">Percent Urban</option>
                                     <option value="political_aff">Political</option>
-                                    
                                 </select>
                             </div>
-                            <div class="col-sm-4" >     
+                        </div>
+                        <div class="col-sm-2 cn">     
+                            <div class="inner">
                                 <h5> Time (color) </h5>                       
                                 <select class="select-css" id="color-select">
                                     <option value="state_hundred">States's 100th Case</option>
@@ -73,92 +108,67 @@
                                 </select>
                             </div>
                         </div>
+                            <a class="btn" id="ph2-help">
+                                <i class="fa fa-question-circle help-button-right-upper" id ="scatter-help-icon" style="font-size: 2.3rem;"></i>
+                            </a>
                     </div>
-                    <div class = "row" >
-                        <div id="northwest-region"></div>
-                    </div>
-
-                </div>
-            </div>
-            <div class="col-lg-7">
-                <div class="row" style="padding: 0">
-                    <div class="col-lg-12">
-                        <div class="bounding">
-                            <div class="row row-headers" style="width: 100%; margin-left: 0px; height: 60px;">
-                                <div class="col-sm-6">
-                                    <h2 class="section-title"> Covid-19 Trajectory </h2>
-                                </div>
-                                <div class="col-sm-2 inline-buttons" style="height: 100%;">
-                                    <select class="select-css" id="axes-select" style="position: relative; top: 15%;">
-                                        <option value="log">Logarithmic Scale </option>
-                                        <option value="linear">Linear Scale </option>
-                                    </select>
-                                </div>
-
-                                <a class="btn" id="chart-help">
-                                    <i class="fa fa-question-circle help-button" id ="chart-help-icon" style="font-size: 2.3rem;"></i>
-                                </a>
-                            </div>
-                            <div id="chart-area"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" style="margin-top: 30px;">
-                    <div class="col-lg-12">
-                        <div class="bounding">
-                            <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
-                                <h2 class="section-title"> State-Issued Orders </h2>
-                                    <a class="btn" id="orders-help">
-                                        <i class="fa fa-question-circle help-button" id ="orders-help-icon" style="font-size: 2.3rem;"></i>
-                                    </a>
-                            </div>
-                            <div id="legis-chart"></div>
-                        </div>
+                    <div id="outter2">
+                        <div id="scatter-area"></div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-lg-2">
-                <div class="row" style="padding: 0">
-                    <div class="col-lg-12">
-                        <div class="bounding">
-                            <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
-                                <h2 class="section-title"> States Ranking </h2>
-                                    <a class="btn" id="ph1-help">
-                                        <i class="fa fa-question-circle help-button" id ="ph1-help-icon" style="font-size: 2.3rem;"></i>
-                                    </a>
-                            </div>
-                            <div id="outter1">
-                                <div id="ranking"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" style="margin-top: 30px;">
-                    <div class="col-lg-12">
-                        <div class="bounding">
-                            <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
-                                <h2 class="section-title"> Placeholder 2 </h2>
-                                    <a class="btn" id="ph2-help">
-                                        <i class="fa fa-question-circle help-button" id ="ph2-help-icon" style="font-size: 2.3rem;"></i>
-                                    </a>
-                            </div>
-                            <div id="outter2">
-                                <div id="placeholder2"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
+        <div class="row" style="margin-top: 30px;">
+            <div class="col-lg-6 left-coloumn">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                        <h2 class="section-title"> State-Issued Orders </h2>
+                            <a class="btn" id="orders-help">
+                                <i class="fa fa-question-circle help-button" id ="orders-help-icon" style="font-size: 2.3rem;"></i>
+                            </a>
+                    </div>
+                    <div id="legis-chart"></div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                        <h2 class="section-title"> States Ranking </h2>
+                            <a class="btn" id="rank-help">
+                                <i class="fa fa-question-circle help-button" id ="rank-help-icon" style="font-size: 2.3rem;"></i>
+                            </a>
+                    </div>
+                    <div id="outter1">
+                        <div id="ranking"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 right-coloumn">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                        <h2 class="section-title"> Placeholder </h2>
+                            <a class="btn" id="ph1-help">
+                                <i class="fa fa-question-circle help-button-right-lower" id ="ph1-help-icon" style="font-size: 2.3rem;"></i>
+                            </a>
+                    </div>
+                    <div id="outter1">
+                        <div id="placeholder"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+
+
     <div id="div_template"></div>
 
     <!-- Modal -->
     <div class="modal fade" id="logChartModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 1500px;">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content center-block" style="width: 200%;">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Interpreting the Covid-19 Trajectory chart</h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
@@ -202,7 +212,7 @@
     <!-- Modal -->
     <div class="modal fade" id="bubblesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 1500px;">
+            <div class="modal-content center-block" style="width: 200%;">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Interpreting the Severity Bubbles</h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
@@ -256,7 +266,7 @@
 
     <div class="modal fade" id="legisModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 1500px;">
+            <div class="modal-content center-block" style="width: 200%;">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Interpreting the Legislative Orders Chart</h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
@@ -298,7 +308,7 @@
 
     <div class="modal fade" id="selectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 1500px;">
+            <div class="modal-content center-block" style="width: 200%;">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Interpreting the Covid-19 Trajectory chart</h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
@@ -350,6 +360,7 @@
     <script src="js/lineChart.js"></script>
     <script src="js/stateSelection.js"></script>
     <script src="js/bubbles.js"></script>
+    <script src="js/scatter.js"></script>
     <script src="js/stateOrders.js"></script>
     <script src="js/placeholder.js"></script>
     <script src="js/ranking.js"></script>

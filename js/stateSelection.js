@@ -1,13 +1,15 @@
 function selector(config){
-    var margin = { left:10, right:50, top:10, bottom:10 },
+    var margin = { left:10, right:60, top:10, bottom:10 },
         states_list = config.states_list,
-        full2abbrev = config.full2abbrev
+        full2abbrev = config.full2abbrev,
+        defaultColor = config.defaultColor,
+        defaultOpacity = config.defaultOpacity
 
     var focus = [];
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
 
-    var color = d3.scaleOrdinal(d3.schemeDark2);
+    var color = d3.scaleOrdinal(config.scheme);
     var cur_color = 0;
       
     // append the svg object to the body of the page
@@ -23,7 +25,7 @@ function selector(config){
 
     var icons_loc = svg.append("g")
         .attr("class", "states-icons")
-        .attr("transform", "translate(" + (width + margin.right*0.5) + ",25)")
+        .attr("transform", "translate(" + (width + margin.right*0.4) + ",25)")
     
     icons_loc.append("text")
         .attr("font-family", "FontAwesome")
@@ -111,8 +113,8 @@ function selector(config){
             .attr("x", function(d, i){  return x(d.x); })
             .attr("height", y.bandwidth())
             .attr("width", x.bandwidth())
-            .attr("fill", "grey")
-            .attr('opacity', 0.2)
+            .attr("fill", defaultColor)
+            .attr('opacity', defaultOpacity)
             .attr("rx", 3)
 
 
@@ -157,7 +159,7 @@ function selector(config){
             d3.select("#sel-rect-" + d)
                 .attr("stroke", function(){ return (action == "on" ? "steelblue": "#000"); })
                 .attr("stroke-width", function(){ return (action == "on" ? "3px": "0"); })
-                .attr("opacity", function(){ return (action == "on" ? 1 : 0.2 ); } )
+                .attr("opacity", function(){ return (action == "on" ? 1 : defaultOpacity ); } )
         }
     }
 
@@ -197,8 +199,8 @@ function selector(config){
         }
 
         d3.select("#sel-rect-" + d)
-            .attr("opacity", 0.2)
-            .attr("fill", "grey")
+            .attr("opacity", defaultOpacity)
+            .attr("fill", defaultColor)
 
         //update_vis(focus);
     }

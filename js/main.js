@@ -22,7 +22,8 @@ var promises = [
     d3.csv('data/regions.csv'),
     d3.csv('data/2019_us_census.csv'),
     d3.json('data/us_urban_pop.json'),
-    d3.json('data/2016_election_affiliation.json')
+    d3.json('data/2016_election_affiliation.json'),
+    d3.json('data/orders.json')
 ]
 Promise.all(promises).then(ready)
 
@@ -77,23 +78,21 @@ function dropdownChange(){
     var id = d3.select(this).property("id");
     var sel = d3.select(this).property('value')
     if (id == "group-select"){
-        bubbles_vis.groupSelector(sel)
+        scatter_vis.groupSelector(sel)
     } 
     else if (id == "severity-select"){
-        bubbles_vis.severitySelector(sel)
+        scatter_vis.severitySelector(sel)
     } 
     else if (id == "color-select"){
-        bubbles_vis.timeSelector(sel);
+        scatter_vis.timeSelector(sel);
     } else if (id == "axes-select"){
         line_vis.axesSelector(sel);
     }
 }
 
 //Once all local data is loaded in....
-function ready([abbrev, anno, regions, census, urban_pop, pol]){
-
+function ready([abbrev, anno, regions, census, urban_pop, pol, order]){
     //Reorganize the data appropriately
-
     var duration = 1000;
     census.forEach(function(d){
         d.Population = +d.Population;
@@ -127,7 +126,6 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
     request.open("GET", "https://covidtracking.com/api/v1/states/daily.json", true)
     request.onload = function(){ 
         states_time_data = JSON.parse(this.response)
-        
         states_time_data.forEach(function(d){
             d.date = parseTime(d.date)
             if(d.positive == null) { d.positive = 0}
@@ -162,8 +160,10 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
         var row2Height = fullHeight *0.295
 
         lineChartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
-        bubblesWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
-        var forcePackWidth = bubblesWidth * 0.95
+        //bubblesWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
+        var default_color = '#42d5c6'
+        var default_opacity = 0.1
+        var scheme = d3.schemeCategory10
 
         var selWidth = parseInt(d3.select("#state-selection").style("width"), 10)
         if ( selWidth <= 768){
@@ -188,25 +188,28 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'abbrev2full': abbrev2full,
             'selection': '#chart-area',
             'orderByState': ordersByState,
-            'duration': duration
+            'duration': duration,
+            'defaultColor': default_color,
+            'defaultOpacity': default_opacity,
+            'scheme': scheme
         }
 
-        var bubblesConfig = {
-            'height':leftRowHeight,
-            'width': forcePackWidth,
-            'anno': anno,
-            'regions': regions, 
-            'states_data': states_time_data,
-            'full2abbrev': full2abbrev,
-            'census':census, 
-            'group': 'population',
-            'severity': 'cases',
-            'selection': '#northwest-region',
-            'dateSelector': 'state_hundred',
-            'urban': urban_pop,
-            'political_aff': pol,
-            'duration': duration
-        }
+        // var bubblesConfig = {
+        //     'height':leftRowHeight,
+        //     'width': bubblesWidth * 0.9,
+        //     'anno': anno,
+        //     'regions': regions, 
+        //     'states_data': states_time_data,
+        //     'full2abbrev': full2abbrev,
+        //     'census':census, 
+        //     'group': 'population',
+        //     'severity': 'cases',
+        //     'selection': '#northwest-region',
+        //     'dateSelector': 'state_hundred',
+        //     'urban': urban_pop,
+        //     'political_aff': pol,
+        //     'duration': duration
+        // }
 
         var ordersConfig = {
             'height': row2Height,
@@ -215,7 +218,11 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'marker': tmp,
             'raw_orders': orders,
             'full2abbrev': full2abbrev,
-            'duration': duration
+            'duration': duration,
+            'order': order,
+            'defaultColor': default_color,
+            'defaultOpacity': default_opacity,
+            'scheme': scheme
         }
 
         var selectionConfig = {
@@ -225,39 +232,73 @@ function ready([abbrev, anno, regions, census, urban_pop, pol]){
             'selection': '#state-selection',
             'full2abbrev': full2abbrev,
             'rows': rows,
-            'duration': duration
+            'duration': duration,
+            'defaultColor': default_color,
+            'defaultOpacity': default_opacity,
+            'scheme': scheme
         }
 
         var rankingConfig = {
-            'height':row1Height,
+            'height':row2Height,
             'width': parseInt(d3.select("#ranking").style("width"), 10),
             'selection': '#ranking',
             'currentData': current,
-            'duration': duration
+            'duration': duration,
+            'defaultColor': default_color,
+            'defaultOpacity': default_opacity,
+            'scheme': scheme
         }
 
-        var placeHolder2Config = {
-            'height': row2Height,
-            'width': parseInt(d3.select("#placeholder2").style("width"), 10),
-            'selection': '#placeholder2'
+
+        var scatterConfig = {
+            'height':row1Height,
+            'width': lineChartWidth,
+            'anno': anno,
+            'regions': regions, 
+            'states_data': states_time_data,
+            'full2abbrev': full2abbrev,
+            'census':census, 
+            'group': 'region',
+            'severity': 'cases',
+            'selection': '#scatter-area',
+            'dateSelector': 'state_hundred',
+            'urban': urban_pop,
+            'political_aff': pol,
+            'duration': duration,
+            'defaultColor': default_color,
+            'defaultOpacity': default_opacity,
+            'scheme': scheme
+        }
+
+        var placeholderConfig = {
+            'height':row2Height,
+            'width': parseInt(d3.select("#placeholder").style("width"), 10),
+            'selection': '#placeholder',
+            'currentData': current,
+            'duration': duration,
+            'defaultColor': default_color,
+            'defaultOpacity': default_opacity,
+            'scheme': scheme
         }
 
 
         //Initialize all charts with their configurations
         line_vis = line_chart(lineChartconfig);
-        bubbles_vis = bubbles_chart(bubblesConfig);
+        //bubbles_vis = bubbles_chart(bubblesConfig);
         legistate_vis = orders_chart(ordersConfig)
         selector_vis = selector(selectionConfig);
         ranking_vis = ranking_chart(rankingConfig)
-        placeHolder2_vis = placeholder_chart(placeHolder2Config)
+        scatter_vis = scatter_chart(scatterConfig)
+        placeholder_vis = placeholder_chart(placeholderConfig)
 
 
         //Build each vis
-        bubbles_vis();
+        //bubbles_vis();
         legistate_vis();
         line_vis();
         selector_vis();
         ranking_vis();
+        scatter_vis();
     }
     request.send()
 
@@ -286,19 +327,21 @@ function update_vis(f){
 function update_focus(state, action){
     //Updates the Focus view of each individual chart
     selector_vis.addFocus(state, action);
-    bubbles_vis.addFocus(state, action);
+    //bubbles_vis.addFocus(state, action);
     line_vis.addFocus(state, action);
     legistate_vis.addFocus(state, action);
     ranking_vis.addFocus(state, action)
+    scatter_vis.addFocus(state, action)
 }
 
 function update_highlight(state, action){
     //Updates the highlight view (mouseover) of each individual chart
-    bubbles_vis.highlight(state, action)
+    //bubbles_vis.highlight(state, action)
     selector_vis.highlight(state,action)
     legistate_vis.highlight(state, action)
     line_vis.highlight(state, action)
     ranking_vis.highlight(state, action)
+    scatter_vis.highlight(state, action)
 }
 
 function organize_data(){

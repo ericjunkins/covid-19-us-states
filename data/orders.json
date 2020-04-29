@@ -1,0 +1,383 @@
+{
+	"AL" : {"lockdown": [
+							{"date": "04/03/20", "order": "1"}
+			],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"AK" : {"lockdown": [
+							{"date": "03/28/20", "order": "1"}
+			],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"AZ" : {"lockdown": [
+							{"date": "03/31/20", "order": "1"}
+			],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"AR" : {"lockdown": [
+							{"date": "", "order": ""}
+			],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"CA" : {"lockdown": [
+							{"date": "03/19/20", "order": "1"}
+			],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"CO" : {"lockdown": [
+							{"date": "03/26/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/27/20", "order": "0"}
+			]
+	},
+	"CT" : {"lockdown": [
+							{"date": "03/23/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"DE" : {"lockdown": [
+							{"date": "03/24/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"DC" : {"lockdown": [
+							{"date": "03/30/20", "order": "2"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"FL" : {"lockdown": [
+							{"date": "04/03/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"GA" : {"lockdown": [
+							{"date": "04/03/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/24/20", "order": "1"}
+			]
+	},
+	"GU" : {"lockdown": [
+							{"date": "", "order": ""}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"HI" : {"lockdown": [
+							{"date": "03/25/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"ID" : {"lockdown": [
+							{"date": "03/25/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"IL" : {"lockdown": [
+							{"date": "03/21/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"IN" : {"lockdown": [
+							{"date": "03/24/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"IA" : {"lockdown": [
+							{"date": "03/17/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "05/01/20", "order": "2"}
+			]
+	},
+	"KS" : {"lockdown": [
+							{"date": "03/30/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"KY" : {"lockdown": [
+							{"date": "03/26/20", "order": "0"}
+						],
+			"reopen": [
+							{"date": "04/27/20", "order": "1"}
+			]
+	},
+	"LA" : {"lockdown": [
+							{"date": "03/23/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "05/01/20", "order": "0"}
+			]
+	},
+	"ME" : {"lockdown": [
+							{"date": "04/02/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"MD" : {"lockdown": [
+							{"date": "03/30/20", "order": "0"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"MA" : {"lockdown": [
+							{"date": "03/24/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"MI" : {"lockdown": [
+							{"date": "03/24/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/24/20", "order": "0"}
+			]
+	},
+	"MN" : {"lockdown": [
+							{"date": "04/03/20", "order": "0"}
+						],
+			"reopen": [
+							{"date": "04/24/20", "order": "1"}
+			]
+	},
+	"MS" : {"lockdown": [
+							{"date": "04/03/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/27/20", "order": "0"}
+			]
+	},
+	"MO" : {"lockdown": [
+							{"date": "03/24/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"MT" : {"lockdown": [
+							{"date": "03/28/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/27/20", "order": "1"},
+							{"date": "05/04/20", "order": "2"}
+			]
+	},
+	"NE" : {"lockdown": [
+							{"date": "", "order": ""}
+						],
+			"reopen": [
+							{"date": "", "order": "0"},
+							{"date": "05/04/20", "order": "2"}
+			]
+	},
+	"NV" : {"lockdown": [
+							{"date": "04/01/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"NH" : {"lockdown": [
+							{"date": "03/28/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"NJ" : {"lockdown": [
+							{"date": "03/21/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"NM" : {"lockdown": [
+							{"date": "03/24/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"NY" : {"lockdown": [
+							{"date": "03/22/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"NC" : {"lockdown": [
+							{"date": "03/30/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"ND" : {"lockdown": [
+							{"date": "", "order": ""}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"OH" : {"lockdown": [
+							{"date": "03/23/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"OK" : {"lockdown": [
+							{"date": "04/01/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/24/20", "order": "1"}
+			]
+	},
+	"OR" : {"lockdown": [
+							{"date": "03/23/20", "order": "2"}
+						],
+			"reopen": [
+							{"date": "05/01/20", "order": "0"}
+			]
+	},
+	"PA" : {"lockdown": [
+							{"date": "04/01/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "05/01/20", "order": "1"}
+			]
+	},
+	"PR" : {"lockdown": [
+							{"date": "", "order": ""}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"RI" : {"lockdown": [
+							{"date": "03/28/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"SC" : {"lockdown": [
+							{"date": "04/06/20", "order": "2"}
+						],
+			"reopen": [
+							{"date": "04/20/20", "order": "1"}
+			]
+	},
+	"SD" : {"lockdown": [
+							{"date": "", "order": ""}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"TN" : {"lockdown": [
+							{"date": "04/02/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/29/20", "order": "2"}
+			]
+	},
+	"TX" : {"lockdown": [
+							{"date": "03/31/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/27/20", "order": "1"},
+							{"date": "05/01/20", "order": "2"}
+			]
+	},
+	"UT" : {"lockdown": [
+							{"date": "", "order": ""}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"VT" : {"lockdown": [
+							{"date": "03/25/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"VI" : {"lockdown": [
+							{"date": "", "order": ""}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"VA" : {"lockdown": [
+							{"date": "03/30/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"WA" : {"lockdown": [
+							{"date": "03/23/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	},
+	"WV" : {"lockdown": [
+							{"date": "03/24/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/27/20", "order": "0"}
+			]
+	},
+	"WI" : {"lockdown": [
+							{"date": "03/25/20", "order": "1"}
+						],
+			"reopen": [
+							{"date": "04/24/20", "order": "1"}
+			]
+	},
+	"WY" : {"lockdown": [
+							{"date": "", "order": "1"}
+						],
+			"reopen": [
+							{"date": "", "order": "0"}
+			]
+	}
+}

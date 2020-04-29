@@ -2,12 +2,14 @@ function ranking_chart(config){
     var margin = { left:50, right:10, top:30, bottom:80 }
     var focus = [];
     var currentData = config.currentData
-        dur = config.duration;
+        dur = config.duration,
+        defaultColor = config.defaultColor,
+        defaultOpacity = config.defaultOpacity
 
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
 
-    var color = d3.scaleOrdinal(d3.schemeDark2);
+    var color = d3.scaleOrdinal(config.scheme);
     var cur_color = 0;
 
     // append the svg object to the body of the page
@@ -111,8 +113,8 @@ function ranking_chart(config){
 
             .attr("y", function(d){ return y(d.state); })
             .attr("height", y.bandwidth())
-            .attr("fill", "grey")
-            .attr("opacity", 0.2)
+            .attr("fill", defaultColor)
+            .attr("opacity", defaultOpacity)
             .attr("width", 0)
             .transition().duration(dur)
             .attr("width", function(d){ return x(d.threeDayPercent); })
@@ -140,7 +142,7 @@ function ranking_chart(config){
             d3.select("#rank-rect-" + d)
                 .attr("stroke", function(){ return (action == "on" ? "steelblue": "#000"); })
                 .attr("stroke-width", function(){ return (action == "on" ? "3px": "0"); })
-                .attr("opacity", function(){ return (action == "on" ? 1 : 0.2 ); } )
+                .attr("opacity", function(){ return (action == "on" ? 1 : defaultOpacity ); } )
         }
     }
 
@@ -181,8 +183,8 @@ function ranking_chart(config){
 
         d3.select("#rank-rect-" + d)
             .transition().duration(dur)
-            .attr("opacity", 0.2)
-            .attr("fill", "grey")
+            .attr("opacity", defaultOpacity)
+            .attr("fill", defaultColor)
 
     }
 

@@ -16,7 +16,6 @@ function bubbles_chart(config){
         political_aff = config.political_aff,
         focus = [];
 
-
     var color = d3.scaleOrdinal(d3.schemeDark2);
     var cur_color = 0;
 
@@ -73,7 +72,6 @@ function bubbles_chart(config){
     //Default to Population Sorted
     var y = yLinearPop;
     var yAxis = d3.axisLeft();
-
     //Setup tooltip
     var tooltip =  d3.select("#div_template")
         .append("div")

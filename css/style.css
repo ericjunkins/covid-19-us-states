@@ -23,6 +23,7 @@ h5 {
 	text-align: left;
 	margin: 0 auto;
 	padding-left: 10px;
+	font-size: 1.2rem;
 }
 
 /* ---------------------------------------------------- */
@@ -31,8 +32,8 @@ h5 {
 /* ---------------------------------------------------- */
 
 .bounding {
-	background-color: #2b2b2b;
-	border: 1px solid #424242;
+	background-color: #1e2025;
+	border: 1px solid #413b3b;
 	border-radius: 5px;
 }
 
@@ -41,17 +42,31 @@ h5 {
 	padding-left: 30px;
 	padding-top: 10px;
 	margin-bottom: 0px;
+	font-size: 2rem;
 }
 
 .row-headers{
-	background-color: rgb(34, 34, 34);
+	background-color: #14161b;
 	border-top-left-radius: 6px;
 	border-top-right-radius: 6px;
 	border-bottom: 1px solid #424242;
+	height: 70px;
 }
 
 .inline-buttons {
 	vertical-align: middle;
+}
+
+#selection-tool{
+	
+}
+
+.left-coloumn {
+	padding-left: 2%;
+}
+
+.right-coloumn {
+	padding-right: 2%;
 }
 
 /* ---------------------------------------------------- */
@@ -62,13 +77,9 @@ h5 {
 	fill: #fff;
 }
 
-.title-text {
-	fill: #fff;
-	font-size: 2.5rem;
-}
 
 .axis-label{
-	font-size: 1.7rem;
+	font-size: 1.2rem;
 	fill: #fff;
 	text-anchor: middle;
 }
@@ -93,7 +104,7 @@ h5 {
   
 .axisWhite text{
 	fill: #fff;
-	font-size: 1.3rem;
+	font-size: 1.0rem;
 }
   
 .axisWhite line{
@@ -102,6 +113,11 @@ h5 {
   
 .axisWhite path{
 	stroke: #fff;
+}
+
+/* This doesn't exactly work idk why..... */
+.gridlines .tick line {
+	stroke-width: 0.5px;
 }
 
 .labels text {
@@ -126,8 +142,8 @@ h5 {
 	color: #444;
 	line-height: 1.3;
 	padding: .6em 1.4em .5em .8em;
-	width: 100%;
-	max-width: 100%;
+	width: 90%;
+	max-width: 90%;
 	box-sizing: border-box;
 	margin: 5px;
 	border: 1px solid #aaa;
@@ -175,6 +191,22 @@ h5 {
 .help-button {
 	position: absolute;
 	right: 30px;
+	top: 10px;
+	color: lightsteelblue;
+	opacity: 0.5;
+}
+
+.help-button-right-upper {
+	position: absolute;
+	right: 5%;
+	top: 10px;
+	color: lightsteelblue;
+	opacity: 0.5;
+}
+
+.help-button-right-lower {
+	position: absolute;
+	right: 10%;
 	top: 10px;
 	color: lightsteelblue;
 	opacity: 0.5;
@@ -269,3 +301,66 @@ circle-packs {
 }
 
 /* ---------------------------------------------------- */
+
+.nav-tabs {
+	border-bottom: 1px solid #3b3b3b;
+}
+
+.nav-tabs>li>a{
+	color: #fff;
+	border-color: #3b3b3b;
+	background-color: #2c2c2c;
+	
+}
+
+
+.nav-tabs>li.active>a {
+	color: #fff;
+	border-color: #3b3b3b;
+	background-color: #444444;
+}
+
+.nav-tabs>li.active>a:hover {
+	background-color: #5f5f5f;
+	color: #fff
+}
+
+
+.tab-area{
+	background-color: #1f1e1e;
+	padding-top: 15px;
+}
+
+.nav-tabs>li>a:hover {
+	background-color: #5f5f5f;
+}
+
+
+
+.severity-circle {
+	stroke: #fff;
+	stroke-width: 1px;
+}
+
+.grid>tick>line{
+	stroke: blue;
+}
+
+.cn {
+	position: relative;
+	height: 100%;
+}
+  
+.inner {
+	position: absolute;
+	width: 100%;
+	top: 50%;
+	transform: translate(0,-50%);
+}
+
+#zero-day-line{
+	stroke: rgb(216, 247, 107);
+	stroke-width: 0.5px;
+	stroke-dasharray: 15 15;
+	opacity: 0.2;
+}
