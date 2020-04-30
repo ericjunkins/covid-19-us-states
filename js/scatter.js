@@ -25,7 +25,7 @@ function scatter_chart(config){
     var max_pop = 40000000,
         min_pop = 0,
         max_urban = 100,
-        min_urban = 0
+        min_urban = 30
 
     var usFirstCase = new Date(2020, 0, 21),
         usHundredCase = new Date(2020, 2, 5);

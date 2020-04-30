@@ -1,0 +1,434 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <title>Coronavirus</title>
+        <!--
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <!-- jQuery UI CSS -->
+        <link rel="stylesheet" href="css/jquery-ui.min.css">
+        <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
+        <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="css/style.css">   
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+
+<body>
+
+    <!-- Bootstrap grid setup -->
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="index.html">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="index.html">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link" href="">About</a>
+                <a class="nav-item nav-link" href="#">Dashboard</a>
+                <a class="nav-item nav-link" href="#">Resources</a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="title">
+        <div class="container-fluid">
+            <h1 style="margin-bottom: 15px; margin-top: 5px" class="title_text"> Covid-19 Dashboard</h1>
+        </div>
+    </section>
+    <section id="time-graph">
+    <div class="container-fluid" id="main-container">
+        <div class="row">
+            <div class="col-sm-10 offset-sm-1">
+                <div class = "bounding" id="selection-tool">
+                    <div id="selectionTooltip"></div>
+                    <div id="state-selection"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row rows">
+            <div class="col-lg-6 left-coloumn">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px;">
+                        <div class="col-sm-3">
+                            <h2 class="section-title"> Covid-19 Trajectory </h2>
+                        </div>
+
+                        <div class="col-sm-6"> </div>
+                        <div class="col-sm-2 cn">
+                            <div class="inner">
+                                <h5> Axis Scale </h5>
+                                <select class="select-css" id="axes-select">
+                                    <option value="log">Logarithmic Scale </option>
+                                    <option value="linear">Linear Scale </option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--
+                        <div class="col-sm-2 inline-buttons" style="height: 100%;">
+                            <select class="select-css" id="axes-select" style="position: relative; top: 15%;">
+                                <option value="log">Logarithmic Scale </option>
+                                <option value="linear">Linear Scale </option>
+                            </select>
+                        </div>
+                        -->
+
+                        <a class="btn" id="chart-help">
+                            <i class="fa fa-question-circle help-button" id ="chart-help-icon" style="font-size: 1.2rem;"></i>
+                        </a>
+                    </div>
+                    <div id="chart-area"></div>
+                </div>
+            </div>
+            <div class="col-lg-6 right-coloumn">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                        <div class="col-sm-3">
+                            <h2 class="section-title">Severity Per State </h2>
+                        </div>
+                        <div class="col-sm-2"> </div>
+                        <div class="col-sm-2 cn">
+                            <div class="inner">
+                                <h5> Severity (area) </h5>
+                                <select class="select-css" id="severity-select">
+                                    <option value="cases">Total Cases</option>
+                                    <option value="cases_per_capita">Cases Per Capita</option>
+                                    <option value="deaths">Total Deaths</option>
+                                    <option value="deaths_per_capita">Deaths per Capita</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 cn">
+                            <div class="inner">
+                                <h5> Grouping (y-axis)</h5>
+                                <select class="select-css" id="group-select">
+                                    <option value="region">Region</option>
+                                    <option value="population">Population</option>
+                                    <option value="urban">Percent Urban</option>
+                                    <option value="political_aff">Political</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 cn">     
+                            <div class="inner">
+                                <h5> Time (x-axis) </h5>                       
+                                <select class="select-css" id="color-select">
+                                    <option value="state_hundred">States's 100th Case</option>
+                                    <option value="us_hundred_case">US 100th Case</option>
+                                    <option value="us_first_case">US 1st Case</option>
+                                </select>
+                            </div>
+                        </div>
+                            <a class="btn" id="scatter-help">
+                                <i class="fa fa-question-circle help-button-right-upper" id ="scatter-help-icon" style="font-size: 1.2rem;"></i>
+                            </a>
+                    </div>
+                    <div id="outter2">
+                        <div id="scatterTooltip"></div>
+                        <div id="scatter-area"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row rows">
+            <div class="col-lg-6 left-coloumn">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                        <h2 class="section-title"> State-Issued Orders </h2>
+                            <a class="btn" id="orders-help">
+                                <i class="fa fa-question-circle help-button" id ="orders-help-icon" style="font-size: 1.2rem;"></i>
+                            </a>
+                    </div>
+                    <div id="legis-chart"></div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                        <h2 class="section-title"> States Ranking </h2>
+                            <a class="btn" id="rank-help">
+                                <i class="fa fa-question-circle help-button" id ="rank-help-icon" style="font-size: 1.2rem;"></i>
+                            </a>
+                    </div>
+                    <div id="outter1">
+                        <div id="ranking"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 right-coloumn">
+                <div class="bounding">
+                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                        <h2 class="section-title"> Placeholder </h2>
+                            <a class="btn" id="ph1-help">
+                                <i class="fa fa-question-circle help-button-right-lower" id ="ph1-help-icon" style="font-size: 1.2rem;"></i>
+                            </a>
+                    </div>
+                    <div id="outter1">
+                        <div id="placeholder"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    
+
+    <!-- Modal -->
+    <div class="modal fade" id="logChartModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content center-block" style="width: 200%;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Covid-19 Trajectory chart</h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                            This chart is to show the growth rate of COVID-19 on a scale that that makes seeing if it is spreading at an exponential rate, or if the curve has begun to "flatten". It is important to note that it is on a Logarithmic scale, and also that the "Y-axis" is the total cases in the last 7 days, meaning it will be more conservative in showing trends. More explaination on this chart type can be found in the resources footer below.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/trajectory.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <ul>
+                                <li class="modal-text em-red" ><em>Exponential growth line</em>: This dotted line gives where there is exponential growth of number of cases. The more vertical the state's curve is progressing down to zero the more they have contained the spread </li>
+
+                                <li class="modal-text em-blue" > In the highlighted <em> blue section </em> you can see an example of a state who's growth rate is still pretty similar to the exponential growth curve, meaning cases are still growing rapidly </li>
+                                <li class="modal-text em-orange"> In the highlighted <em> orange section </em> you can see an example of a state who's curve is almost veritcal, meaning they have signficantly slowed the growth rate and have done a good job "flattening the curve" </li>
+
+                                <li class="modal-text"> The Circles make where each state issued a stay a lockdown order, and the squares mark where that state has issued a reopening order </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: left; ">
+                    <p class="modal-text" style="font-size: 2rem; margin-left: 10%;">
+                        Inspiration of this visulization from <a href="https://aatishb.com/covidtrends/">https://aatishb.com/covidtrends/</a> and <a href="https://www.youtube.com/user/minutephysics">MinutePhysics</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="scatterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content center-block" style="width: 150%;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Severity Scatter Plot</h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                            This chart allows you to compare the relative severity of each state when a lockdown order occured in that state. It gives sorting criteria to allow you to look at the data grouped in different ways, and with different factors to determine the severity in each state. 
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/severity.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <ul>
+                                <li class="modal-text em-red" ><em>The X-axis </em>: in thie chart represents number of days since an event for each state until that state issued its' lockdown order. The default is each individual state's 100th case. Note a negative value of days means the order was issued before the 100th case for that state. The further right a circle is the longer it took them to respond and issue a lockdown order. </li>
+
+                                <li class="modal-text em-green"> <em> The Y-axis </em> in this chart gives a grouping criteria for the states. The default is grouped by region, so that all states in that given region are at the same y-height
+
+                                <li class="modal-text em-light-blue"> <em> The Area </em> of each individual state is given by how "severe" it was in that state at the point of the lockdown order being issued. Larger circles correspond to more severe
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: left; ">
+                    <p class="modal-text" style="font-size: 2rem; margin-left: 10%;">
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content center-block" style="width: 130%;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the State-Issued Orders Chart </h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                            This chart is to show the state ordered actions taken by the local government, sorted by which type of order it is and dates it was released on
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/orders.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text em-yellow">
+                                The fainter rectangles in the chart are the number of that type of order given on each day. If <em> a state has both a lockdown and reopening order </em> they will be displayed in each with the same color
+                            </p>
+
+                            <p class="modal-text em-red">
+                                The <em> Lower half of the chart </em> shows the lockdown orders per date, and when a state is selected it will appear with a circle in the date it issued an order. These also correspond with the circles in the Covid-19 Trajectory chart
+                            </p>
+
+                            <p class="modal-text em-green">
+                                The <em> Upper half of the chart </em> shows the reopening orders per date, and when a state is selected it will appear with a square in the date it issued an order. These also correspond with the squares in the Covid-19 Trajectory chart
+                            </p>
+
+                            <p class="modal-text em-light-blue">
+                                The <em> Right hand side </em> shows states which are missing orders for each order type
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="rankingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content center-block" style="width: 130%;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting States Ranking Chart </h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                            This chart is to show the absolute and relative values of states ranked on different criteria. More criteria on selecting the ranking criteria to come.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/ranking.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text em-yellow">
+
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="selectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content center-block" style="width: 150%;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"> State Selection </h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                                This section is used to be a selection tool for exploring the visulization
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/selection.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text em-yellow">
+                                <em> Selecting any of the states </em> will highlight and bring to focus all the data points corresponding to that state in every chart. Some states are not represented in every chart, depending on if there is data for that state for that chart type. 
+
+                                You can also <em> select any state </em> by clicking on the data element in each individual chart
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </section>
+
+    <!-- External JS libraries -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+    <script src="https://d3js.org/d3-voronoi.v1.min.js"></script>
+
+
+    <!-- Custom JS -->
+
+
+    <script src="https://unpkg.com/d3fc"></script>
+    <script src="js/lineChart.js"></script>
+    <script src="js/stateSelection.js"></script>
+    <script src="js/bubbles.js"></script>
+    <script src="js/scatter.js"></script>
+    <script src="js/stateOrders.js"></script>
+    <script src="js/placeholder.js"></script>
+    <script src="js/ranking.js"></script>
+    <script src="js/main.js"></script>
+    
+</body>
+</html>

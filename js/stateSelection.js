@@ -41,8 +41,8 @@ function selector(config){
 
     icons_loc.append("text")
         .attr("font-family", "FontAwesome")
-        .attr("font-size", "2rem")
-        .attr("x", 0)
+        .attr("font-size", "1.2rem")
+        .attr("x", 5)
         .attr("y", 0)
         .attr("text-anchor", "middle")
         .attr("fill", "lightsteelblue")
@@ -141,7 +141,7 @@ function selector(config){
             .attr("x", function(d, i){  return x(d.x) + x.bandwidth()/2; })
             .attr("fill", "#fff")
             .text(function(d){ return d.state})
-            .attr("font-size", "1.5rem")
+            .attr("font-size", "1rem")
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
 
