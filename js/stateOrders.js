@@ -287,7 +287,7 @@ function orders_chart(config){
             .attr("fill", "#fff")
             .attr("font-size", "0.05rem")
             .transition().duration(dur)
-            .attr("font-size", "1.2rem")
+            .attr("font-size", "0.9rem")
             
     }
 

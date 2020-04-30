@@ -4,10 +4,12 @@
     <meta charset="utf-8">
     <meta name="description" content="">
     <title>Coronavirus</title>
+
         <!--
-        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        
         <!-- jQuery UI CSS -->
         <link rel="stylesheet" href="css/jquery-ui.min.css">
         <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
@@ -31,9 +33,9 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-item nav-link active" href="index.html">Home <span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link" href="">About</a>
-                <a class="nav-item nav-link" href="#">Dashboard</a>
-                <a class="nav-item nav-link" href="#">Resources</a>
+                <a class="nav-item nav-link" href="index.html#about">About</a>
+                <a class="nav-item nav-link" href="dashboard.html">Dashboard</a>
+                <a class="nav-item nav-link" href="index.html#resources">Resources</a>
             </div>
         </div>
     </nav>
@@ -178,7 +180,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
 
@@ -186,9 +187,10 @@
     
 
     <!-- Modal -->
+
     <div class="modal fade" id="logChartModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content center-block" style="width: 200%;">
+            <div class="modal-content center-block">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Interpreting the Covid-19 Trajectory chart</h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
@@ -223,7 +225,7 @@
                     </div>
                 </div>
                 <div class="modal-footer" style="text-align: left; ">
-                    <p class="modal-text" style="font-size: 2rem; margin-left: 10%;">
+                    <p class="modal-text" style="font-size: 1.2rem; margin-left: 30px;">
                         Inspiration of this visulization from <a href="https://aatishb.com/covidtrends/">https://aatishb.com/covidtrends/</a> and <a href="https://www.youtube.com/user/minutephysics">MinutePhysics</a>
                     </p>
                 </div>
@@ -233,8 +235,8 @@
 
     <!-- Modal -->
     <div class="modal fade" id="scatterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 150%;">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content center-block">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Interpreting the Severity Scatter Plot</h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
@@ -276,8 +278,8 @@
     </div>
 
     <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 130%;">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content center-block">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Interpreting the State-Issued Orders Chart </h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
@@ -327,8 +329,8 @@
     </div>
 
     <div class="modal fade" id="rankingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 130%;">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content center-block">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Interpreting States Ranking Chart </h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
@@ -352,7 +354,7 @@
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
                             <p class="modal-text em-yellow">
-
+                                The default is the Average % Increase of Cases for each day, averaged over the previous 3 days. This shows you how quickly cases are speeding up or slowing down, compard to the number of cases there already are. 
                             </p>
 
                         </div>
@@ -366,8 +368,8 @@
     </div>
 
     <div class="modal fade" id="selectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 150%;">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content center-block">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel"> State Selection </h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">

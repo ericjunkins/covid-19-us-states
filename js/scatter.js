@@ -211,12 +211,7 @@ function scatter_chart(config){
         }
     }
 
-    function numberWithCommas(num) {
-        //Retuns number seperated by commas
-        if (typeof(num) == "string") return num
-        if (num > 1) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        else return num.toExponential(1)
-    }
+
 
     function draw_vis(){
 
@@ -423,6 +418,14 @@ function scatter_chart(config){
         }
     }
 
+    function numberWithCommas(num) {
+        //Retuns number seperated by commas
+        
+        if (typeof(num) == "string") return num
+        if (num > 1) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        else return Math.round(num*1000000)
+    }
+
     function mousemove(d){
         if (groupSelector == "region") groupText = "Region: "
         else if (groupSelector == "population") groupText = "Population: "
@@ -433,17 +436,29 @@ function scatter_chart(config){
         else if (timeSelector == "us_hundred_case") timeText = "Days between US's 1st case and Lockdown: "
         else if (timeSelector == "us_first_case") timeText = "Days between US's 100th case and Lockdown: "
 
-        if (severitySelector == "cases") sevText = "Number of Cases at lockdown: "
-        else if (severitySelector == "cases_per_capita") sevText = "Number of Deaths per Capita at lockdown: "
-        else if (severitySelector == "deaths") sevText = "Number of Deaths at lockdown: "
-        else if (severitySelector == "deaths_per_capita") sevText = "Number of Deaths per Capita at lockdown: "
+        if (severitySelector == "cases"){
+            sevText = "Number of Cases at lockdown: "
+            sevNum = d[severitySelector].toFixed(2)
+        } 
+        else if (severitySelector == "cases_per_capita"){
+            sevText = "Number of Deaths per 100,000 at lockdown: "
+            sevNum = d[severitySelector].toExponential(2)
+        } 
+        else if (severitySelector == "deaths") {
+            sevText = "Number of Deaths at lockdown: "
+            sevNum = d[severitySelector].toFixed(2)
+        }
+        else if (severitySelector == "deaths_per_capita") {
+            sevText = "Number of Deaths per 100,000 at lockdown: "
+
+        }
 
         scatterTooltip
             .html(
                 "State: " + d.state + "<br>" + 
                 groupText +  d[groupSelector] + "<br>" + 
                 timeText  +  d[timeSelector] + "<br>" + 
-                sevText   +  d[severitySelector] + "<br>"
+                sevText   +  numberWithCommas(d[severitySelector]) + "<br>"
                 
         )
         .style("left", (d3.mouse(this)[0]+ 175) + "px")
