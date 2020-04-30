@@ -81,14 +81,14 @@ function line_chart(config){
         .attr("dominant-baseline", "middle")
 
     legend.append('rect')
-        .attr("x", 130 - orderR)
+        .attr("x", 140 - orderR)
         .attr("y", 25 - orderR)
         .attr("height", orderR *2)
         .attr("width", orderR*2)
         .attr("fill", "#fff")
 
     legend.append('circle')
-        .attr("cx", 130)
+        .attr("cx", 140)
         .attr("cy", 0)
         .attr("fill", "#fff")
         .attr("r", orderR)
