@@ -3,7 +3,7 @@ function selector(config){
         states_list = config.states_list,
         full2abbrev = config.full2abbrev,
         defaultColor = config.defaultColor,
-        defaultOpacity = config.defaultOpacity
+        defaultOpacity = config.defaultOpacity *0.5
 
     var focus = [];
     var height = config.height - margin.top - margin.bottom, 
@@ -26,7 +26,19 @@ function selector(config){
     var icons_loc = svg.append("g")
         .attr("class", "states-icons")
         .attr("transform", "translate(" + (width + margin.right*0.4) + ",25)")
-    
+   
+    var selectionTooltip =  d3.select("#selectionTooltip")
+        .append("div")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .style("opacity", 0)
+        .attr("class", "tooltip")
+        .style("font-size", "1.5rem")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "3px")
+        .style("border-radius", "5px")
+        .style("padding", "5px")
+
     icons_loc.append("text")
         .attr("font-family", "FontAwesome")
         .attr("font-size", "2rem")
@@ -146,12 +158,23 @@ function selector(config){
             .on("click", clicked)
     }
     function mouseover(d){
+        if (d.state == "") return
+        selectionTooltip
+            .transition().duration(250)
+            .style("opacity", 1)
         document.body.style.cursor = "pointer"
         update_highlight(d.state, "on")
     }
 
     function mousemove(d){
-
+        if (d.state == "") return
+        selectionTooltip
+            .html(
+                "State: " + abbrev2full[d.state] + "<br>"
+                
+        )
+        .style("left", (d3.mouse(this)[0]- 50) + "px")
+        .style("top", (d3.mouse(this)[1]+ 50) + "px")
     }
 
     function display_hover(d, action){
@@ -164,6 +187,9 @@ function selector(config){
     }
 
     function mouseout(d){
+        selectionTooltip
+            .transition().duration(250)
+            .style("opacity", 0)
         document.body.style.cursor = "default"
         update_highlight(d.state, "off");
     }

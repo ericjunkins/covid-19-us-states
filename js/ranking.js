@@ -4,7 +4,7 @@ function ranking_chart(config){
     var currentData = config.currentData
         dur = config.duration,
         defaultColor = config.defaultColor,
-        defaultOpacity = config.defaultOpacity
+        defaultOpacity = config.defaultOpacity *0.5
 
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
@@ -23,7 +23,7 @@ function ranking_chart(config){
     const outerSvg = d3.select("#outter1").append('svg')
         .attr("width", width + margin.left + margin.right)
 
-    var barHeight = height/18
+    var barHeight = height/12
     
 
     currentData.forEach(function(d){
@@ -74,7 +74,7 @@ function ranking_chart(config){
         .range([barHeight*currentData.length, 0])
         .padding(0.05)
 
-    var x_axis = d3.axisBottom(x).ticks(4)
+    var x_axis = d3.axisBottom(x).ticks(6)
     var y_axis = d3.axisLeft(y)
 
     function rankChart(){

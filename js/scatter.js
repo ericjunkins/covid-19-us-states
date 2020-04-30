@@ -15,14 +15,13 @@ function scatter_chart(config){
         timeSelector = config.dateSelector,
         political_aff = config.political_aff,
         defaultColor = config.defaultColor,
-        scatterDefaultOpacity = config.defaultOpacity * 2,
+        scatterDefaultOpacity = config.defaultOpacity * 1.5,
         dur = config.duration,
         scatterFocus = [];
 
         var color = d3.scaleOrdinal(config.scheme);
         var cur_color = 0; 
 
-        console.log(scatterDefaultOpacity)
     var max_pop = 40000000,
         min_pop = 0,
         max_urban = 100,
@@ -81,7 +80,17 @@ function scatter_chart(config){
     var colorScale = d3.scaleSequential(d3.interpolateReds)
         .domain([-3,20])
 
-
+    var scatterTooltip =  d3.select("#scatterTooltip")
+        .append("div")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .style("opacity", 0)
+        .attr("class", "tooltip")
+        .style("font-size", "1.5rem")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "3px")
+        .style("border-radius", "5px")
+        .style("padding", "5px")
 
     //Default to Population Sorted
     var y = yLinearPop;
@@ -355,7 +364,7 @@ function scatter_chart(config){
 
 
         if (timeSelector == "state_hundred"){
-            var t = "Days since each state's 100th Case"
+            var t = "Days between state's 100th Case and lockdown order"
             // svg.append("line")
             //     .attr("id", "zero-day-line")
             //     .attr("x1", xLinear(0))
@@ -398,9 +407,9 @@ function scatter_chart(config){
     }
 
     function mouseover(d){
-        // tooltip
-        //     .transition().duration(250)
-        //     .style("opacity", 1)
+        scatterTooltip
+            .transition().duration(250)
+            .style("opacity", 1)
 
         document.body.style.cursor = "pointer"
         update_highlight(d.state, 'on')
@@ -415,23 +424,38 @@ function scatter_chart(config){
     }
 
     function mousemove(d){
-        // tooltip
-        // .html("State: " + d.state + "<br>" + 
-        //     severitySelector + ": " + numberWithCommas(d[severitySelector]) + "<br>" + 
-        //     'Stay at home order: ' + formatTime(d.date) + "<br>" + 
-        //     timeSelector + ": " + d[timeSelector] + "<br>" +
-        //     groupSelector + ": " + numberWithCommas(d[groupSelector])
-        // )
-        // .style("left", (d3.mouse(this)[0]+ 175) + "px")
-        // .style("top", (d3.mouse(this)[1]+50) + "px")
+        if (groupSelector == "region") groupText = "Region: "
+        else if (groupSelector == "population") groupText = "Population: "
+        else if (groupSelector == "urban") groupText = "Percent Urban: "
+        else if (groupSelector == "political_aff") groupText = "Political Affiliation: "
+
+        if (timeSelector == "state_hundred") timeText = "Days between State's 100th case and Lockdown: "
+        else if (timeSelector == "us_hundred_case") timeText = "Days between US's 1st case and Lockdown: "
+        else if (timeSelector == "us_first_case") timeText = "Days between US's 100th case and Lockdown: "
+
+        if (severitySelector == "cases") sevText = "Number of Cases at lockdown: "
+        else if (severitySelector == "cases_per_capita") sevText = "Number of Deaths per Capita at lockdown: "
+        else if (severitySelector == "deaths") sevText = "Number of Deaths at lockdown: "
+        else if (severitySelector == "deaths_per_capita") sevText = "Number of Deaths per Capita at lockdown: "
+
+        scatterTooltip
+            .html(
+                "State: " + d.state + "<br>" + 
+                groupText +  d[groupSelector] + "<br>" + 
+                timeText  +  d[timeSelector] + "<br>" + 
+                sevText   +  d[severitySelector] + "<br>"
+                
+        )
+        .style("left", (d3.mouse(this)[0]+ 175) + "px")
+        .style("top", (d3.mouse(this)[1]+50) + "px")
 
 
     }
 
     function mouseout(d){
-        // tooltip
-        //     .transition().duration(250)
-        //     .style("opacity", 0)
+        scatterTooltip
+            .transition().duration(250)
+            .style("opacity", 0)
         document.body.style.cursor = "default"
         update_highlight(d.state, "off")
     }
@@ -466,7 +490,6 @@ function scatter_chart(config){
             .attr("fill", defaultColor)
             .attr("opacity", scatterDefaultOpacity)
 
-        update_vis(focus);
     }
 
 

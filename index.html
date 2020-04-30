@@ -20,9 +20,34 @@
 <body>
 
     <!-- Bootstrap grid setup -->
+
+    <div class="jumbotron jumbotron-fluid" id="home">
+        <div class="container h-100">
+            <h1 class="display-4">COVID-19 US States Data</h1>
+            <p class="lead">Explore the US historical data for coronavirus, and how it relates to each state's government issued orders </p>
+        </div>
+    </div>
+
+    <div class="row" id="about">
+        <div class="col-sm-12">
+            <h1 id="info-title" > Using this dashboard </h1>
+            <div class="col-sm-3"> </div>
+            <div class="col-sm-6" style="text-align: center;">
+                <p class="about-text">
+                    This dashboard is meant to help inform the user about how each of the US states are doing in response to the Covid-19 crisis, both in an absolute sense and relative sense. It is meant to be interactive to aid in seeing relationships in the data that are otherwise difficult to come about. The main data source comes from <a id="tracking-link" href="https://covidtracking.com/">Covid Tracking Porject </a>
+                </p>
+
+                <p style="margin-top: 50px;" id="date-update-text">
+                    Data updated:  <span id="updated-time"> </span>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
     <section id="title">
         <div class="container-fluid">
-            <h1 style="margin-bottom: 15px; margin-top: 5px" class="title_text">COVID-19 US States Data </h1>
+            <h1 style="margin-bottom: 15px; margin-top: 5px" class="title_text"> Covid-19 Dashboard</h1>
         </div>
     </section>
     <section id="time-graph">
@@ -30,6 +55,7 @@
         <div class="row">
             <div class="col-sm-10 col-sm-offset-1">
                 <div class = "bounding" id="selection-tool">
+                    <div id="selectionTooltip"></div>
                     <div id="state-selection"></div>
                 </div>
             </div>
@@ -72,13 +98,13 @@
             <div class="col-lg-6 right-coloumn">
                 <div class="bounding">
                     <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
-                        <div class="col-sm-2">
-                            <h2 class="section-title"> Scatter </h2>
+                        <div class="col-sm-3">
+                            <h2 class="section-title">Severity Per State </h2>
                         </div>
-                        <div class="col-sm-3"> </div>
+                        <div class="col-sm-2"> </div>
                         <div class="col-sm-2 cn">
                             <div class="inner">
-                                <h5> Severity (radius) </h5>
+                                <h5> Severity (area) </h5>
                                 <select class="select-css" id="severity-select">
                                     <option value="cases">Total Cases</option>
                                     <option value="cases_per_capita">Cases Per Capita</option>
@@ -100,7 +126,7 @@
                         </div>
                         <div class="col-sm-2 cn">     
                             <div class="inner">
-                                <h5> Time (color) </h5>                       
+                                <h5> Time (x-axis) </h5>                       
                                 <select class="select-css" id="color-select">
                                     <option value="state_hundred">States's 100th Case</option>
                                     <option value="us_hundred_case">US 100th Case</option>
@@ -108,11 +134,12 @@
                                 </select>
                             </div>
                         </div>
-                            <a class="btn" id="ph2-help">
+                            <a class="btn" id="scatter-help">
                                 <i class="fa fa-question-circle help-button-right-upper" id ="scatter-help-icon" style="font-size: 2.3rem;"></i>
                             </a>
                     </div>
                     <div id="outter2">
+                        <div id="scatterTooltip"></div>
                         <div id="scatter-area"></div>
                     </div>
                 </div>
@@ -163,7 +190,7 @@
 
 
 
-    <div id="div_template"></div>
+    
 
     <!-- Modal -->
     <div class="modal fade" id="logChartModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -179,23 +206,25 @@
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
                             <p class="modal-text">
-                            This chart is to show the growth rate of COVID-19 on a scale that that makes seeing if it is spreading at an exponential rate, or if the curve has begun to "flatten". It is important to note that it is on a Logarithmic scale, and also that the "Y-axis" is the total cases in the last 7 days, meaning it will be more conservative in showing trends. 
+                            This chart is to show the growth rate of COVID-19 on a scale that that makes seeing if it is spreading at an exponential rate, or if the curve has begun to "flatten". It is important to note that it is on a Logarithmic scale, and also that the "Y-axis" is the total cases in the last 7 days, meaning it will be more conservative in showing trends. More explaination on this chart type can be found in the resources footer below.
                             </p>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
-                            <img class="center" style="margin:0 auto; width: 100%;" src="img/log_explaination.png" alt="">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/trajectory.png" alt="">
                         </div>
                     </div>
 
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
                             <ul>
-                                <li class="modal-text em-red" ><em>Exponential growth line</em>: Given by x=y, this line denotes where exponential growth in cases is occuring</li>
-                                <li class="modal-text em-green" ><em>A vertical line</em> would indicate that there was no new cases of COVID-19, that is the eventual goal</li>
-                                <li class="modal-text em-blue" > Look for <em>significant deviation from the exponential growth line </em>, with significant downward trends to see a state experiencing "flattening the curve" </li>
-                                <li class="modal-text em-yellow"><em> Stay at Home</em> legislative orders issued by each state goverment mark the number of total cases a state had</li>
+                                <li class="modal-text em-red" ><em>Exponential growth line</em>: This dotted line gives where there is exponential growth of number of cases. The more vertical the state's curve is progressing down to zero the more they have contained the spread </li>
+
+                                <li class="modal-text em-blue" > In the highlighted <em> blue section </em> you can see an example of a state who's growth rate is still pretty similar to the exponential growth curve, meaning cases are still growing rapidly </li>
+                                <li class="modal-text em-orange"> In the highlighted <em> orange section </em> you can see an example of a state who's curve is almost veritcal, meaning they have signficantly slowed the growth rate and have done a good job "flattening the curve" </li>
+
+                                <li class="modal-text"> The Circles make where each state issued a stay a lockdown order, and the squares mark where that state has issued a reopening order </li>
                             </ul>
                         </div>
                     </div>
@@ -210,11 +239,11 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="bubblesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="scatterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 200%;">
+            <div class="modal-content center-block" style="width: 150%;">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Severity Bubbles</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Severity Scatter Plot</h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -223,52 +252,41 @@
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
                             <p class="modal-text">
-                                This chart is to show the relative severity of each state when its local government decided to take legislative action. It is made to be sortable/filterable by different criteria so you can use many variables to determine if a state had an appropriate response to the pandemic.
+                            This chart allows you to compare the relative severity of each state when a lockdown order occured in that state. It gives sorting criteria to allow you to look at the data grouped in different ways, and with different factors to determine the severity in each state. 
                             </p>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 20px;">
-                        <div class="col-sm-4" style="text-align: center;">
-                            <img src="img/bubbles_area_exp.png" style="width:95%;" />
-                            <p class = "modal-text em-yellow" style="text-align: left; padding: 5px 20px; ">
-                                The <em> Severity</em> of a state is given by the radius of each individual bubble
-                            </p>
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/severity.png" alt="">
                         </div>
-                        <div class="col-sm-4" style="text-align: center;">
-                            <img src="img/bubbles_y_exp.png" style="width:95%;"/>
-                                <p class = "modal-text em-green" style="text-align: left; padding: 5px 20px; ">
-                                The <em> Y-axis Grouping </em> of a state filters how the bubbles are positioned on the Y-axis, given different filtering criteria
-                            </p>
-                        </div>
-                        <div class="col-sm-4" style="text-align: center;">
-                            <img src="img/bubbles_time_exp.png" style="width:95%;"/>
-                                <p class = "modal-text em-blue" style="text-align: left; padding: 5px 20px; ">
-                                The <em> Time Since specific event </em> of a state is given by the color of the bubble, less time appearing more white, and longer appearing more red
-                            </p>
-                        </div>
-
                     </div>
 
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
+                            <ul>
+                                <li class="modal-text em-red" ><em>The X-axis </em>: in thie chart represents number of days since an event for each state until that state issued its' lockdown order. The default is each individual state's 100th case. Note a negative value of days means the order was issued before the 100th case for that state. The further right a circle is the longer it took them to respond and issue a lockdown order. </li>
 
+                                <li class="modal-text em-green"> <em> The Y-axis </em> in this chart gives a grouping criteria for the states. The default is grouped by region, so that all states in that given region are at the same y-height
+
+                                <li class="modal-text em-light-blue"> <em> The Area </em> of each individual state is given by how "severe" it was in that state at the point of the lockdown order being issued. Larger circles correspond to more severe
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer" style="text-align: center;">
-                    <p class="modal-text" style="font-size: 1.5rem;">
-
+                <div class="modal-footer" style="text-align: left; ">
+                    <p class="modal-text" style="font-size: 2rem; margin-left: 10%;">
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="legisModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 200%;">
+            <div class="modal-content center-block" style="width: 130%;">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Legislative Orders Chart</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the State-Issued Orders Chart </h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -277,25 +295,73 @@
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
                             <p class="modal-text">
-                            This chart is to show the legislative actions taken by the local government, sorted by which type of order it is and dates it was released on
+                            This chart is to show the state ordered actions taken by the local government, sorted by which type of order it is and dates it was released on
                             </p>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
-                            <img class="center" style="margin:0 auto; width: 100%;" src="img/legis_exp.png" alt="">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/orders.png" alt="">
                         </div>
                     </div>
 
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
                             <p class="modal-text em-yellow">
-                                The fainter rectangles in the chart are the number of that type of order given on each day. More order types will come in the future. 
+                                The fainter rectangles in the chart are the number of that type of order given on each day. If <em> a state has both a lockdown and reopening order </em> they will be displayed in each with the same color
                             </p>
 
-                            <p class="modal-text em-yellow">
-                                This chart can be used to correlate the <em> Date of the order </em> by state to the <em> data in the line chart </em> above to determine if trends emerge in response to this event, either spikes/resurgenses in cases, or "flattening" of the curve
+                            <p class="modal-text em-red">
+                                The <em> Lower half of the chart </em> shows the lockdown orders per date, and when a state is selected it will appear with a circle in the date it issued an order. These also correspond with the circles in the Covid-19 Trajectory chart
                             </p>
+
+                            <p class="modal-text em-green">
+                                The <em> Upper half of the chart </em> shows the reopening orders per date, and when a state is selected it will appear with a square in the date it issued an order. These also correspond with the squares in the Covid-19 Trajectory chart
+                            </p>
+
+                            <p class="modal-text em-light-blue">
+                                The <em> Right hand side </em> shows states which are missing orders for each order type
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="rankingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content center-block" style="width: 130%;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Interpreting States Ranking Chart </h5>
+                    <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 10px 10%;">
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text">
+                            This chart is to show the absolute and relative values of states ranked on different criteria. More criteria on selecting the ranking criteria to come.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/ranking.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <p class="modal-text em-yellow">
+
+                            </p>
+
                         </div>
                     </div>
                 </div>
@@ -308,9 +374,9 @@
 
     <div class="modal fade" id="selectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content center-block" style="width: 200%;">
+            <div class="modal-content center-block" style="width: 150%;">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Interpreting the Covid-19 Trajectory chart</h5>
+                    <h5 class="modal-title" id="exampleModalLabel"> State Selection </h5>
                     <button type="button" style="position: relative; bottom: 30px;" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -325,12 +391,17 @@
                     </div>
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
-                            <img class="center" style="margin:0 auto; width: 100%;" src="img/selection_exp.png" alt="">
+                            <img class="center" style="margin:0 auto; width: 100%;" src="img/selection.png" alt="">
                         </div>
                     </div>
 
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-sm-12">
+                            <p class="modal-text em-yellow">
+                                <em> Selecting any of the states </em> will highlight and bring to focus all the data points corresponding to that state in every chart. Some states are not represented in every chart, depending on if there is data for that state for that chart type. 
+
+                                You can also <em> select any state </em> by clicking on the data element in each individual chart
+                            </p>
                         </div>
                     </div>
                 </div>

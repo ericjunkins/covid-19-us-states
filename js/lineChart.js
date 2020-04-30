@@ -6,13 +6,20 @@ function line_chart(config){
         ordersList = config.orderByState,
         dur = config.duration,
         data = config.state_data,
+        stateOrders = config.order,
+        historicalData = config.historicalData,
         defaultColor = config.defaultColor,
         defaultOpacity = config.defaultOpacity
+
 
     var color = d3.scaleOrdinal(config.scheme);
     var cur_color = 0;   
     var focus = [],
         axesSelector = "log";
+
+    var orderR = 8,
+        lockdownMarkers = []
+        reopenMarkers = []
 
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
@@ -50,18 +57,41 @@ function line_chart(config){
 
     var x_axis = d3.axisBottom().tickPadding(8);
     var y_axis = d3.axisLeft().tickPadding(8);
-    
-    var zoom = d3.zoom()
-        .scaleExtent([1, Infinity])
-        .translateExtent([[0, 0], [width, height]])
-        .extent([[0, 0], [width, height]])
-        .on("zoom", zoomed);
-
-
-
 
     var labels = svg.append('g')
         .attr("class", "labels")
+
+    var legend = svg.append("g")
+        .attr("class", "legend")
+        .attr("transform", "translate(" + width*0.075 + "," + height* 0.075 + ")")
+    
+    legend.append('text')
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("fill", "#fff")
+        .text("Lockdown Order")
+        .attr("dominant-baseline", "middle")
+
+    legend.append('text')
+        .attr("x", 0)
+        .attr("y", 25)
+        .attr("fill", "#fff")
+        .attr("text-anchor", "left")
+        .text("Reopening Order")
+        .attr("dominant-baseline", "middle")
+
+    legend.append('rect')
+        .attr("x", 130 - orderR)
+        .attr("y", 25 - orderR)
+        .attr("height", orderR *2)
+        .attr("width", orderR*2)
+        .attr("fill", "#fff")
+
+    legend.append('circle')
+        .attr("cx", 130)
+        .attr("cy", 0)
+        .attr("fill", "#fff")
+        .attr("r", orderR)
 
     var xAxisCall = labels.append("g")
         .attr("transform", "translate(0," + height + ")")
@@ -114,70 +144,160 @@ function line_chart(config){
     }
     
     function draw_paths(){
-        // svg.append("rect")
-        //     .attr("class", "zoom")
-        //     .attr("width", width)
-        //     .attr("height", height)
-        //     //.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        //     .attr("fill", defaultColor)
-        //     .attr("opacity", 0)
-        //     .call(zoom)
-
         // Draw paths
-        lines = svg.selectAll(".covid-line")
-            .data(data_list, function(d){ return d[0].state })
 
-        lines.exit().remove()
-    
-        lines
-            .attr("d", function(d){ return line(d); });
-    
+        lines = svg.selectAll(".covid-line")
+            .data(historicalByState, function(d){ return d.state})
+
+
+        lines.attr("d", function(d){ return line(d.values)})
+
         lines.enter()
             .append("path")
-                .attr("class", "covid-line")
-                .attr("opacity", 1)
-                .attr("id", function(d){
-                    return "path-" + d[0].state; 
-                })
-                .attr("fill", "none")
-                .attr("stroke", defaultColor)
-                .attr("stroke-width", 0.5)
-                .attr("opacity", defaultOpacity * 2)
-                .attr("d", function(d){ return line(d) });
-
-        d3.selectAll(".covid-line")
-            .on("mousemove", mousemove)
-            .on("mouseenter", mouseover)
-            .on("mouseout", mouseout)
-            .on("click", clicked)
+                .on("mousemove", mousemove)
+                .on("mouseenter", mouseover)
+                .on("mouseout", mouseout)
+                .on("click", clicked)
+            .attr("class", "covid-line")
+            .attr("opacity", defaultOpacity)
+            .attr("id", function(d){ return "path-" + d.state; })
+            .attr("fill", "none")
+            .attr("stroke", defaultColor)
+            .attr("stroke-width", 0.5)
+            .attr("d", function(d){ return line(d.values)})
 
     }
     
     function draw_orders(){
         //Draws the orders
         // TO DO add different shapes based on what type of order it is
-        orders = orderGroup.selectAll("circle")
-            .data(ordersList, d => d.state)
 
-        orders
+
+        // orders = orderGroup.selectAll("circle")
+        //     .data(ordersList, d => d.state)
+
+        // orders
+        //     .attr("cx", function(d){ return x(d.positive); })
+        //     .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
+
+        // orders.enter()
+        //     .append('circle')
+        //     .attr("class", "order-circle")
+        //     .attr("id", function(d){ return "order-circ-" + d.state; })
+        //     .attr("fill", defaultColor)
+        //     .attr('r', orderR)
+        //     .attr("cx", function(d){ return x(d.positive); })
+        //     .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
+        //     .attr("opacity", 0)
+
+        circles = orderGroup.selectAll("circle")
+            .data(lockdownMarkers, d=> d.state)
+
+        circles.exit().remove();
+
+        circles
             .attr("cx", function(d){ return x(d.positive); })
             .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
 
-        orders.enter()
-            .append('circle')
-            .attr("class", "order-circle")
-            .attr("id", function(d){ return "order-circ-" + d.state; })
-            .attr("fill", "#fff")
-            .attr('r', 10)
+        circles.enter()
+            .append("circle")
+            .attr("class", "lockdown-circle")
+            .attr("id", function(d){ return "mark-lockdown-circ-" + d.state; })
+            .attr("fill", defaultColor)
+            .attr("r", orderR)
             .attr("cx", function(d){ return x(d.positive); })
-            .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
+            .attr("cy", function(d){ return y(d.binnedPositiveIncrease); })
             .attr("opacity", 0)
+
+
+        
+        rects = orderGroup.selectAll("rect")
+            .data(reopenMarkers, d=> d.state)
+
+        rects.exit().remove()
+
+        rects
+            .attr("x", function(d){ return x(d.positive) - orderR; })
+            .attr("y", function(d){ return y(d.binnedPositiveIncrease) - orderR; })
+
+        rects.enter()
+            .append("rect")
+            .attr("class", "reopen-rect")
+            .attr("id", function(d){ return "mark-reopen-rect-" + d.state; })
+            .attr("fill", defaultColor)
+            .attr("width", orderR *2)
+            .attr("height", orderR *2)
+            .attr("x", function(d){ return x(d.positive) - orderR; })
+            .attr("y", function(d){ return y(d.binnedPositiveIncrease) - orderR; })
+            .attr("opacity", 0)
+
+
 
     }
     
     function get_lines_data(){
         //Parses the data to build the lines based on format 
         // TODO, give this selection criteria based on desired chart type
+
+        historicalByState = d3.nest()
+            .key(function(d){ return d.state; })
+            .entries(historicalData)
+
+        historicalByState = historicalByState.filter(function(d){ return d.key != "MP" && d.key != "AS"; })
+
+        lockdowns = []
+        reopens = []
+        historicalByState.forEach(function(d){
+            d.state = d.key;
+            delete d.key
+            var window = []
+
+            tmp1 = stateOrders[d.state].lockdown
+            tmp1.forEach(function(v){ v.state = d.state; })
+            lockdowns.push(tmp1)
+            
+            tmp2 = stateOrders[d.state].reopen
+            tmp2.forEach(function(k){ k.state = d.state; })
+            reopens.push(tmp2)
+
+            for (var i=d.values.length -1; i>=0; --i){
+                window.push(d.values[i].positiveIncrease)
+                if( window.length > 7){
+                    window.shift()
+                }
+                var total = (window.length == 1 ? window[0] : d3.sum(window))
+                d.values[i]['binnedPositiveIncrease'] = total
+            }
+        })
+
+
+
+        lockdowns.forEach(function(d){
+            d.forEach(function(v){
+                if (v.date != ""){
+                    tmp = historicalByState.filter(function(k){ return v.state == k.state})[0].values
+                    tmp.forEach(function(j){
+                        if (formatTime(j.date) == v.date){
+                            lockdownMarkers.push(j)
+                        }
+                    })
+                }
+            })
+        })
+
+        reopens.forEach(function(d){
+            d.forEach(function(v){
+                if (v.date != ""){
+                    tmp = historicalByState.filter(function(k){ return v.state == k.state})[0].values
+                    tmp.forEach(function(j){
+                        if (formatTime(j.date) == v.date){
+                            reopenMarkers.push(j)
+                        }
+                    })
+                }
+            })
+        })
+            
         data_list = []
         stayHomeDots = []
 
@@ -223,17 +343,24 @@ function line_chart(config){
                 .attr("opacity", 1)
                 .attr("stroke-width", 8.5)
                 .transition().duration(dur)
-                .attr("stroke-width", 2.5)
+                .attr("stroke-width", 3.5)
                 .attr("stroke", color(cur_color))
 
-            d3.select("#order-circ-" + d)
+            d3.select("#mark-lockdown-circ-" + d)
                 .raise()
                 .attr("opacity", 1)
                 .attr("r", 30)
                 .attr("fill", "#fff")
                 .transition().duration(dur)
                 .attr("fill", color(cur_color))
-                .attr("r", 10)
+                .attr("r", orderR)
+
+            d3.select("#mark-reopen-rect-" + d)
+                .raise()
+                .attr("opacity", 1)
+                .attr("fill", "#fff")
+                .transition().duration(dur)
+                .attr("fill", color(cur_color))
 
             cur_color += 1;
         } 
@@ -241,13 +368,13 @@ function line_chart(config){
 
     function mouseover (d,i){
         document.body.style.cursor = "pointer"
-        update_highlight(d[0].state, "on")
+        update_highlight(d.state, "on")
     }
     
     function clicked(d, i){
         //Adds or removes element from the 'focus'
-        if (focus.includes(d[0].state)) update_focus(d[0].state, "remove")
-        else update_focus(d[0].state, "add")
+        if (focus.includes(d.state)) update_focus(d.state, "remove")
+        else update_focus(d.state, "add")
     }
 
     function removeFromFocus(d, i){
@@ -263,7 +390,7 @@ function line_chart(config){
             .attr("stroke-width", 0.5)
             .attr("opacity", defaultOpacity * 2)
 
-        d3.select("#order-circ-" + d)
+        d3.select("#mark-lockdown-circ-" + d)
             .transition().duration(dur)
             .attr("opacity", 0)
 
@@ -279,16 +406,19 @@ function line_chart(config){
                 .attr("stroke-width", function(){ return (action == "on" ? 3 : 0.5 ); })
                 .attr("opacity", function(){ return (action == "on" ? 1 : defaultOpacity * 2); })
 
-            d3.select("#order-circ-" + d)
-                .raise()    
-                //.attr("fill", function(){ return (action == "on" ? "steelblue" : defaultColor); })
+            d3.select("#mark-lockdown-circ-" + d)
+                .raise()
+                .attr("opacity", function(){ return (action == "on" ? 1 : 0); })
+
+            d3.select("#mark-reopen-rect-" + d)
+                .raise()
                 .attr("opacity", function(){ return (action == "on" ? 1 : 0); })
         }
     }
 
     function mouseout (d, i){
         document.body.style.cursor = "default"
-        update_highlight(d[0].state, "off")
+        update_highlight(d.state, "off")
     }
     
 
@@ -318,21 +448,6 @@ function line_chart(config){
         draw_orders();
         draw_paths();
     }
-
-    function zoomed() {
-        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
-        var t = d3.event.transform;
-        console.log(t)
-        x.domain((t.rescaleX(x).domain()))
-        y.domain((t.rescaleY(y).domain()))
-        draw_chart();
-        //xAxisCall.call(x_axis)
-        // x.domain(t.rescaleX(x2).domain());
-        // Line_chart.select(".line").attr("d", line);
-        // focus.select(".axis--x").call(xAxis);
-        // context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
-      }
-
 
     // Getters & Setters for vis
 

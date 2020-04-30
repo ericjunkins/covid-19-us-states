@@ -4,19 +4,20 @@ function orders_chart(config){
         markerData = config.marker,
         raw_orders = config.raw_orders,
         full2abbrev = config.full2abbrev;
-        missingList = [],
+        missingLockdownList = [],
+        missingReopenList = []
         dur = config.duration,
         order = config.order,
         defaultColor = config.defaultColor,
-        defaultOpacity = config.defaultOpacity
+        defaultOpacity = config.defaultOpacity*0.5
 
     var ordersFocus = [],
-        focus_markers = [],
-        data = [];
+        lockdown_markers = [],
+        reopen_markers = []
 
     var color = d3.scaleOrdinal(config.scheme);
     var cur_color = 0,
-        circR;
+        y1CircR;
 
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
@@ -40,8 +41,10 @@ function orders_chart(config){
     var lockdown = [];
     var reopen = [];
     var lockdownBarData = []
+    var reopenBarData = []
     var today = new Date();
     var missingLockdown = [{'id': 'lockdown', 'parentId': '', 'size': undefined}]
+    var missingReopen = [{'id': 'lockdown', 'parentId': '', 'size': undefined}]
     const entries = Object.entries(order);
     for (const [key, vals] of entries){
         vals.lockdown.forEach(function(d){ 
@@ -51,32 +54,49 @@ function orders_chart(config){
                 })
                 ordersDates.push(d.date)
                 d.state = key
-                d.level = String(collisions.length)
-                d.type = "lockdown"
-                lockdown.push(d)
+                lockdown.push({
+                    'date': d.date,
+                    'order': d.order,
+                    'state': key,
+                    'level': String(collisions.length),
+                    'type': "lockdown"
+                })
             }
             else {
                 missingLockdown.push({
                     'id': key,
                     'parentId': 'lockdown',
                     'size': 10
+
                 })
-                missingList.push(key)
+                missingLockdownList.push(key)
             }
         })
         vals.reopen.forEach(function(d){
             if (d.date != "" && dates(d.date) <= today){
-                var collisions = lockdown.filter(function(v){
+                var collisions = reopen.filter(function(v){
                     return v.date == d.date;
                 })
                 ordersDates.push(d.date)
                 d.state = key
-                d.level = String(collisions.length)
-                reopen.push(d)
+
+                reopen.push({
+                    'date': d.date,
+                    'order': d.order,
+                    'state': key,
+                    'level': String(collisions.length),
+                    'type': "reopen"
+                })
+            } else if (d.date == ""){
+                missingReopen.push({
+                    'id': key,
+                    'parentId': 'reopen',
+                    'size': 10
+                })
+                missingReopenList.push(key)
             }
         })
     }
-
     var min_date = dates(d3.min(ordersDates)),
         max_date = dates(ext[1])
   
@@ -119,6 +139,10 @@ function orders_chart(config){
 
     var y1band = d3.scaleBand()
         .range([height, height/2 + height * 0.05])
+
+ 
+    var y2band = d3.scaleBand()
+        .range([height/2 - height * 0.05, 0])   
 
     var y2 = d3.scaleLinear()
         .domain([0,1])
@@ -208,20 +232,23 @@ function orders_chart(config){
         var lockdownPack = missingG.append('g')
             .attr("transform", "translate(" + 0 + "," + height/2 + ")")
         
+        var reopenPack = missingG.append('g')
+            .attr("transform", "translate(" + 0 + "," + (-height/2) + ")")
+
         const layout = d3.pack()
             .size([mWidth, height/2])
             .padding(3)
 
-        const stratData = d3.stratify()(missingLockdown)
-        var roots = d3.hierarchy(stratData)
+        const lockdownStrat = d3.stratify()(missingLockdown)
+        var lockdownRoots = d3.hierarchy(lockdownStrat)
             .sum(function (d){ return d.data.size })
             .sort(function(a, b) { return b.value - a.value })
-        var nodes = roots.descendants()
+        var lockdownNodes = lockdownRoots.descendants()
 
-        layout(roots)
+        layout(lockdownRoots)
 
         const slices = lockdownPack.selectAll(".missing-circle")
-            .data(nodes, function(d){ return d.data.id})
+            .data(lockdownNodes, function(d){ return d.data.id})
         
 
         slices.enter()
@@ -230,7 +257,7 @@ function orders_chart(config){
                 .on("mousemove", missingMousemove)
                 .on("mouseout", missingMouseout)
                 .on("click", missingClicked)
-            .attr("id", function(d){ return "legis-circ-" + d.data.id; })
+            .attr("id", function(d){ return "order-lockdown-circ-" + d.data.id; })
             .attr("cx", function(d){ return d.x; })
             .attr("cy", function(d){ return d.y; })
             .style("fill", function(d){ return (d.depth == 0 ? 'none' : defaultColor); })
@@ -242,7 +269,7 @@ function orders_chart(config){
         
 
         const missingTexts = lockdownPack.selectAll("text")
-            .data(nodes)
+            .data(lockdownNodes)
             .enter()
             .append("text")
                 .on("mouseover", missingMouseover)
@@ -265,49 +292,15 @@ function orders_chart(config){
     }
 
     function draw_chart(){
-        data = []
-
-        dateArrayStrings.forEach(function(d){
-            isDate = false;
-            chartData.forEach(function(v){
-                if (v.key == d){
-                    isDate = true;
-                    data.push({
-                        'date': d,
-                        'count': v.values.length,
-                        'order': +v.values[0].order 
-                    })
-                }
-            })
-            if (! isDate ) data.push({ 'date': d, 'count': 0, "order": 0 })
-        })
-
-        var y1_max = d3.max(data, function(d){ 
-            return d.count; })
-        
-        var y1_string = []
-        for(var i=0; i<y1_max; ++i){
-            y1_string.push(String(i))
-        }
-
-        y1.domain([0, y1_max])
-        y2.domain([0, 10])
-
-        y1band.domain(y1_string)
-
-        circR = Math.min(x.bandwidth(), y1band.bandwidth())/2 * 0.6
-
-        legis_y_axis.scale(y1).ticks(5)
-        legisYaxisCall1.call(legis_y_axis);
-
-        legis_y_axis2.scale(y2).ticks(5)
-        legisYaxisCall2.call(legis_y_axis2);
 
         var lockdownNest = d3.nest()
-            .key(function(d){ 
-                return d.date;
-            })
+            .key(function(d){ return d.date; })
             .entries(lockdown)
+
+            
+        var reopenNest = d3.nest()
+            .key(function(d){ return d.date; })
+            .entries(reopen)
 
         dateArrayStrings.forEach(function(d){
             isDate = false;
@@ -326,19 +319,12 @@ function orders_chart(config){
             } 
         })
 
-        var reopenNest = d3.nest()
-            .key(function(d){ 
-                return d.date;
-            })
-            .entries(reopen)
-
-        var reopenBarsData = []
         dateArrayStrings.forEach(function(d){
             isDate = false;
             reopenNest.forEach(function(v){
                 if (d == v.key){
                     isDate = true;
-                    reopenBarsData.push({
+                    reopenBarData.push({
                         'date': d,
                         'count': v.values.length,
                         'values': v.values
@@ -346,10 +332,55 @@ function orders_chart(config){
                 }
             })
             if (! isDate ){
-                reopenBarsData.push({ 'date': d, 'count': 0 , 'values': []})
+                lockdownBarData.push({ 'date': d, 'count': 0 , 'values': []})
             } 
         })
-        var w = width/lockdownBarData.length * 0.9
+
+    
+        dateArrayStrings.forEach(function(d){
+            isDate = false;
+            reopenNest.forEach(function(v){
+                if (d == v.key){
+                    isDate = true;
+                    reopenBarData.push({
+                        'date': d,
+                        'count': v.values.length,
+                        'values': v.values
+                    })
+                }
+            })
+            if (! isDate ){
+                reopenBarData.push({ 'date': d, 'count': 0 , 'values': []})
+            } 
+        })
+        
+        y1_max = d3.max(lockdownBarData, function(d){ return d.count; })
+        y2_max = d3.max(reopenBarData, function(d){ return d.count; })
+        var y1_string = [],
+            y2_string = []
+
+        for(var i=0; i<y1_max; ++i){
+            y1_string.push(String(i))
+        }
+
+        for(var i=0; i<y1_max; ++i){
+            y2_string.push(String(i))
+        }
+
+        y1.domain([0, y1_max])
+        y2.domain([0, y2_max])
+
+        y1band.domain(y1_string)
+        y2band.domain(y2_string)
+
+        y1CircR = Math.min(x.bandwidth(), y1band.bandwidth())/2 * 0.8
+        y2CircR = Math.min(x.bandwidth(), y2band.bandwidth())/2 * 0.8
+
+        legis_y_axis.scale(y1).ticks(5)
+        legisYaxisCall1.call(legis_y_axis);
+
+        legis_y_axis2.scale(y2).ticks(5)
+        legisYaxisCall2.call(legis_y_axis2);
 
         var lockdownRects = orderChart.selectAll(".lockdown-rect")
             .data(lockdownBarData)
@@ -373,14 +404,14 @@ function orders_chart(config){
             .attr("height", function(d){ return y1(0) - y1(d.count); })
 
         var openRects = orderChart.selectAll(".open-rect")
-            .data(reopenBarsData)
+            .data(reopenBarData)
 
         openRects.enter()
             .append('rect')
             .attr("class", "open-rect")
             .attr("id", function(d){ return "open-rect-" + d.date.replace(new RegExp("/", "g"),""); })
             .attr("x", function(d){ return x(d.date); })
-            .attr("width", w)
+            .attr("width", x.bandwidth())
             .attr("fill", defaultColor)
             .attr("opacity", defaultOpacity)
                 .on("mouseover", mouseover)
@@ -394,32 +425,52 @@ function orders_chart(config){
             .attr("height", function(d){ return y2(0) - y2(d.count); })
             
 
-        var focus_markers = []
-        markerData.forEach(function(d){
-            var collisions = focus_markers.filter(function(v){
-                return v.date == d.date; })
-            d.level = String(collisions.length)
-            focus_markers.push(d)
-        })
-
-
-
-
-        // console.log(focus_markers[0])
-        var circles = orderChart.selectAll("circle")
+        var lockdownCircles = orderChart.selectAll(".lockdown-circ")
             .data(lockdown, function(d){ return d.state; })
 
-        circles.enter()
+        lockdownCircles.enter()
             .append("circle")
-            .attr("class", "legis-lockdown-circ")
-            .attr("id", function(d){ return "legis-circ-" + d.state; })
-            .attr("cx", function(d){
-                return x(d.date) + x.bandwidth()/2; })
+            .attr("class", "lockdown-circ")
+            .attr("id", function(d){ return "order-lockdown-circ-" + d.state; })
+            .attr("cx", function(d){ return x(d.date) + x.bandwidth()/2; })
             .attr("cy", function(d){ return y1band(d.level) + y1band.bandwidth()/2; })
-            .attr("r", circR)
+            .attr("r", y1CircR)
             .attr("fill", defaultColor)
             .attr("opacity", 0)
 
+
+        // var reopenCircles = orderChart.selectAll(".reopen-circ")
+        //     .data(reopen, function(d){ return d.state; })
+
+        //     reopenCircles.enter()
+        //     .append("circle")
+        //         .on("mouseover", mouseover)
+        //         .on("mousemove", mousemove)
+        //         .on("mouseout", mouseout)
+        //         .on("click", clicked)
+        //     .attr("class", "reopen-circ")
+        //     .attr("id", function(d){ return "order-reopen-rect-" + d.state; })
+        //     .attr("cx", function(d){ return x(d.date) + x.bandwidth()/2; })
+        //     .attr("cy", function(d){ return y2band(d.level) + y2band.bandwidth()/2; })
+        //     .attr("r", y2CircR)
+        //     .attr("fill", defaultColor)
+        //     .attr("opacity", 0)   
+            
+        reopenTriangle = orderChart.selectAll(".reopen-rect")
+            .data(reopen, function(d){ return d.state; })
+
+        reopenTriangle.enter()
+            .append("rect")
+
+            .attr("class", "reopen-rect")
+            .attr("id", function(d){ return "order-reopen-rect-" + d.state; })
+            .attr("x", function(d){ return x(d.date) + x.bandwidth()/2 - y2CircR; })
+            .attr("y", function(d){ return y2band(d.level); })
+            .attr("height", y2CircR *2)
+            .attr("width", y2CircR*2)
+            .attr("fill", defaultColor)
+            .attr("opacity", 0)
+        
 
     }
     
@@ -438,12 +489,14 @@ function orders_chart(config){
     }
 
     function missingClicked(d){
-        if (ordersFocus.includes(d.data.id)) update_focus(d.data.id, "remove")
-        else update_focus(d.data.id, 'add')
+        if (ordersFocus.includes(d.data.data.id)) update_focus(d.data.data.id, "remove")
+        else update_focus(d.data.data.id, 'add')
     }
 
     function mouseover(d){
-        var states = lockdownBarData.filter(function(v){
+        if (d.values == undefined) return
+        var arr = d.values[0].type == "lockdown" ? lockdownBarData : reopenBarData
+        var states = arr.filter(function(v){
             return v.date == d.date
         })[0].values.map(function(k){ return k.state; })
         states.forEach(function(v){
@@ -458,7 +511,9 @@ function orders_chart(config){
     }
 
     function mouseout(d){
-        var states = lockdownBarData.filter(function(v){
+        if (d.values == undefined) return
+        var arr = d.values[0].type == "lockdown" ? lockdownBarData : reopenBarData
+        var states = arr.filter(function(v){
             return v.date == d.date
         })[0].values.map(function(k){ return k.state; })
         states.forEach(function(v){
@@ -469,19 +524,23 @@ function orders_chart(config){
     }
 
     function display_hover(d, action){
-        if (missingList.includes(d)){
+        if (missingLockdownList.includes(d)){
             if (!ordersFocus.includes(d)){
-                d3.select("#legis-circ-" + d)
+                d3.select("#order-lockdown-circ-" + d)
                     .attr("stroke", function(){ return (action == "on" ? "steelblue" : "#000"); })
                     .attr("stroke-width", function(){ return (action == "on" ? "1px" : "0"); })
                     .attr("opacity", function(){ return (action =="on" ? 1 : defaultOpacity)})
-            return
+                return
             }
 
         }
-
         if (!ordersFocus.includes(d)) {
-            d3.select("#legis-circ-"+ d)
+            d3.select("#order-lockdown-circ-"+ d)
+                .attr("opacity", function(){ return (action =="on" ? 1 : 0)})
+                .attr("stroke", function(){ return (action == "on" ? "steelblue" : "#000"); })
+                .attr("stroke-width", function(){ return (action == "on" ? "3px" : "0"); })
+
+            d3.select("#order-reopen-rect-" + d)
                 .attr("opacity", function(){ return (action =="on" ? 1 : 0)})
                 .attr("stroke", function(){ return (action == "on" ? "steelblue" : "#000"); })
                 .attr("stroke-width", function(){ return (action == "on" ? "3px" : "0"); })
@@ -491,7 +550,9 @@ function orders_chart(config){
     }
 
     function clicked(d){
-        var states = lockdownBarData.filter(function(v){
+        if (d.values == undefined) return
+        var arr = d.values[0].type == "lockdown" ? lockdownBarData : reopenBarData
+        var states = arr.filter(function(v){
             return v.date == d.date
         })[0].values.map(function(k){ return k.state; })
 
@@ -506,9 +567,9 @@ function orders_chart(config){
         if (!ordersFocus.includes(d)){
             ordersFocus.push(d)
 
-            if (missingList.includes(d)){
-                rad = (d3.select("#legis-circ-" + d).attr("r"))
-                d3.select("#legis-circ-" + d)
+            if (missingLockdownList.includes(d)){
+                rad = (d3.select("#order-lockdown-circ-" + d).attr("r"))
+                d3.select("#order-lockdown-circ-" + d)
                     .attr("opacity", 1)
                     .style("fill", "#fff")
                     .attr("stroke-width", 0)
@@ -516,16 +577,30 @@ function orders_chart(config){
                     .transition().duration(dur)
                     .style("fill", color(cur_color))
                     .attr("r", rad)
-            }
-            else {
-                d3.select("#legis-circ-" + d)
+            } else {
+                d3.select("#order-lockdown-circ-" + d)
                 .attr("r", 20)
                 .attr("opacity", 1)
                 .attr("fill", "#fff")
                 .attr("stroke-width", 0)
                 .transition().duration(dur)
-                .attr("r", circR)
+                .attr("r", y1CircR)
                 .attr("fill", color(cur_color))
+            }
+            if (missingReopenList.includes(d)){
+                d3.select("#order-reopen-rect-" + d)
+                    .attr("opacity", 1)
+                    .style("fill", "#fff")
+                    .attr("stroke-width", 0)
+                    .transition().duration(dur)
+                    .style("fill", color(cur_color))
+            } else {
+                d3.select("#order-reopen-rect-" + d)
+                    .attr("opacity", 1)
+                    .style("fill", "#fff")
+                    .attr("stroke-width", 0)
+                    .transition().duration(dur)
+                    .style("fill", color(cur_color))
             }
         }
         cur_color += 1;
@@ -537,8 +612,8 @@ function orders_chart(config){
             ordersFocus.splice(index, 1);
         }
         
-        if (missingList.includes(d)){
-            d3.select("#legis-circ-" + d)
+        if (missingLockdownList.includes(d)){
+            d3.select("#order-lockdown-circ-" + d)
                 .transition().duration(dur)
                 .attr("opacity", defaultOpacity)
                 .style("fill", defaultColor)
@@ -546,54 +621,13 @@ function orders_chart(config){
             return
         }
         else {
-            d3.select("#legis-circ-" + d)
+            d3.select("#order-lockdown-circ-" + d)
                 .transition().duration(dur)
                 .attr("opacity", 0)
         }
 
     }
 
-    function highlight_focus(){
-
-        draw_markers();
-    }
-
-    function draw_markers(){
-        focus_markers = [];
-        ordersFocus.forEach(function(d){
-            markerData.forEach(function(v){
-                if (v.state == d){
-                    var collisions = focus_markers.filter(function(k){ return k.date == v.date}).length
-                    v.level = String(collisions)                   
-                    v.color = cur_color;
-                    focus_markers.push(v)
-                    cur_color += 1;
-                }
-            })
-        })
-
-        var markers = svg.selectAll("circle")
-            .data(focus_markers, function(d){ return d.state})
-
-        markers.exit().remove()
-
-        markers.attr("fill", function(d, i){
-            return color(d.color);
-        })
-
-        markers.enter()
-            .append("circle")
-            .attr("id", function(d){ return "legis-circ-" + d.state; })
-            .attr("cx", function(d){ return x(d.date) + x.bandwidth()/2; })
-            .attr("cy", function(d){ return y1band(d.level) + y1band.bandwidth()/2; })
-
-            .attr("fill", function(d, i){ return "#fff"; })
-            .transition().duration(dur)
-            .attr("r", circR)
-            .attr("fill", function(d, i){
-                return color(d.color); })
-        
-    }
 
     ordersChart.width = function(value){
         if (!arguments.length) return width;

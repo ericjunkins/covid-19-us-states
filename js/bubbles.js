@@ -73,17 +73,7 @@ function bubbles_chart(config){
     var y = yLinearPop;
     var yAxis = d3.axisLeft();
     //Setup tooltip
-    var tooltip =  d3.select("#div_template")
-        .append("div")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .style("opacity", 0)
-        .attr("class", "tooltip")
-        .style("font-size", "1.5rem")
-        .style("background-color", "white")
-        .style("border", "solid")
-        .style("border-width", "3px")
-        .style("border-radius", "5px")
-        .style("padding", "5px")
+
 
     svg.append('rect')
         .attr("x", 0)

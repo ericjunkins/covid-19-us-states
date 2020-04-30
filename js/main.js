@@ -40,20 +40,20 @@ $("#chart-help")
         $("#chart-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
     })
 
-$("#bubbles-help")
+$("#scatter-help")
     .click(function(){
-        $("#bubblesModal").modal();
+        $("#scatterModal").modal();
     })
     .mouseover(function(){
-        $("#bubbles-help-icon").css("color", "yellow").css("opacity", 1)
+        $("#scatter-help-icon").css("color", "yellow").css("opacity", 1)
     })
     .mouseout(function(){
-        $("#bubbles-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
+        $("#scatter-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
     })
 
 $("#orders-help")
     .click(function(){
-        $("#legisModal").modal();
+        $("#orderModal").modal();
     })
     .mouseover(function(){
         $("#orders-help-icon").css("color", "yellow").css("opacity", 1)
@@ -61,7 +61,18 @@ $("#orders-help")
     .mouseout(function(){
         $("#orders-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
     })
-        
+
+$("#rank-help")
+    .click(function(){
+        $("#rankingModal").modal();
+    })
+    .mouseover(function(){
+        $("#rank-help-icon").css("color", "yellow").css("opacity", 1)
+    })
+    .mouseout(function(){
+        $("#rank-help-icon").css("color", "lightsteelblue").css("opacity", 0.5)
+    })
+
 var severityDropdown = d3.select("#severity-select")
     .on("change", dropdownChange)
 
@@ -89,6 +100,29 @@ function dropdownChange(){
         line_vis.axesSelector(sel);
     }
 }
+
+
+var today = new Date(); 
+var hour = d3.utcFormat("%H")
+var zone = d3.timeFormat("%Z")
+var fullDate = d3.timeFormat("%m/%d/%y")
+
+var fixed = hour(today)
+offset = +zone(today)/100
+
+if (+fixed -4 <= 16) {
+    tmp = fullDate(d3.timeHour.offset(today, -24))
+    tmpHour = offset+ 4 + 16
+    t = (tmp + " "  + tmpHour + ":00")
+    
+} else {
+    tmp = fullDate(today)
+    tmpHour = offset + 4 + 16
+    t = (tmp + " " + tmpHour + ":00")
+}
+
+d3.select("#updated-time").text(t)
+
 
 //Once all local data is loaded in....
 function ready([abbrev, anno, regions, census, urban_pop, pol, order]){
@@ -162,7 +196,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order]){
         lineChartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
         //bubblesWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
         var default_color = '#42d5c6'
-        var default_opacity = 0.1
+        var default_opacity = 0.2
         var scheme = d3.schemeCategory10
 
         var selWidth = parseInt(d3.select("#state-selection").style("width"), 10)
@@ -190,7 +224,9 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order]){
             'orderByState': ordersByState,
             'duration': duration,
             'defaultColor': default_color,
+            'order': order,
             'defaultOpacity': default_opacity,
+            'historicalData': states_time_data,
             'scheme': scheme
         }
 
@@ -317,12 +353,6 @@ function init_display(){
     organize_data();
 }
 
-function update_vis(f){
-    // line_vis.focus(f);
-    // bubbles_vis.focus(f);
-    // legistate_vis.focus(f);
-    //selector_vis.focus(f);
-}
 
 function update_focus(state, action){
     //Updates the Focus view of each individual chart
@@ -353,6 +383,7 @@ function organize_data(){
         return d.date;
     })
     
+
     const entries = Object.entries(data_by_states);
     for (const [key, vals] of entries){
         var window = []
@@ -378,63 +409,9 @@ function organize_data(){
                     })
                     annotations[abbrev2full[key]]['binnedPositiveIncrease'] = vals[i].binnedPositiveIncrease
                     annotations[abbrev2full[key]]['positive'] = vals[i].positive
-                    annotations[abbrev2full[key]]['annotation'] = {
-                        'note': {
-                            'label': abbrev2full[key],
-                            'title': 'Stay at home order issued: ' + formatTime(vals[i].date)
-                        },      
-                        'connector': {
-                            'end': "dot",
-                            'endScale': 10
-                        },
-                        'disable': [],
-                        // 'x': x(vals[i].positive),
-                        // 'y': y(vals[i].binnedPositiveIncrease),
-                        'dy': 0,
-                        'dx': 0
-                    }
                 }
             }
         }
-        if (annotations[abbrev2full[key]].date == null){
-            annotations[abbrev2full[key]].date = parseTime("3/19/40")
-            annotations[abbrev2full[key]]['binnedPositiveIncrease'] = 'banana'
-            annotations[abbrev2full[key]]['positive'] = 0
-            annotations[abbrev2full[key]]['annotation'] = {
-                'note': {
-                    'label': abbrev2full[key],
-                    'title': 'None' 
-                },
-                'subject': {
-                    'radius': 15,
-                    'stroke': 10
-                },
-                'connector': {
-                    'end': "dot",
-                    'endScale': 1
-                },
-                'disable': ['subject, note, connector'],
-                'x': -1000,
-                'y': -1000,
-                'dy': -30,
-                'dx': -30
-            }
-        }
 
-        annotations[abbrev2full[key]]['line_label'] = {
-            'note': {
-                'label': abbrev2full[key],
-            },
-            'connector': {
-                'end': "dot",
-                'endScale': 2
-            },
-
-            'disable': ["subject", "connector"],
-            // 'x': x(1),
-            // 'y': y(1),
-            'dy': 0,
-            'dx': 30
-        }
     }
 }
