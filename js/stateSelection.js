@@ -1,5 +1,5 @@
 function selector(config){
-    var margin = { left:10, right:60, top:10, bottom:10 },
+    var margin = { left:70, right:60, top:10, bottom:10 },
         states_list = config.states_list,
         full2abbrev = config.full2abbrev,
         defaultColor = config.defaultColor,
