@@ -441,7 +441,7 @@ function scatter_chart(config){
             sevNum = d[severitySelector].toFixed(2)
         } 
         else if (severitySelector == "cases_per_capita"){
-            sevText = "Number of Deaths per 100,000 at lockdown: "
+            sevText = "Number of Cases per 100,000 at lockdown: "
             sevNum = d[severitySelector].toExponential(2)
         } 
         else if (severitySelector == "deaths") {
