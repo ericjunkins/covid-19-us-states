@@ -145,7 +145,10 @@ function line_chart(config){
     
     function draw_paths(){
         // Draw paths
-
+        historicalByState.forEach(function(d){
+            d.values = d.values.reverse();
+        })
+        
         lines = svg.selectAll(".covid-line")
             .data(historicalByState, function(d){ return d.state})
 
@@ -165,8 +168,23 @@ function line_chart(config){
             .attr("stroke", defaultColor)
             .attr("stroke-width", 0.5)
             .attr("d", function(d){ return line(d.values)})
+            .call(trans)
 
     }
+
+
+    function trans(path) {
+        path.transition()
+            .duration(750)
+            .attrTween("stroke-dasharray", tweenDash)
+      }
+      
+      function tweenDash() {
+        var l = this.getTotalLength(),
+            i = d3.interpolateString("0," + l, l + "," + l);
+        return function(t) { return i(t); };
+      }
+
     
     function draw_orders(){
         //Draws the orders
