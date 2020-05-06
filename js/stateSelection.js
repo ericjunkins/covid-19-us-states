@@ -1,9 +1,10 @@
 function selector(config){
-    var margin = { left:70, right:60, top:10, bottom:10 },
+    var margin = { left:10, right:60, top:10, bottom:10 },
         states_list = config.states_list,
         full2abbrev = config.full2abbrev,
         defaultColor = config.defaultColor,
-        defaultOpacity = config.defaultOpacity *0.5
+        defaultOpacity = config.defaultOpacity *0.5,
+        dur = config.duration
 
     var focus = [];
     var height = config.height - margin.top - margin.bottom, 
@@ -32,7 +33,7 @@ function selector(config){
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .style("opacity", 0)
         .attr("class", "tooltip")
-        .style("font-size", "1.5rem")
+        .style("font-size", "1rem")
         .style("background-color", "white")
         .style("border", "solid")
         .style("border-width", "3px")
@@ -93,6 +94,8 @@ function selector(config){
         .padding(0.03)
 
 
+
+
     function stateSelection(){
         draw_chart();
     }
@@ -121,14 +124,20 @@ function selector(config){
             .append("rect")
             .attr("class", "selection-rect")
             .attr("id", function(d){ return "sel-rect-"+ d.state; })
+            .attr("fill", defaultColor)
+            .attr('opacity', defaultOpacity)
+            .attr("rx", 0)
+            .attr("y", function(d, i){ return y(d.y) + y.bandwidth()/2; })
+            .attr("x", function(d, i){  return x(d.x) + x.bandwidth()/2; })
+            .attr("height",0)
+            .attr("width", 0)
+
+            .transition().duration(dur)
+            .attr("rx", 3)
             .attr("y", function(d, i){ return y(d.y); })
             .attr("x", function(d, i){  return x(d.x); })
             .attr("height", y.bandwidth())
             .attr("width", x.bandwidth())
-            .attr("fill", defaultColor)
-            .attr('opacity', defaultOpacity)
-            .attr("rx", 3)
-
 
         texts = text_svg.selectAll("text")
             .data(data)
@@ -141,9 +150,12 @@ function selector(config){
             .attr("x", function(d, i){  return x(d.x) + x.bandwidth()/2; })
             .attr("fill", "#fff")
             .text(function(d){ return d.state})
-            .attr("font-size", "1rem")
+            
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
+            .attr("font-size", "0.1rem")
+            .transition().duration(dur)
+            .attr("font-size", "1rem")
 
         d3.selectAll(".selection-rect")
             .on("mouseover", mouseover)
@@ -231,11 +243,21 @@ function selector(config){
         //update_vis(focus);
     }
 
+    function removeAll(){
+        focus.forEach(function(d){
+            d3.select("#sel-rect-" + d)
+                .transition().duration(dur)
+                .attr("opacity", defaultOpacity)
+                .attr("fill", defaultColor)
+        })
+        focus = [];
+    }
+
     function highlight_focus(){
 
         focus.forEach(function(d, i){
             d3.select("#sel-rect-" + d)
-                .transition().duration(1000)
+                .transition().duration(dur)
                 .attr("fill", function(d){
                     return color(i)
                 })
@@ -295,6 +317,7 @@ function selector(config){
         if(!arguments.length) return addFocus;
         if (action == "add") add2Focus(value)
         else if (action == "remove") removeFromFocus(value)
+        else if (action == "removeAll") removeAll()
         return stateSelection;
     }
 

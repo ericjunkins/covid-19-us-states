@@ -1,5 +1,5 @@
 function orders_chart(config){
-    var margin = { left:120, right:200, top:15, bottom:40 }
+    var margin = { left:120, right:50, top:15, bottom:40 }
         chartData = config.data,
         markerData = config.marker,
         raw_orders = config.raw_orders,
@@ -11,26 +11,36 @@ function orders_chart(config){
         defaultColor = config.defaultColor,
         defaultOpacity = config.defaultOpacity*0.5
 
-    var ordersFocus = [],
-        lockdown_markers = [],
-        reopen_markers = []
+    var ordersFocus = []
 
     var color = d3.scaleOrdinal(config.scheme);
-    var cur_color = 0,
-        y1CircR;
+    var cur_color = 0
 
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
     
-    // append the svg object to the body of the page
-    var svg = d3.select("#legis-chart")
+    document.getElementById("ordersOuter").setAttribute("style", "width:" + (width +margin.left + margin.right) + "px");
+    document.getElementById("ordersOuter").setAttribute("style", "height:" + (height + margin.top + margin.bottom) + "px");
+
+    document.getElementById("orders-chart").setAttribute("style", "width:" + (width +margin.left + margin.right) + "px");
+    document.getElementById("orders-chart").setAttribute("style", "height:" + (height + margin.top) + "px");
+
+    const outerSvg = d3.select("#ordersOuter").append('svg')
+        .attr("width", width + margin.left + margin.right)
+    
+    var barHeight = height/8
+
+    var svg = d3.select("#orders-chart")
         .append("svg")
             .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("height", barHeight * d3.keys(order).length + barHeight*0.5)
     
 
+    var chart = svg.append("g")
+        .attr("transform", "translate(" + margin.left + ",10)")
+
+
+                
     var idTimeFormat = d3.timeFormat("%m%d%y")
 
     var orderChart = svg.append("g")
@@ -121,6 +131,7 @@ function orders_chart(config){
         return d.values.length;
     })
 
+    //var dateArray = getDates(min_date, d3.timeDay.offset(today,1))
     var dateArray = getDates(min_date, today)
     var dateArrayStrings = [];
 
@@ -134,162 +145,46 @@ function orders_chart(config){
         .range([0,width])
         .padding(0.05)
     
-    var y1 = d3.scaleLinear()
-        .range([height, height/2 + height * 0.05])
-
-    var y1band = d3.scaleBand()
-        .range([height, height/2 + height * 0.05])
-
- 
-    var y2band = d3.scaleBand()
-        .range([height/2 - height * 0.05, 0])   
-
-    var y2 = d3.scaleLinear()
-        .domain([0,1])
-        .range([height/2 - height * 0.05, 0])
-
-        
     
-    
+
+
+    var yBand = d3.scaleBand()
+        .domain(d3.keys(order).sort(function(a,b){ return d3.descending(a,b)}))
+        .range([barHeight * d3.keys(order).length, 0])
+        .padding(0.15)
+
+    var h = yBand.bandwidth()
+
+    var rectHeight = d3.scaleOrdinal()
+        .domain(["0", "1", "2", "3", "4", "5"])
+        .range([h*0.8, h * 0.5, h * 0.3, h * 0.2, h * 0.1, 4])
+
+   
     var x_axis = d3.axisBottom(x)
         .tickValues(x.domain().filter(function(d,i){ return !(i%7)}))
         // .ticks(4)
         .tickPadding(10)
-    var x_axis2 = d3.axisBottom(x).tickValues(x.domain().filter(function(d,i){ return }));
-    var legis_y_axis = d3.axisLeft()
-    var legis_y_axis2 = d3.axisLeft()
+    var y_axis = d3.axisLeft(yBand)
 
-    svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
+    outerSvg.append("g")
+        .attr("transform", "translate(" + margin.left  + ")")
         .attr("class", "axis axis--y axisWhite")
         .call(x_axis);
 
-    svg.append("g")
-        .attr("transform", "translate(0," +(height/2 - height * 0.05)+ ")")
+    
+    labels = chart.append("g")
+        // .attr("transform", "translate(" + margin.left  + ")")
+    
+    labels.append('g')
         .attr("class", "axis axis--y axisWhite")
-        .call(x_axis2);
-
-    svg.append("line")
-        .attr("x1", 0)
-        .attr("x2", 0)
-        .attr("y1", height/2 + height * 0.05)
-        .attr("y2", height/2 - height * 0.05)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", "1px")
+        .call(y_axis)
     
     legisYaxisCall1 = svg.append("g")
-        .attr("class", "axis axis--y axisWhite")
-        
-    legisYaxisCall2 = svg.append("g")
         .attr("class", "axis axis--y axisWhite")
 
     var labels = svg.append("g")
         .attr("class", "legis-labels")
 
-
-    labels.append("text")
-        .attr("x", -height * 0.75)
-        .attr("class", "axis-label")
-        .attr("y", - 45)
-        .attr("transform", "rotate(-90)")
-        .text("Lockdown")
-
-    labels.append("text")
-        .attr("x", -(height/2 - height * 0.05)/2)
-        .attr("y", - 45)
-        .attr("class", "axis-label")
-        .attr("transform", "rotate(-90)")
-        .text("Re-open")
-
-    // labels.append("text")
-    //     .attr("transform", "translate(" + width/2 + "," + height + ")")
-    //     .attr("x", 0)
-    //     .attr("y", 60)
-    //     .attr("class", "axis-label")
-    //     .text("Date")
-
-    function ordersChart(){
-        missing_points();
-        draw_chart();
-    }
-
-
-    function missing_points(){
-        mWidth = margin.right * 0.7
-        
-        missingG = svg.append("g")
-            .attr("class", "missing")
-            .attr("transform", "translate(" + (width + margin.right*0.15) + ",0)")
-
-
-        missingG.append('text')
-            .attr("x", mWidth/2)
-            .attr('transform', 'translate(0,' + height + ')')
-            .attr("y", 10)
-            .attr("class", "axis-label")
-            .text("Missing Orders")
-
-        var lockdownPack = missingG.append('g')
-            .attr("transform", "translate(" + 0 + "," + height/2 + ")")
-        
-        var reopenPack = missingG.append('g')
-            .attr("transform", "translate(" + 0 + "," + (-height/2) + ")")
-
-        const layout = d3.pack()
-            .size([mWidth, height/2])
-            .padding(3)
-
-        const lockdownStrat = d3.stratify()(missingLockdown)
-        var lockdownRoots = d3.hierarchy(lockdownStrat)
-            .sum(function (d){ return d.data.size })
-            .sort(function(a, b) { return b.value - a.value })
-        var lockdownNodes = lockdownRoots.descendants()
-
-        layout(lockdownRoots)
-
-        const slices = lockdownPack.selectAll(".missing-circle")
-            .data(lockdownNodes, function(d){ return d.data.id})
-        
-
-        slices.enter()
-            .append("circle")
-                .on("mouseover", missingMouseover)
-                .on("mousemove", missingMousemove)
-                .on("mouseout", missingMouseout)
-                .on("click", missingClicked)
-            .attr("id", function(d){ return "order-lockdown-circ-" + d.data.id; })
-            .attr("cx", function(d){ return d.x; })
-            .attr("cy", function(d){ return d.y; })
-            .style("fill", function(d){ return (d.depth == 0 ? 'none' : defaultColor); })
-            .attr("opacity", function(d){ return (d.depth == 0 ? 1 : defaultOpacity); })
-            .attr("r", 0)
-            .transition().duration(dur)
-            .attr("r", function(d){ return d.r; })
-
-        
-
-        const missingTexts = lockdownPack.selectAll("text")
-            .data(lockdownNodes)
-            .enter()
-            .append("text")
-                .on("mouseover", missingMouseover)
-                .on("mousemove", missingMousemove)
-                .on("mouseout", missingMouseout)
-                .on("click", missingClicked)
-            .attr("x", function(d){ return d.x; })
-            .attr("y", function(d){ return d.y; })
-            .text(function(d){ 
-                var t = (d.depth != 0 ? d.data.id : "")
-                return t; })
-            
-            .attr("text-anchor", 'middle')
-            .attr("dominant-baseline", 'middle')
-            .attr("fill", "#fff")
-            .attr("font-size", "0.05rem")
-            .transition().duration(dur)
-            .attr("font-size", "0.9rem")
-            
-    }
 
 
     var lockdownNest = d3.nest()
@@ -354,171 +249,168 @@ function orders_chart(config){
     })
 
     y1_max = d3.max(lockdownBarData, function(d){ return d.count; })
-    y2_max = d3.max(reopenBarData, function(d){ return d.count; })
-    var y1_string = [],
-        y2_string = []
+    var y1_string = []
 
     for(var i=0; i<y1_max; ++i){
         y1_string.push(String(i))
     }
 
-    for(var i=0; i<y1_max; ++i){
-        y2_string.push(String(i))
-    }
-
-    y1.domain([0, y1_max])
-    y2.domain([0, y2_max])
-
-    y1band.domain(y1_string)
-    y2band.domain(y2_string)
-
-    y1CircR = Math.min(x.bandwidth(), y1band.bandwidth())/2 * 0.8
-    y2CircR = Math.min(x.bandwidth(), y2band.bandwidth())/2 * 0.8
-
-    legis_y_axis.scale(y1).ticks(5)
-    legisYaxisCall1.call(legis_y_axis);
-
-    legis_y_axis2.scale(y2).ticks(5)
-    legisYaxisCall2.call(legis_y_axis2);
-
-    console.log(lockdown)
     var diffRects = [];
+    var id = 0;
+
+    var t = d3.timeFormat("%m/%d/%y")(today)
+
     d3.keys(order).forEach(function(d){
         tmp = {
             'x1': d3.timeFormat("%m/%d/%y")(min_date),
             'order': "5",
             'state': d,
+            'id': id
         }
         close = lockdown.filter(v=>v.state == d)[0]
         if (close != undefined){
             tmp['x2'] = close.date
+            tmp['id'] = id;
             diffRects.push(tmp)
+            id += 1;
             tmp = {
                 'x1': close.date,
                 'order': close.order,
-                'state': d
+                'state': d,
+                'id': id
             }
             open = reopen.filter(v=>v.state == d)
-            if (open.length == 0) tmp['x2'] = d3.timeFormat("%m/%d/%y")(today)
+            if (open.length == 0){
+                //tmp['x2'] = d3.timeFormat("%m/%d/%y")(d3.timeDay.offset(today,1))
+                tmp['id'] = id;
+                tmp['x2'] = 'today'
+                diffRects.push(tmp)
+                id += 1;
+            }
             open.forEach(function(k, i){
                 if (i == open.length - 1){
                     tmp['x2'] = k.date
                     diffRects.push(tmp)
+                    id += 1;
                     tmp = {
                         'x1': k.date,
                         'order': k.order,
                         'state': d,
-                        'x2': d3.timeFormat("%m/%d/%y")(today)
+                        'x2': 'today',
+                        'id': id
                     }
                     diffRects.push(tmp)
+                    id += 1;
                 } else {
                     tmp['x2'] = k.date
                     diffRects.push(tmp)
+                    id += 1;
                     tmp = {
                         'x1': k.date,
                         'order': k.order,
-                        'state': d
+                        'state': d,
+                        'id': id
                     }
                 }
             })
         } else {
-            tmp['x2'] = d3.timeFormat("%m/%d/%y")(today)
+            tmp['id'] = id;
+            tmp['x2'] = 'today'
             diffRects.push(tmp)
+            id += 1;
         }
     })
 
-    console.log(diffRects)
+    
 
+    svg
+        .append('defs')
+            .append('pattern')
+                .attr('id', 'diagonalHatch')
+                .attr('patternUnits', 'userSpaceOnUse')
+                .attr('width', 4)
+                .attr('height', 4)
+                .append('path')
+                    .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+                    .attr('stroke', '#000000')
+                    .attr('stroke-width', 1);
+
+
+    function ordersChart(){
+        draw_chart();
+    }
 
     function draw_chart(){
-        var lockdownRects = orderChart.selectAll(".lockdown-rect")
-            .data(lockdownBarData)
-
-        lockdownRects.enter()
-            .append('rect')
-            .attr("class", "lockdown-rect")
-            .attr("id", function(d){ return "lockdown-rect-" + d.date.replace(new RegExp("/", "g"),""); })
-            .attr("x", function(d){ return x(d.date); })
-            .attr("width", x.bandwidth())
-            .attr("fill", defaultColor)
-            .attr("opacity", defaultOpacity)
-                .on("mouseover", mouseover)
-                .on("mousemove", mousemove)
-                .on("mouseout", mouseout)
-                .on("click", clicked)
-            .attr("y", y1(0))
-            .attr("height", 0)
-            .transition().duration(dur)
-            .attr("y", function(d){ return y1(d.count); })
-            .attr("height", function(d){ return y1(0) - y1(d.count); })
-
-        var openRects = orderChart.selectAll(".open-rect")
-            .data(reopenBarData)
-
-        openRects.enter()
-            .append('rect')
-            .attr("class", "open-rect")
-            .attr("id", function(d){ return "open-rect-" + d.date.replace(new RegExp("/", "g"),""); })
-            .attr("x", function(d){ return x(d.date); })
-            .attr("width", x.bandwidth())
-            .attr("fill", defaultColor)
-            .attr("opacity", defaultOpacity)
-                .on("mouseover", mouseover)
-                .on("mousemove", mousemove)
-                .on("mouseout", mouseout)
-                .on("click", clicked)
-            .attr("y", y1(0))
-            .attr("height", 0)
-            .transition().duration(dur)
-            .attr("y", function(d){ return y1(d.count); })
-            .attr("height", function(d){ return y1(0) - y1(d.count); })
-            
-
-        var lockdownCircles = orderChart.selectAll(".lockdown-circ")
-            .data(lockdown, function(d){ return d.state; })
-
-        lockdownCircles.enter()
-            .append("circle")
-            .attr("class", "lockdown-circ")
-            .attr("id", function(d){ return "order-lockdown-circ-" + d.state; })
-            .attr("cx", function(d){ return x(d.date) + x.bandwidth()/2; })
-            .attr("cy", function(d){ return y1band(d.level) + y1band.bandwidth()/2; })
-            .attr("r", y1CircR)
-            .attr("fill", defaultColor)
-            .attr("opacity", 0)
 
 
-        // var reopenCircles = orderChart.selectAll(".reopen-circ")
-        //     .data(reopen, function(d){ return d.state; })
+        var backgroundRects = chart.selectAll('rect')
+            .data(d3.keys(order))
 
-        //     reopenCircles.enter()
-        //     .append("circle")
-        //         .on("mouseover", mouseover)
-        //         .on("mousemove", mousemove)
-        //         .on("mouseout", mouseout)
-        //         .on("click", clicked)
-        //     .attr("class", "reopen-circ")
-        //     .attr("id", function(d){ return "order-reopen-rect-" + d.state; })
-        //     .attr("cx", function(d){ return x(d.date) + x.bandwidth()/2; })
-        //     .attr("cy", function(d){ return y2band(d.level) + y2band.bandwidth()/2; })
-        //     .attr("r", y2CircR)
-        //     .attr("fill", defaultColor)
-        //     .attr("opacity", 0)   
-            
-        reopenTriangle = orderChart.selectAll(".reopen-rect")
-            .data(reopen, function(d){ return d.state; })
-
-        reopenTriangle.enter()
+        backgroundRects.enter()
             .append("rect")
-            .attr("class", "reopen-rect")
-            .attr("id", function(d){ return "order-reopen-rect-" + d.state; })
-            .attr("x", function(d){ return x(d.date) + x.bandwidth()/2 - y2CircR; })
-            .attr("y", function(d){ return y1band(d.level) + y1band.bandwidth()/4; })
-            .attr("height", y2CircR *2)
-            .attr("width", y2CircR*2)
-            .attr("fill", defaultColor)
-            .attr("opacity", 0)
+            .attr("x", 0)
+            .attr("y", function(d){ return yBand(d); })
+            .attr('height', yBand.bandwidth())
+            .attr('width', width)
+            .attr('fill', 'grey')
+            .attr("opacity", defaultOpacity/3)
         
+        rects = chart.selectAll("rect")
+            .data(diffRects, d=>d.id )
+
+        rects.enter()
+            .append('rect')
+            .attr("id", function(d){return "order-rect-" + d.state; })
+            .attr("x", function(d){ return x(d.x1); })
+            .attr("width", function(d){ 
+                if (d.x2 == "today"){
+                    w = width - x(d.x1)
+                } else {
+                    var w = x(d.x2) - x(d.x1)
+                }
+                
+                return w
+            })
+            .attr("y", function(d){ 
+                off = yBand.bandwidth()/2 - rectHeight(d.order)/2
+                return yBand(d.state) + (off); })
+            .attr("height", function(d){ 
+                //console.log(rectHeight(String(d.order)), d.order)
+                return rectHeight(d.order); })
+            .attr("fill", defaultColor)
+            .attr("opacity", defaultOpacity)
+            .attr('stroke', "#000")
+            .attr("stroke-width", "2px")
+
+
+        // bg = chart.selectAll("bg-rect")
+        //     .data(diffRects, d=>d.id )
+
+        // bg.enter()
+        //     .append('rect')
+        //     .attr("x", function(d){ return x(d.x1); })
+        //     .attr("width", function(d){ 
+        //         if (d.x2 == "today"){
+        //             w = width - x(d.x1)
+        //         } else {
+        //             var w = x(d.x2) - x(d.x1)
+        //         }
+                
+        //         return w
+        //     })
+        //     .attr("y", function(d){ 
+        //         off = yBand.bandwidth()/2 - rectHeight(d.order)/2
+        //         return yBand(d.state) + (off); })
+        //     .attr("height", function(d){ 
+        //         //console.log(rectHeight(String(d.order)), d.order)
+        //         return rectHeight(d.order); })
+        //     .attr("fill", function(d){ return (d.order == 0 ? 'url(#diagonalHatch' : 'none'); })
+        //     //.attr("fill", 'url(#diagonalHatch')
+        //     //.attr("fill", "url(#circles-1")
+
+
+            
+             
 
     }
     

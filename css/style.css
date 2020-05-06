@@ -6,6 +6,10 @@ body {
 	
 }
 
+html {
+	padding-bottom: 0;
+}
+
 h1 {
 	color: #fff;
 	text-align: center;
@@ -269,6 +273,16 @@ circle-packs {
 
 /* ---------------------------------------------------- */
 
+/* Orders Styles */
+/* ---------------------------------------------------- */
+
+/* #orders-chart {
+	overflow-y: scroll;
+	overflow-x: hidden;
+} */
+
+/* ---------------------------------------------------- */
+
 
 /* Modal Styles */
 /* ---------------------------------------------------- */
@@ -412,4 +426,20 @@ circle-packs {
 	stroke-width: 0.5px;
 	stroke-dasharray: 15 15;
 	opacity: 0.2;
+}
+
+.tooltip {
+	background-color: #262729;
+	border: 1px solid #5e5e5e;
+	border-radius: 5px;
+	padding: 10px;
+	font-size: 1.2rem;
+	color: #fff;
+}
+
+.tooltip>p {
+	color: #fff;
+	fill: #fff;
+	stroke: #fff;
+	font-size: 1.2rem;
 }

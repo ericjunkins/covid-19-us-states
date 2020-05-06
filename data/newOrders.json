@@ -1,0 +1,290 @@
+{
+	"AL" : {"orders": [
+                            {"date": "04/03/20", "order": "0"},
+                            {"date": "05/01/20", "order": "2"}
+			]
+	},
+	"AK" : {"orders": [
+                            {"date": "03/28/20", "order": "0"},
+                            {"date": "04/24/20", "order": "2"}
+			]
+	},
+	"AZ" : {"orders": [
+                            {"date": "03/31/20", "order": "0"},
+                            {"date": "05/01/20", "order": "1"},
+							{"date": "05/08/20", "order": "2"},
+							{"date": "05/11/20", "order": "3"}
+			]
+	},
+	"AR" : {"orders": [
+                            {"date": "03/20/20", "order": "2"},
+                            {"date": "05/11/20", "order": "3"}
+			]
+	},
+	"CA" : {"orders": [
+                            {"date": "03/19/20", "order": "0"},
+                            {"date": "05/01/20", "order": "2"},
+							{"date": "05/04/20", "order": "3"}
+			]
+	},
+	"CO" : {"orders": [
+                            {"date": "03/26/20", "order": "0"},
+                            {"date": "04/27/20", "order": "1"},
+							{"date": "05/01/20", "order": "2"}
+			]
+	},
+	"CT" : {"orders": [
+                            {"date": "03/23/20", "order": "1"},
+                            {"date": "", "order": ""}
+			]
+	},
+	"DE" : {"orders": [
+                            {"date": "03/24/20", "order": "1"},
+                            {"date": "05/08/20", "order": "2"}
+			]
+	},
+	"DC" : {"orders": [
+                            {"date": "04/01/20", "order": "0"},
+                            {"date": "", "order": ""}
+			]
+	},
+	"FL" : {"orders": [
+                            {"date": "04/03/20", "order": "1"},
+                            {"date": "05/04/20", "order": "3"}
+			]
+	},
+	"GA" : {"orders": [
+                            {"date": "04/03/20", "order": "0"},
+                            {"date": "04/24/20", "order": "3"}
+			]
+	},
+	"GU" : {"orders": [
+                            {"date": "", "order": ""},
+                            {"date": "", "order": "2"}
+			]
+	},
+	"HI" : {"orders": [
+                            {"date": "03/25/20", "order": "0"},
+                            {"date": "04/30/20", "order": "2"}
+			]
+	},
+	"ID" : {"orders": [
+                            {"date": "03/25/20", "order": "0"},
+                            {"date": "05/01/20", "order": "2"}
+			]
+	},
+	"IL" : {"orders": [
+                            {"date": "03/21/20", "order": "0"},
+                            {"date": "05/01/20", "order": "2"}
+			]
+	},
+	"IN" : {"orders": [
+                            {"date": "03/24/20", "order": "0"},
+                            {"date": "05/01/20", "order": "2"}
+			]
+	},
+	"IA" : {"orders": [
+                            {"date": "03/17/20", "order": "2"},
+                            {"date": "05/01/20", "order": "3"}
+			]
+	},
+	"KS" : {"orders": [
+                            {"date": "03/30/20", "order": "1"},
+                            {"date": "05/04/20", "order": "3"}
+			]
+	},
+	"KY" : {"orders": [
+                            {"date": "03/26/20", "order": "0"},
+                            {"date": "04/27/20", "order": "1"},
+							{"date": "05/06/20", "order": "2"},
+							{"date": "05/11/20", "order": "3"}
+			]
+	},
+	"LA" : {"orders": [
+                            {"date": "03/23/20", "order": "1"},
+                            {"date": "05/01/20", "order": "2"},
+							{"date": "05/08/20", "order": "3"}
+			]
+	},
+	"ME" : {"orders": [
+                            {"date": "04/02/20", "order": "1"},
+                            {"date": "05/01/20", "order": "2"}
+			]
+	},
+	"MD" : {"orders": [
+                            {"date": "03/30/20", "order": "0"},
+                            {"date": "", "order": ""}
+			]
+	},
+	"MA" : {"orders": [
+                            {"date": "03/24/20", "order": "0"},
+                            {"date": "", "order": ""}
+			]
+	},
+	"MI" : {"orders": [
+                            {"date": "03/24/20", "order": "0"},
+                            {"date": "04/24/20", "order": "2"}
+			]
+	},
+	"MN" : {"orders": [
+                            {"date": "04/03/20", "order": "0"},
+                            {"date": "04/24/20", "order": "1"},
+							{"date": "05/04/20", "order": "2"}
+			]
+	},
+	"MS" : {"orders": [
+                            {"date": "04/03/20", "order": "0"},
+                            {"date": "04/27/20", "order": "2"},
+							{"date": "05/04/20", "order": "3"}
+			]
+	},
+	"MO" : {"orders": [
+                            {"date": "03/24/20", "order": "1"},
+                            {"date": "05/04/20", "order": "2"}
+			]
+	},
+	"MT" : {"orders": [
+                            {"date": "03/28/20", "order": "0"},
+                            {"date": "04/27/20", "order": "1"},
+							{"date": "05/04/20", "order": "2"}
+			]
+	},
+	"NE" : {"orders": [
+                            {"date": "03/20/20", "order": "2"},
+                            {"date": "05/04/20", "order": "3"}
+			]
+	},
+	"NV" : {"orders": [
+                            {"date": "04/01/20", "order": "1"},
+                            {"date": "05/01/20", "order": "3"}
+			]
+	},
+	"NH" : {"orders": [
+                            {"date": "03/28/20", "order": "0"},
+                            {"date": "05/01/20", "order": "1"},
+							{"date": "05/11/20", "order": "2"}
+			]
+	},
+	"NJ" : {"orders": [
+                            {"date": "03/21/20", "order": "1"},
+                            {"date": "05/02/20", "order": "3"}
+			]
+	},
+	"NM" : {"orders": [
+                            {"date": "03/24/20", "order": "1"},
+                            {"date": "", "order": ""}
+			]
+	},
+	"NY" : {"orders": [
+                            {"date": "03/22/20", "order": "1"},
+                            {"date": "", "order": "2"}
+			]
+	},
+	"NC" : {"orders": [
+                            {"date": "03/30/20", "order": "0"},
+                            {"date": "05/08/20", "order": "2"}
+			]
+	},
+	"ND" : {"orders": [
+                            {"date": "03/20/20", "order": "2"},
+                            {"date": "", "order": "3"}
+			]
+	},
+	"OH" : {"orders": [
+                            {"date": "03/23/20", "order": "0"},
+                            {"date": "05/01/20", "order": "1"},
+							{"date": "05/04/20", "order": "2"},
+							{"date": "05/12/20", "order": "3"}
+			]
+	},
+	"OK" : {"orders": [
+                            {"date": "04/01/20", "order": "0"},
+                            {"date": "04/24/20", "order": "2"}
+			]
+	},
+	"OR" : {"orders": [
+                            {"date": "03/23/20", "order": "0"},
+                            {"date": "05/01/20", "order": "1"}
+			]
+	},
+	"PA" : {"orders": [
+                            {"date": "04/01/20", "order": "0"},
+                            {"date": "05/01/20", "order": "2"}
+			]
+	},
+	"PR" : {"orders": [
+                            {"date": "", "order": ""},
+                            {"date": "", "order": ""}
+			]
+	},
+	"RI" : {"orders": [
+                            {"date": "03/28/20", "order": "0"},
+                            {"date": "05/09/20", "order": "2"}
+			]
+	},
+	"SC" : {"orders": [
+                            {"date": "04/06/20", "order": "1"},
+                            {"date": "04/20/20", "order": "2"},
+							{"date": "05/04/20", "order": "3"}
+			]
+	},
+	"SD" : {"orders": [
+                            {"date": "03/20/20", "order": "2"},
+                            {"date": "", "order": ""}
+			]
+	},
+	"TN" : {"orders": [
+                            {"date": "04/02/20", "order": "0"},
+                            {"date": "04/29/20", "order": "1"},
+							{"date": "05/06/20", "order": "2"}
+			]
+	},
+	"TX" : {"orders": [
+                            {"date": "03/31/20", "order": "0"},
+                            {"date": "04/27/20", "order": "1"},
+							{"date": "05/01/20", "order": "2"}
+			]
+	},
+	"UT" : {"orders": [
+                            {"date": "03/29/20", "order": "2"},
+                            {"date": "05/01/20", "order": "3"}
+			]
+	},
+	"VT" : {"orders": [
+                            {"date": "03/25/20", "order": "1"},
+                            {"date": "05/04/20", "order": "2"}
+			]
+	},
+	"VI" : {"orders": [
+                            {"date": "", "order": ""},
+                            {"date": "", "order": ""}
+			]
+	},
+	"VA" : {"orders": [
+                            {"date": "03/30/20", "order": "0"},
+                            {"date": "05/01/20", "order": "1"}
+			]
+	},
+	"WA" : {"orders": [
+                            {"date": "03/23/20", "order": "0"},
+                            {"date": "05/05/20", "order": "3"}
+			]
+	},
+	"WV" : {"orders": [
+                            {"date": "03/24/20", "order": "0"},
+                            {"date": "04/27/20", "order": "1"},
+							{"date": "05/04/20", "order": "2"}
+			]
+	},
+	"WI" : {"orders": [
+                            {"date": "03/25/20", "order": "0"},
+                            {"date": "04/24/20", "order": "1"},
+							{"date": "05/01/20", "order": "2"}
+			]
+	},
+	"WY" : {"orders": [
+                            {"date": "03/20/20", "order": "1"},
+                            {"date": "05/01/20", "order": "2"}
+			]
+	}
+}

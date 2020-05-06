@@ -67,8 +67,8 @@ function ranking_chart(config){
         .domain([0, maxX])
         .range([0, width])
     
-    range = d3.range(28, (currentData.length + 1) * 28, 28)
-
+    //range = d3.range(28, (currentData.length + 1) * 28, 28)
+    // console.log(range)
     var y = d3.scaleBand()
         .domain(currentData.map(function(d){ return d.state; }))
         .range([barHeight*currentData.length, 0])
@@ -182,10 +182,27 @@ function ranking_chart(config){
         }
 
         d3.select("#rank-rect-" + d)
+        
+            .attr("fill", "#fff")
             .transition().duration(dur)
             .attr("opacity", defaultOpacity)
             .attr("fill", defaultColor)
 
+    }
+
+    function removeAll(){
+        focus.forEach(function(d){
+            d3.select("#rank-rect-" + d)
+                .attr("height", y.bandwidth() * 1.5)
+                .attr("y", function(){ return y(d) - y.bandwidth()/4})
+                .attr("fill", "#fff")
+                .transition().duration(dur)
+                .attr("opacity", defaultOpacity)
+                .attr("fill", defaultColor)
+                .attr("height", y.bandwidth())
+                .attr("y", y(d))
+        })
+        focus = [];
     }
 
 
@@ -213,6 +230,7 @@ function ranking_chart(config){
         if(!arguments.length) return addFocus;
         if (action == "add") add2Focus(value)
         else if (action == "remove") removeFromFocus(value)
+        else if (action == "removeAll") removeAll()
         return rankChart;
     }
 

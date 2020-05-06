@@ -188,25 +188,6 @@ function line_chart(config){
     
     function draw_orders(){
         //Draws the orders
-        // TO DO add different shapes based on what type of order it is
-
-
-        // orders = orderGroup.selectAll("circle")
-        //     .data(ordersList, d => d.state)
-
-        // orders
-        //     .attr("cx", function(d){ return x(d.positive); })
-        //     .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
-
-        // orders.enter()
-        //     .append('circle')
-        //     .attr("class", "order-circle")
-        //     .attr("id", function(d){ return "order-circ-" + d.state; })
-        //     .attr("fill", defaultColor)
-        //     .attr('r', orderR)
-        //     .attr("cx", function(d){ return x(d.positive); })
-        //     .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
-        //     .attr("opacity", 0)
 
         circles = orderGroup.selectAll("circle")
             .data(lockdownMarkers, d=> d.state)
@@ -364,7 +345,7 @@ function line_chart(config){
                 .attr("stroke-width", 3.5)
                 .attr("stroke", color(cur_color))
 
-            d3.select("#mark-lockdown-circ-" + d)
+            d3.selectAll("#mark-lockdown-circ-" + d)
                 .raise()
                 .attr("opacity", 1)
                 .attr("r", 30)
@@ -373,7 +354,7 @@ function line_chart(config){
                 .attr("fill", color(cur_color))
                 .attr("r", orderR)
 
-            d3.select("#mark-reopen-rect-" + d)
+            d3.selectAll("#mark-reopen-rect-" + d)
                 .raise()
                 .attr("opacity", 1)
                 .attr("fill", "#fff")
@@ -408,11 +389,36 @@ function line_chart(config){
             .attr("stroke-width", 0.5)
             .attr("opacity", defaultOpacity * 2)
 
-        d3.select("#mark-lockdown-circ-" + d)
+        d3.selectAll("#mark-lockdown-circ-" + d)
+            .transition().duration(dur)
+            .attr("opacity", 0)
+
+        d3.selectAll("#mark-reopen-rect-" + d)
             .transition().duration(dur)
             .attr("opacity", 0)
 
     }
+
+
+    function removeAll(){
+        focus.forEach(function(d){
+            d3.select("#path-" + d)
+                .transition().duration(dur/2)
+                .attr("stroke", defaultColor)
+                .attr("stroke-width", 0.5)
+                .attr("opacity", defaultOpacity * 2)
+
+            d3.selectAll("#mark-lockdown-circ-" + d)
+                .transition().duration(dur/2)
+                .attr("opacity", 0)
+
+            d3.selectAll("#mark-reopen-rect-" + d)
+                .transition().duration(dur/2)
+                .attr("opacity", 0)
+        })
+        focus = [];
+    }
+
 
 
     function display_hover(d, action){
@@ -424,11 +430,11 @@ function line_chart(config){
                 .attr("stroke-width", function(){ return (action == "on" ? 3 : 0.5 ); })
                 .attr("opacity", function(){ return (action == "on" ? 1 : defaultOpacity * 2); })
 
-            d3.select("#mark-lockdown-circ-" + d)
+            d3.selectAll("#mark-lockdown-circ-" + d)
                 .raise()
                 .attr("opacity", function(){ return (action == "on" ? 1 : 0); })
-
-            d3.select("#mark-reopen-rect-" + d)
+                
+            d3.selectAll("#mark-reopen-rect-" + d)
                 .raise()
                 .attr("opacity", function(){ return (action == "on" ? 1 : 0); })
         }
@@ -563,6 +569,7 @@ function line_chart(config){
         if(!arguments.length) return addFocus;
         if (action == "add") add2Focus(value)
         else if (action == "remove") removeFromFocus(value)
+        else if (action == "removeAll") removeAll()
         return lineChart;
     }
 

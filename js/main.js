@@ -23,7 +23,8 @@ var promises = [
     d3.csv('data/2019_us_census.csv'),
     d3.json('data/us_urban_pop.json'),
     d3.json('data/2016_election_affiliation.json'),
-    d3.json('data/orders.json')
+    d3.json('data/orders.json'),
+    d3.json('data/newOrders.json')
 ]
 Promise.all(promises).then(ready)
 
@@ -104,7 +105,7 @@ function dropdownChange(){
 
 
 //Once all local data is loaded in....
-function ready([abbrev, anno, regions, census, urban_pop, pol, order]){
+function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]){
     //Reorganize the data appropriately
     var duration = 1000;
     census.forEach(function(d){
@@ -170,7 +171,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order]){
         let fullHeight = window.innerHeight;
         var leftRowHeight = fullHeight * 0.71
         var row1Height = fullHeight *0.39
-        var row2Height = fullHeight *0.295
+        var row2Height = fullHeight *0.38
 
         lineChartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
         //bubblesWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
@@ -240,6 +241,21 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order]){
             'scheme': scheme
         }
 
+        var bubbleOrdersConfig = {
+            'height': row2Height,
+            'width': lineChartWidth,
+            'data': ordersByDate,
+            'marker': tmp,
+            'raw_orders': orders,
+            'full2abbrev': full2abbrev,
+            'duration': duration,
+            'order': newOrders,
+            'defaultColor': default_color,
+            'defaultOpacity': default_opacity,
+            'scheme': scheme,
+            'selection': '#orders-chart'
+        }
+
         var selectionConfig = {
             'height':selHeight,
             'width': selWidth,
@@ -296,15 +312,27 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order]){
             'scheme': scheme
         }
 
-
+        var deSelectConfig = {
+            'height':selHeight,
+            'width': parseInt(d3.select("#deselection").style("width"), 10),
+            'states_list': d3.values(abbrev),
+            'selection': '#deselection',
+            'full2abbrev': full2abbrev,
+            'rows': rows,
+            'duration': duration,
+            'defaultColor': default_color,
+            'defaultOpacity': default_opacity,
+            'scheme': scheme
+        }
         //Initialize all charts with their configurations
         line_vis = line_chart(lineChartconfig);
         //bubbles_vis = bubbles_chart(bubblesConfig);
-        legistate_vis = orders_chart(ordersConfig)
+        legistate_vis = bubbleOrders_chart(bubbleOrdersConfig)
         selector_vis = selector(selectionConfig);
         ranking_vis = ranking_chart(rankingConfig)
         scatter_vis = scatter_chart(scatterConfig)
         placeholder_vis = placeholder_chart(placeholderConfig)
+        deselect_vis = deselector(deSelectConfig)
 
 
         //Build each vis
@@ -314,6 +342,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order]){
         selector_vis();
         ranking_vis();
         scatter_vis();
+        deselect_vis();
     }
     request.send()
 
@@ -341,6 +370,7 @@ function update_focus(state, action){
     legistate_vis.addFocus(state, action);
     ranking_vis.addFocus(state, action)
     scatter_vis.addFocus(state, action)
+    deselect_vis.addFocus(state, action)
 }
 
 function update_highlight(state, action){

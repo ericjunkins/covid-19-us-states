@@ -502,11 +502,23 @@ function scatter_chart(config){
         }
 
         d3.select("#sev-circ-" + d)
+            .transition().duration(dur/2)
             .attr("fill", defaultColor)
             .attr("opacity", scatterDefaultOpacity)
 
     }
 
+    function removeAll(){
+
+        scatterFocus.forEach(function(d){
+            d3.select("#sev-circ-" + d)
+                .transition().duration(dur/2)
+                .attr("fill", defaultColor)
+                .attr("opacity", scatterDefaultOpacity)
+        })
+        scatterFocus = [];
+    }
+    
 
     //Getters & Setters for Vis
     scatterChart.width = function(value){
@@ -580,6 +592,7 @@ function scatter_chart(config){
         if(!arguments.length) return addFocus;
         if (action == "add") add2Focus(value)
         else if (action == "remove") removeFromFocus(value)
+        else if (action == "removeAll") removeAll()
         return scatterChart;
     }
 

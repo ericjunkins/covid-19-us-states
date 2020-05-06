@@ -1,17 +1,11 @@
 {
-    "lockdown": { 
-        "0": "Encouraged to stay at home, non-essential businesses can remain open with limited services",
-        "1": "Closure of non-essential businesses, mandatory stay at home except for essential activities (ie. grocery shopping, short daily excersize outside etc.)",
-        "2": "Police enforced stay at home orders, all non-essential businesses closed",
-        "3": "Full Lockdown"
-    },
-
-    "reopen": {
-        "0": "Elective medical procedures and surgeries allowed, non-essential business closed, social distancing in effect",
-        "1": "Elective medical procedures allowed, curb-side delivery can reopen, and a select few non-essential businesses reopen",
-        "2": "Some non-essential businesses open, with restrictions on capacity, social distancing still in effect",
-        "3": "All non-essential businesses reopen, social distancing in effect",
-        "4": "Resume life as before, all businesses open and social distancing lifted"
+    "order": {
+        "0": "All non-essential business closed, essential medical procedures only",
+        "1": "Elective medical procedures and surgeries allowed, non-essential business closed, social distancing in effect",
+        "2": "Elective medical procedures allowed, curb-side delivery can reopen, and a select few non-essential businesses reopen",
+        "3": "Some non-essential businesses open, with restrictions on capacity, social distancing still in effect",
+        "4": "All non-essential businesses reopen, social distancing in effect",
+        "5": "Resume life as before, all businesses open and social distancing lifted"
     }
 }
 
