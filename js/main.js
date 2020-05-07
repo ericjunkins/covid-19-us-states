@@ -235,7 +235,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
             'raw_orders': orders,
             'full2abbrev': full2abbrev,
             'duration': duration,
-            'order': order,
+            'order': newOrders,
             'defaultColor': default_color,
             'defaultOpacity': default_opacity,
             'scheme': scheme
@@ -301,12 +301,13 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
             'scheme': scheme
         }
 
-        var placeholderConfig = {
+        var levelComparisonConfig = {
             'height':row2Height,
             'width': parseInt(d3.select("#placeholder").style("width"), 10),
             'selection': '#placeholder',
             'currentData': current,
             'duration': duration,
+            'order': newOrders,
             'defaultColor': default_color,
             'defaultOpacity': default_opacity,
             'scheme': scheme
@@ -327,22 +328,22 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
         //Initialize all charts with their configurations
         line_vis = line_chart(lineChartconfig);
         //bubbles_vis = bubbles_chart(bubblesConfig);
-        legistate_vis = bubbleOrders_chart(bubbleOrdersConfig)
+        legistate_vis = orders_chart(ordersConfig)
         selector_vis = selector(selectionConfig);
         ranking_vis = ranking_chart(rankingConfig)
         scatter_vis = scatter_chart(scatterConfig)
-        placeholder_vis = placeholder_chart(placeholderConfig)
+        groupedBar_vis = groupedBar_chart(levelComparisonConfig)
         deselect_vis = deselector(deSelectConfig)
 
 
         //Build each vis
-        //bubbles_vis();
         legistate_vis();
         line_vis();
         selector_vis();
         ranking_vis();
         scatter_vis();
         deselect_vis();
+        groupedBar_vis();
     }
     request.send()
 
@@ -371,6 +372,7 @@ function update_focus(state, action){
     ranking_vis.addFocus(state, action)
     scatter_vis.addFocus(state, action)
     deselect_vis.addFocus(state, action)
+    groupedBar_vis.addFocus(state, action)
 }
 
 function update_highlight(state, action){

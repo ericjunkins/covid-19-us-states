@@ -1,4 +1,4 @@
-function orders_chart(config){
+function state_orders_chart(config){
     var margin = { left:120, right:50, top:15, bottom:40 }
         chartData = config.data,
         markerData = config.marker,
