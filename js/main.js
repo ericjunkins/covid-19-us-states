@@ -170,8 +170,8 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
         //Initialize all viz heights/widths for each chart
         let fullHeight = window.innerHeight;
         var leftRowHeight = fullHeight * 0.71
-        var row1Height = fullHeight *0.39
-        var row2Height = fullHeight *0.38
+        var row1Height = fullHeight *0.36
+        var row2Height = fullHeight *0.36
 
         lineChartWidth = parseInt(d3.select("#chart-area").style("width"), 10);
         //bubblesWidth = parseInt(d3.select("#bubbles-area").style("width"), 10);
@@ -228,7 +228,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
         // }
 
         var ordersConfig = {
-            'height': row2Height,
+            'height': fullHeight * 0.795,
             'width': lineChartWidth,
             'data': ordersByDate,
             'marker': tmp,
@@ -269,20 +269,20 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
             'scheme': scheme
         }
 
-        var rankingConfig = {
-            'height':row2Height,
-            'width': parseInt(d3.select("#ranking").style("width"), 10),
-            'selection': '#ranking',
-            'currentData': current,
-            'duration': duration,
-            'defaultColor': default_color,
-            'defaultOpacity': default_opacity,
-            'scheme': scheme
-        }
+        // var rankingConfig = {
+        //     'height':row2Height,
+        //     'width': parseInt(d3.select("#ranking").style("width"), 10),
+        //     'selection': '#ranking',
+        //     'currentData': current,
+        //     'duration': duration,
+        //     'defaultColor': default_color,
+        //     'defaultOpacity': default_opacity,
+        //     'scheme': scheme
+        // }
 
 
         var scatterConfig = {
-            'height':row1Height,
+            'height':row2Height,
             'width': lineChartWidth,
             'anno': anno,
             'regions': regions, 
@@ -301,17 +301,17 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
             'scheme': scheme
         }
 
-        var levelComparisonConfig = {
-            'height':row2Height,
-            'width': parseInt(d3.select("#placeholder").style("width"), 10),
-            'selection': '#placeholder',
-            'currentData': current,
-            'duration': duration,
-            'order': newOrders,
-            'defaultColor': default_color,
-            'defaultOpacity': default_opacity,
-            'scheme': scheme
-        }
+        // var levelComparisonConfig = {
+        //     'height':row2Height,
+        //     'width': parseInt(d3.select("#placeholder").style("width"), 10),
+        //     'selection': '#placeholder',
+        //     'currentData': current,
+        //     'duration': duration,
+        //     'order': newOrders,
+        //     'defaultColor': default_color,
+        //     'defaultOpacity': default_opacity,
+        //     'scheme': scheme
+        // }
 
         var deSelectConfig = {
             'height':selHeight,
@@ -330,9 +330,9 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
         //bubbles_vis = bubbles_chart(bubblesConfig);
         legistate_vis = orders_chart(ordersConfig)
         selector_vis = selector(selectionConfig);
-        ranking_vis = ranking_chart(rankingConfig)
+        //ranking_vis = ranking_chart(rankingConfig)
         scatter_vis = scatter_chart(scatterConfig)
-        groupedBar_vis = groupedBar_chart(levelComparisonConfig)
+        //groupedBar_vis = groupedBar_chart(levelComparisonConfig)
         deselect_vis = deselector(deSelectConfig)
 
 
@@ -340,10 +340,10 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
         legistate_vis();
         line_vis();
         selector_vis();
-        ranking_vis();
+        //ranking_vis();
         scatter_vis();
         deselect_vis();
-        groupedBar_vis();
+        //groupedBar_vis();
     }
     request.send()
 
@@ -369,10 +369,10 @@ function update_focus(state, action){
     //bubbles_vis.addFocus(state, action);
     line_vis.addFocus(state, action);
     legistate_vis.addFocus(state, action);
-    ranking_vis.addFocus(state, action)
+    //ranking_vis.addFocus(state, action)
     scatter_vis.addFocus(state, action)
     deselect_vis.addFocus(state, action)
-    groupedBar_vis.addFocus(state, action)
+    //groupedBar_vis.addFocus(state, action)
 }
 
 function update_highlight(state, action){
@@ -381,7 +381,7 @@ function update_highlight(state, action){
     selector_vis.highlight(state,action)
     legistate_vis.highlight(state, action)
     line_vis.highlight(state, action)
-    ranking_vis.highlight(state, action)
+    //ranking_vis.highlight(state, action)
     scatter_vis.highlight(state, action)
 }
 

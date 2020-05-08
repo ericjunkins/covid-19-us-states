@@ -117,7 +117,11 @@ h5 {
 .axis--grid .tick line {
 	stroke: #fff;
 }
-  
+
+#small-tick-text {
+	font-size: 0.5rem;
+}
+
 .axis--grid .tick--minor line {
 	stroke-opacity: .5;
 }
@@ -128,7 +132,7 @@ h5 {
   
 .axisWhite text{
 	fill: #fff;
-	font-size: 0.7rem;
+	font-size: 0.55rem;
 }
   
 .axisWhite line{

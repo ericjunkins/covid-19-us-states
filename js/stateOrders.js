@@ -10,7 +10,7 @@ function orders_chart(config){
         defaultOpacity = config.defaultOpacity*0.5
 
     var ordersFocus = []
-
+    var statesPlaceholder = ['ph0','ph1','ph2','ph3','ph4']
     var color = d3.scaleOrdinal(config.scheme);
     var cur_color = 0
     var height = config.height - margin.top - margin.bottom, 
@@ -26,9 +26,13 @@ function orders_chart(config){
     
 
     var getDateObj = d3.timeParse("%m/%d/%y");
+    var date2String = d3.timeFormat("%m/%d/%y")
     var today = new Date();
     var ordersDate = [],
-        dateBinning = 1
+        textLabels = [],
+        dateBinning = 1,
+        spanData = [],
+        filler = []
 
     const dict = Object.entries(order)
     for (const [key, vals] of dict){
@@ -39,8 +43,6 @@ function orders_chart(config){
             d.id = key + "-" + i
         })
     }
-
-    
 
     sorted = ordersDate.sort(function(a,b){
         return d3.ascending(a,b)
@@ -63,7 +65,7 @@ function orders_chart(config){
     }
 
     var dateArray = getDates(
-        d3.timeDay.offset(getDateObj(sorted[0]), -3), 
+        d3.timeDay.offset(getDateObj(sorted[0]), -10), 
         d3.timeDay.offset(today, 1)
     )
 
@@ -78,7 +80,15 @@ function orders_chart(config){
         ordersByDate[d] = []
     })
 
+    var minDate = "03/07/20"
+    var filteredData
+    var groupedBarData = []
+    var orderLevels= ["0", "1", "2", "3", "4", "5"]
+
+    id = 0
     for (const [key, vals] of dict){
+        prevDate = minDate
+        prevOrder = "5"
         tmp = vals.orders.filter(function(d){ return d.date != "" && getDateObj(d.date) <= today})
         tmp.forEach(function(d, i){
             if (d.date != ""){
@@ -86,6 +96,32 @@ function orders_chart(config){
                 d.id = key + "-" + i
                 d.level = String(ordersByDate[d.date].length)
                 ordersByDate[d.date].push(d)
+
+                diff = getDateDiff(prevDate, d.date)
+                
+                groupedBarData.push({
+                    'state': key,
+                    'order': prevOrder,
+                    'startDate': prevDate,
+                    'endDate': d.date,
+                    'id': id
+                    //'id': key + "-" + prevOrder
+                })
+                prevDate = d.date
+                prevOrder = d.order
+                id += 1
+
+                if (i == tmp.length -1){
+                    groupedBarData.push({
+                        'state': key,
+                        'order': prevOrder,
+                        'startDate': prevDate,
+                        'endDate': date2String(today),
+                        'id': id
+                        //'id': key + "-" + prevOrder
+                    })
+                    id += 1
+                }
             }
         })
     }
@@ -109,6 +145,16 @@ function orders_chart(config){
         bandStrings.push(String(i))
     }
 
+    var states = d3.keys(order)
+
+
+    function getDateDiff(a,b){
+        return Math.round((getDateObj(b) - getDateObj(a))/ (1000*60*60*24))
+    }
+
+    height1 = height/2 + height * 0.1
+    height2 = height/2
+
     //Set Scales
     var x = d3.scaleBand()
         .domain(dateArrayStrings)
@@ -117,42 +163,239 @@ function orders_chart(config){
     
     var y1 = d3.scaleLinear()
         .domain([0, maxCount])
-        //.range([height, height/2 + height * 0.05])
-        .range([height, 0])
+        .range([height, height1])
+        //.range([height, 0])
 
     var y1band = d3.scaleBand()
         .domain(bandStrings)
         .range(y1.range())
         .padding(0.05)
 
+    var yState = d3.scaleBand()
+        .domain(["0", "1", "2", "3", "4"])
+        .range([0, height2])
+        .padding(0.2)
+
+    var yLevel = d3.scaleBand()
+        .domain(orderLevels)
+        .range([0, yState.bandwidth()])
+        .padding(0.1)
+
+    var xLinear = d3.scaleLinear()
+        .domain([0, dateArrayStrings.length])
+        .range([0, width])
+
+    var yBg = d3.scaleBand()
+        .domain(["0", "1", "2", "3", "4"])
+        .range(yState.range())
+        .padding(0.05)
+
     var radius = Math.min(y1band.bandwidth(), x.bandwidth())/2 * 0.7
 
+    var x_axis1 = d3.axisBottom(x)
+        //.tickValues(x.domain().filter(function(d,i){ return !(i%7)}))
+        .tickPadding(15)
 
-    var x_axis = d3.axisBottom(x)
-        .tickValues(x.domain().filter(function(d,i){ return !(i%7)}))
-        .tickPadding(10)
+    var x_axis2 = d3.axisBottom(x)
+        //.tickValues(x.domain().filter(function(d,i){ return !(i%7)}))
+        .tickFormat("")
 
-    var y_axis = d3.axisLeft(y1)
+    var y_axis1 = d3.axisLeft(y1).ticks(5)
+    var y_axis2 = d3.axisLeft().tickPadding(30)
+    var y_axis3 = d3.axisLeft(yLevel).tickSize(5,0)
 
     var labels = svg.append("g")
         .attr("class", "labels")
 
     labels.append("g")
         .attr("class", "axis axis--x axisWhite")
-        .call(y_axis)
+        .call(y_axis1)
 
     labels.append("g")
         .attr("class", "axis axis--x axisWhite")
+        .attr("id", "orders-bottom-axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(x_axis)
+        .call(x_axis1)
 
+    labels.append("g")
+        .attr("class", "axis axis--x axisWhite")
+        .attr("id", "orders-top-axis")
+        .attr("transform", "translate(0," + height2 + ")")
+        .call(x_axis2)
 
- 
+    upperAxisCall = labels.append("g")
+        .attr("class", "axis axis--x axisWhite")
+        
+    var dynamicAxis = svg.append("g")
+        .attr("id", "dynm-axis")
+
+    sel = d3.selectAll("#orders-bottom-axis")
+    sel.selectAll("text").each(function(_,i){
+        if (i % 7 !== 0) d3.select(this).remove();
+    })
+    sel.selectAll('line').each(function(_,i){
+        if (i % 7 == 0) d3.select(this).attr("y2", 12);
+    })
+    sel = d3.selectAll("#orders-top-axis")
+    sel.selectAll('line').each(function(_,i){
+        if (i % 7 == 0) d3.select(this).attr("y2", 12);
+    })
+
+    upperChart = svg.append('g')
+        .attr("class", "upper-chart")
+
+    textGroup = upperChart.append('g')
+        .attr("transform", "translate(" + -margin.left * 0.4 + ",0)")
+
+    upperChart.append('text')
+        .attr("x", -height2/2)
+        .attr("y", -margin.left * 0.7)
+        .attr("transform", "rotate(-90)")
+        .attr("class", "axis-label")
+        .text("Lockdown Level Per state")
+
+    svg.append("text")
+        .attr("x", -height*0.75)
+        .attr("y", -margin.left * 0.7)
+        .attr("transform", "rotate(-90)")
+        .attr("class", "axis-label")
+        .text("Orders Issued Per Day")
+
+    upperChart.append("g").selectAll("bg-rect")
+        .data(yBg.domain())
+        .enter()
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", d=> yBg(d))
+        .attr("width", width)
+        .attr("height", yBg.bandwidth())
+        .attr("fill", "grey")
+        .attr("opacity", 0.05)
+
+    yState.domain().forEach(function(d, i){
+        dynamicAxis.append("g")
+            .attr("id", "dyn-axis-" + i)
+            .attr("transform", "translate(0," + yState(d) + ")")
+            .attr("class", "axis axis--x axisWhite")
+            .attr("opacity", 1)
+            .call(y_axis3)
+    })
+
+    
+
 
     function ordersChart(){
         draw_chart();
+        updateScales();
+        draw_span_rects();
     }
     
+    function draw_span_rects(){
+        var rects = upperChart.selectAll(".order-span-rect")
+            .data(filteredData, function(d){
+                return d.id
+            })
+
+        rects.exit()
+            .attr("fill", "#fff")
+            .transition().duration(dur)
+                .attr("width", 0)
+            .remove()
+
+        
+        rects
+            .transition().duration(dur/2)
+                .attr("y", function(d){ return yState(d.state) + yLevel(d.order) })
+                .attr("height", yLevel.bandwidth())
+
+        rects.enter()
+            .append("rect")
+            .attr("class", "order-span-rect")
+            .attr("id", d=> "span-rect-" + d)
+            .attr("x", function(d){ return (d.startDate != "" ? x(d.startDate) + x.bandwidth()/2 : 0)  })
+            .attr("y", function(d){ return yState(d.state) + yLevel(d.order) })
+            .attr("height", yLevel.bandwidth())
+            .attr("rx", 3)
+            .attr("width", 0)
+            .attr("fill", "#fff")
+            .transition().duration(dur)
+            .attr("width", function(d){ return (d.startDate != "" ? x(d.endDate) - x(d.startDate) : 0 );  })
+            .attr("fill", color(cur_color))
+        
+        
+        var texts = textGroup.selectAll(".texts-labels-state")
+            .data(textLabels, function(d){ return d.id})
+
+        texts.exit()
+            .attr("fill", "#fff")
+            .transition().duration(dur/2)
+            .attr("fill", "#000")
+            .attr("opacity", 0)
+            .remove()
+
+        texts
+            .attr("x", 0)
+            .transition().duration(dur)
+            .attr("y", d=>yState(d.state) + yState.bandwidth()/2)
+            .text(d=>d.state)
+
+
+        texts.enter()
+            .append("text")
+            .attr("class", "texts-labels-state")
+            .attr("x", 0)
+            .attr("y", d=>yState(d.state) + yState.bandwidth()/2)
+            .text(d=>d.state)
+            .attr("fill", "#fff")
+            .attr("font-size", "1.5rem")
+            .transition().duration(dur)
+            .attr("fill", color(cur_color))
+            .attr("font-size", "1rem")
+
+
+        var fillerRect = upperChart.selectAll('.filler-rect')
+            .data(filler, d=>d.id)
+
+        fillerRect.exit().remove()
+
+        fillerRect.enter()
+            .append("rect")
+            .attr("class", "filler-rect")
+            .attr("x", width/2)
+            .attr("y", d=> yState(d.y) + yState.bandwidth()/2)
+            .attr("width", 0)
+            .attr("height", 0)
+            .attr("fill", defaultColor)
+            .attr("opacity", defaultOpacity)
+            .attr("rx", 0)
+            .transition().duration(dur)
+            .attr("x", 0)
+            .attr("y", d=> yState(d.y))
+            .attr("width", width)
+            .attr("height", yState.bandwidth)
+            .attr("rx", 10)
+
+        
+        var fillerText = upperChart.selectAll(".filler-text")
+            .data(filler, d=>d.id)
+
+        fillerText.exit().remove()
+
+        fillerText.enter()
+            .append("text")
+            .attr("class", "filler-text")
+            .attr("x", width/2)
+            .attr("y", d=> yState(d.y) + yState.bandwidth()/2)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("fill", "#fff")
+            .text("Select a state to Populate Data..")
+            .attr("font-size", 0)
+            .transition().duration(dur)
+            .attr("font-size", "1rem")
+
+    }
+
     function draw_chart(){
         var chart = svg.append("g")
             .attr("class", "charts")
@@ -205,6 +448,46 @@ function orders_chart(config){
             //.attr("visibility", 'hidden')
     }
     
+    function updateScales(){
+        ph = 0
+        spanData = []
+        textLabels = []
+        ordersFocus.forEach(d=> spanData.push(d))
+
+        while (spanData.length >= 6) spanData.shift()
+        spanData.forEach(function(d){
+            textLabels.push({'state': d, 'id': states.indexOf(d)})
+        })
+
+        while (spanData.length < 5){
+            spanData.push('ph' + ph)
+            ph += 1
+        }
+        
+        
+        yState.domain(spanData)
+        y_axis2.scale(yState)
+        yLevel.range([0, yState.bandwidth()])
+        y_axis3.scale(yLevel)
+
+        // spanData.forEach(function(d, i){
+        //     if (d.length == 2){
+        //         d3.select("#dyn-axis-" + i)
+        //             .attr("opacity", 1)
+        //     }
+        // })
+
+        filler = []
+        for (var i=0; i<5; ++i){
+            if (i>=ordersFocus.length){
+                filler.push({'y': yState.domain()[i], 'id': i})
+            }
+        }
+
+
+        filteredData = groupedBarData.filter(d=> spanData.includes(d.state))
+    }
+
     function mouseover(d){
         if (d.data == undefined) return
         var states = d.data.map(d => d.state)
@@ -258,14 +541,19 @@ function orders_chart(config){
                 .transition().duration(dur)
                 .attr("r", radius)
                 .attr("fill", color(cur_color))
+            updateScales();
+            draw_span_rects();
+            cur_color += 1;
         }
-        cur_color += 1;
+        
     }
 
     function removeFromFocus(d, i){
         if (ordersFocus.includes(d)){
             const index = ordersFocus.indexOf(d);
             ordersFocus.splice(index, 1);
+            updateScales();
+            draw_span_rects();
         }
         d3.selectAll("#orders-circle-" + d)
             .attr("fill", "#fff")
@@ -274,6 +562,8 @@ function orders_chart(config){
             .attr("opacity", 0)
             .attr("r", radius)
             .attr("fill", defaultColor)
+            
+
     }
 
     function removeAll(){
@@ -286,9 +576,11 @@ function orders_chart(config){
                 .attr("opacity", 0)
                 .attr("r", radius)
                 .attr("fill", defaultColor)
-        })
 
+        })
         ordersFocus = [];
+        updateScales();
+        draw_span_rects();
     }
 
     ordersChart.width = function(value){

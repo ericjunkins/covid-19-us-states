@@ -66,8 +66,7 @@ function groupedBar_chart(config){
 
     function getDateDiff(a,b){
         return Math.round((getDateObj(b) - getDateObj(a))/ (1000*60*60*24))
-    }    
-
+    }
 
     var filteredData
 
@@ -111,7 +110,6 @@ function groupedBar_chart(config){
         xState.domain(groupedBarFocus)
         filteredData = groupedBarData.filter(d=> groupedBarFocus.includes(d.state))
         maxCount = d3.max(filteredData, d=> d.count)
-        console.log(filteredData)
         y.domain([-1, maxCount])
         y_axis.ticks(5)
         yAxisCall
@@ -161,7 +159,6 @@ function groupedBar_chart(config){
             .transition().duration(dur)
                 .attr("fill", color(cur_color))
                 .attr("y", function(d){
-                    console.log(y(d.count), d.count)
                     return  y(d.count)
                 })
                 .attr("height", d=> y(-1) - y(d.count))

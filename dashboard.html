@@ -62,104 +62,116 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="row rows">
+                    <div class="col-lg-12 left-coloumn">
+                        <div class="bounding">
+                            <div class="row row-headers" style="width: 100%; margin-left: 0px;">
+                                <div class="col-sm-4">
+                                    <h2 class="section-title"> Covid-19 Trajectory </h2>
+                                </div>
 
-        <div class="row rows">
-            <div class="col-lg-6 left-coloumn">
-                <div class="bounding">
-                    <div class="row row-headers" style="width: 100%; margin-left: 0px;">
-                        <div class="col-sm-4">
-                            <h2 class="section-title"> Covid-19 Trajectory </h2>
+                                <div class="col-sm-2 offset-sm-4 cn">
+                                    <div class="inner">
+                                        <h5> Axis Scale </h5>
+                                        <select class="select-css" id="axes-select">
+                                            <option value="log">Logarithmic Scale </option>
+                                            <option value="linear">Linear Scale </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!--
+                                <div class="col-sm-2 inline-buttons" style="height: 100%;">
+                                    <select class="select-css" id="axes-select" style="position: relative; top: 15%;">
+                                        <option value="log">Logarithmic Scale </option>
+                                        <option value="linear">Linear Scale </option>
+                                    </select>
+                                </div>
+                                -->
+
+                                <a class="btn" id="chart-help">
+                                    <i class="fa fa-question-circle help-button" id ="chart-help-icon" style="font-size: 1.2rem;"></i>
+                                </a>
+                            </div>
+                            <div id="chart-area"></div>
                         </div>
-
-                        <div class="col-sm-2 offset-sm-4 cn">
-                            <div class="inner">
-                                <h5> Axis Scale </h5>
-                                <select class="select-css" id="axes-select">
-                                    <option value="log">Logarithmic Scale </option>
-                                    <option value="linear">Linear Scale </option>
-                                </select>
+                    </div>
+                </div>
+                <div class="row rows">
+                    <div class="col-lg-12 left-coloumn">
+                        <div class="bounding">
+                            <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                                <div class="col-sm-4">
+                                    <h2 class="section-title">Severity Per State </h2>
+                                </div>
+                                <div class="col-sm-2  offset-sm-1 cn">
+                                    <div class="inner">
+                                        <h5> Severity (area) </h5>
+                                        <select class="select-css" id="severity-select">
+                                            <option value="cases">Total Cases</option>
+                                            <option value="cases_per_capita">Cases Per Capita</option>
+                                            <option value="deaths">Total Deaths</option>
+                                            <option value="deaths_per_capita">Deaths per Capita</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 cn">
+                                    <div class="inner">
+                                        <h5> Grouping (y-axis)</h5>
+                                        <select class="select-css" id="group-select">
+                                            <option value="region">Region</option>
+                                            <option value="population">Population</option>
+                                            <option value="urban">Percent Urban</option>
+                                            <option value="political_aff">Political</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 cn">     
+                                    <div class="inner">
+                                        <h5> Time (x-axis) </h5>                       
+                                        <select class="select-css" id="color-select">
+                                            <option value="state_hundred">States's 100th Case</option>
+                                            <option value="us_hundred_case">US 100th Case</option>
+                                            <option value="us_first_case">US 1st Case</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                    <a class="btn" id="scatter-help">
+                                        <i class="fa fa-question-circle help-button-right-upper" id ="scatter-help-icon" style="font-size: 1.2rem;"></i>
+                                    </a>
+                            </div>
+                            <div id="outter2">
+                                <div id="scatterTooltip"></div>
+                                <div id="scatter-area"></div>
                             </div>
                         </div>
-                        <!--
-                        <div class="col-sm-2 inline-buttons" style="height: 100%;">
-                            <select class="select-css" id="axes-select" style="position: relative; top: 15%;">
-                                <option value="log">Logarithmic Scale </option>
-                                <option value="linear">Linear Scale </option>
-                            </select>
-                        </div>
-                        -->
-
-                        <a class="btn" id="chart-help">
-                            <i class="fa fa-question-circle help-button" id ="chart-help-icon" style="font-size: 1.2rem;"></i>
-                        </a>
                     </div>
-                    <div id="chart-area"></div>
                 </div>
             </div>
-            <div class="col-lg-6 right-coloumn">
-                <div class="bounding">
-                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
-                        <div class="col-sm-4">
-                            <h2 class="section-title">Severity Per State </h2>
-                        </div>
-                        <div class="col-sm-2  offset-sm-1 cn">
-                            <div class="inner">
-                                <h5> Severity (area) </h5>
-                                <select class="select-css" id="severity-select">
-                                    <option value="cases">Total Cases</option>
-                                    <option value="cases_per_capita">Cases Per Capita</option>
-                                    <option value="deaths">Total Deaths</option>
-                                    <option value="deaths_per_capita">Deaths per Capita</option>
-                                </select>
+            <div class="col-sm-6">
+                <div class="row rows">
+                    <div class="col-lg-12 right-coloumn">
+                        <div class="bounding">
+                            <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
+                                <h2 class="section-title"> State-Issued Orders </h2>
+                                    <a class="btn" id="orders-help">
+                                        <i class="fa fa-question-circle help-button" id ="orders-help-icon" style="font-size: 1.2rem;"></i>
+                                    </a>
+                            </div>
+                            <div id="ordersOuter">
+                                <div id="orders-chart"></div>
                             </div>
                         </div>
-                        <div class="col-sm-2 cn">
-                            <div class="inner">
-                                <h5> Grouping (y-axis)</h5>
-                                <select class="select-css" id="group-select">
-                                    <option value="region">Region</option>
-                                    <option value="population">Population</option>
-                                    <option value="urban">Percent Urban</option>
-                                    <option value="political_aff">Political</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-sm-2 cn">     
-                            <div class="inner">
-                                <h5> Time (x-axis) </h5>                       
-                                <select class="select-css" id="color-select">
-                                    <option value="state_hundred">States's 100th Case</option>
-                                    <option value="us_hundred_case">US 100th Case</option>
-                                    <option value="us_first_case">US 1st Case</option>
-                                </select>
-                            </div>
-                        </div>
-                            <a class="btn" id="scatter-help">
-                                <i class="fa fa-question-circle help-button-right-upper" id ="scatter-help-icon" style="font-size: 1.2rem;"></i>
-                            </a>
-                    </div>
-                    <div id="outter2">
-                        <div id="scatterTooltip"></div>
-                        <div id="scatter-area"></div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row rows">
-            <div class="col-lg-6 left-coloumn">
-                <div class="bounding">
-                    <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
-                        <h2 class="section-title"> State-Issued Orders </h2>
-                            <a class="btn" id="orders-help">
-                                <i class="fa fa-question-circle help-button" id ="orders-help-icon" style="font-size: 1.2rem;"></i>
-                            </a>
-                    </div>
-                    <div id="ordersOuter">
-                        <div id="orders-chart"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3">
+    </div>
+
+            
+    <!--
+        <div class="col-lg-3">
                 <div class="bounding">
                     <div class="row row-headers" style="width: 100%; margin-left: 0px; ">
                         <h2 class="section-title"> States Ranking </h2>
@@ -186,12 +198,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-
-
-    
+    -->
 
     <!-- Modal -->
 
