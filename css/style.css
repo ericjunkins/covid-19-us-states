@@ -433,17 +433,20 @@ circle-packs {
 }
 
 .tooltip {
-	background-color: #262729;
+	background-color: #f3f3d0;
 	border: 1px solid #5e5e5e;
 	border-radius: 5px;
-	padding: 10px;
-	font-size: 1.2rem;
-	color: #fff;
+	padding: 12px;
+	font-size: 1rem;
+	pointer-events: none;
 }
 
 .tooltip>p {
-	color: #fff;
-	fill: #fff;
+	color: rgb(0, 0, 0);
 	stroke: #fff;
 	font-size: 1.2rem;
+}
+
+.tooltip>p>em {
+	color: #52fa52);
 }

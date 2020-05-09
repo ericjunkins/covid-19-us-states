@@ -85,12 +85,12 @@ function scatter_chart(config){
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .style("opacity", 0)
         .attr("class", "tooltip")
-        .style("font-size", "1.5rem")
-        .style("background-color", "white")
-        .style("border", "solid")
-        .style("border-width", "3px")
-        .style("border-radius", "5px")
-        .style("padding", "5px")
+        // .style("font-size", "1.5rem")
+        // .style("background-color", "white")
+        // .style("border", "solid")
+        // .style("border-width", "3px")
+        // .style("border-radius", "5px")
+        // .style("padding", "5px")
 
     //Default to Population Sorted
     var y = yLinearPop;

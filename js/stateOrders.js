@@ -25,6 +25,18 @@ function orders_chart(config){
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
 
+    var ordersTooltip =  d3.select("#ttest")
+        .append('div')
+        //.style("width", "270px")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .style("opacity", 0)
+        .attr("class", "tooltip")
+        .style("data-placement", "right")
+
+    var dateTip = ordersTooltip.append("div")
+        .attr("class", "tooltip")
+
+
     var getDateObj = d3.timeParse("%m/%d/%y");
     var date2String = d3.timeFormat("%m/%d/%y")
     var today = new Date();
@@ -43,6 +55,8 @@ function orders_chart(config){
             d.id = key + "-" + i
         })
     }
+
+
 
     sorted = ordersDate.sort(function(a,b){
         return d3.ascending(a,b)
@@ -241,6 +255,9 @@ function orders_chart(config){
         if (i % 7 == 0) d3.select(this).attr("y2", 12);
     })
 
+    lowerChart = svg.append("g")
+        .attr("class", "lower-chart")
+
     upperChart = svg.append('g')
         .attr("class", "upper-chart")
 
@@ -281,7 +298,24 @@ function orders_chart(config){
             .call(y_axis3)
     })
 
-    
+    lowerChart.append('rect')
+        .attr("class", "hover")
+        .attr("x", 0)
+        .attr("y", height1)
+        .attr("width", width)
+        .attr("height", height - height1)
+        .attr("fill", defaultColor)
+        .attr("opacity", 0)
+            .on("mousemove", mousemove)
+            .on("mouseenter", mouseover)
+            .on("mouseout", mouseout)
+
+    verticalMarker = svg.append('line')
+        .attr("y1", 0)
+        .attr("y2", height)
+        .style("stroke-dasharray", ("3,3"))
+        .attr('stroke', "#fff")
+        .attr("opacity", 0)
 
 
     function ordersChart(){
@@ -361,18 +395,20 @@ function orders_chart(config){
         fillerRect.enter()
             .append("rect")
             .attr("class", "filler-rect")
-            .attr("x", width/2)
-            .attr("y", d=> yState(d.y) + yState.bandwidth()/2)
-            .attr("width", 0)
-            .attr("height", 0)
-            .attr("fill", defaultColor)
-            .attr("opacity", defaultOpacity)
-            .attr("rx", 0)
-            .transition().duration(dur)
             .attr("x", 0)
             .attr("y", d=> yState(d.y))
             .attr("width", width)
             .attr("height", yState.bandwidth)
+            // .attr("x", width/2)
+            // .attr("y", d=> yState(d.y) + yState.bandwidth()/2)
+            // .attr("width", 0)
+            // .attr("height", 0)
+            .attr("fill", defaultColor)
+            .attr("opacity", 0)
+            .attr("rx", 0)
+            .transition().duration(dur)
+            .attr("opacity", defaultOpacity)
+
             .attr("rx", 10)
 
         
@@ -390,14 +426,18 @@ function orders_chart(config){
             .attr("dominant-baseline", "middle")
             .attr("fill", "#fff")
             .text("Select a state to Populate Data..")
-            .attr("font-size", 0)
+            //.attr("font-size", 0)
+            
+            .attr("opacity", 0)
             .transition().duration(dur)
             .attr("font-size", "1rem")
+            
+            .attr("opacity", 1)
 
     }
 
     function draw_chart(){
-        var chart = svg.append("g")
+        var chart = lowerChart.append("g")
             .attr("class", "charts")
 
         
@@ -489,7 +529,16 @@ function orders_chart(config){
     }
 
     function mouseover(d){
-        if (d.data == undefined) return
+        ordersTooltip
+            .raise()
+            .transition().duration(250)
+            .style("opacity", 1)
+        if (d == undefined){
+            document.body.style.cursor = "crosshair"
+            return 
+        }
+
+        
         var states = d.data.map(d => d.state)
         states.forEach(function(v,i){
             update_highlight(v, "on")
@@ -497,17 +546,54 @@ function orders_chart(config){
         document.body.style.cursor = "pointer"
     }
 
-    function mousemove(d){
 
+    function mousemove(d){
+        var curX = d3.mouse(this)[0]
+        var i = Math.round(curX/x.step())
+        var data = ordersByDate[x.domain()[i]]
+        verticalMarker
+            .lower()
+            .attr("x1", curX)
+            .attr("x2", curX)
+            .attr("opacity", 1)
+
+        
+        ordersTooltip
+            .html(
+                "<p>" + 
+                "Date: " + "<em>" + x.domain()[i] + "</em>" + "<br>" + 
+                "States with Orders: " + "<em>" + data.length  + "</em>"+ "<br>" + 
+                "States: "  + formatStatesText(data) 
+                + "</p>"
+            )
+        .style("left", (d3.mouse(this)[0]) + (margin.left +30) + "px")
+        .style("top", (d3.mouse(this)[1]) + (margin.top + margin.bottom/2) + "px")
+    }
+
+    function formatStatesText(d){
+        str = ""
+        d.forEach(function(v, i){
+            str += v.state + ", "
+            if (!(i % 3) && i!= 0) str += "<br>"
+        })
+        return str
     }
 
     function mouseout(d){
-        if (d.data == undefined) return
+        document.body.style.cursor = "crosshair"
+        ordersTooltip
+            .transition().duration(250)
+            .style("opacity", 0)
+
+        verticalMarker
+            .transition().duration(250)
+            .attr("opacity", 0)
+
+        if (d == undefined) return
         var states = d.data.map(d => d.state)
         states.forEach(function(v,i){
             update_highlight(v, "off")
         })
-        document.body.style.cursor = "default"
     }
 
     function display_hover(d, action){
