@@ -1,5 +1,5 @@
 function orders_chart(config){
-    var margin = { left:120, right:60, top:30, bottom:70 }
+    var margin = { left:120, right:60, top:100, bottom:70 }
         chartData = config.data,
         markerData = config.marker,
         raw_orders = config.raw_orders,
@@ -165,8 +165,9 @@ function orders_chart(config){
         return Math.round((getDateObj(b) - getDateObj(a))/ (1000*60*60*24))
     }
 
-    height1 = height/2 + height * 0.1
-    height2 = height/2
+    height2 = height*0.6
+    height1 = height2 + height * 0.04
+    
 
     //Set Scales
     var x = d3.scaleBand()
@@ -264,11 +265,14 @@ function orders_chart(config){
         .attr("transform", "translate(" + -margin.left * 0.4 + ",0)")
 
     upperChart.append('text')
-        .attr("x", -height2/2)
+        .attr("x", -height2 * 0.5)
         .attr("y", -margin.left * 0.7)
         .attr("transform", "rotate(-90)")
         .attr("class", "axis-label")
         .text("Lockdown Level Per state")
+
+
+
 
     svg.append("text")
         .attr("x", -height*0.75)
@@ -317,7 +321,101 @@ function orders_chart(config){
         .attr("opacity", 0)
 
 
+    function makeLegend(){
+        legend = upperChart.append("g")
+        .attr("class", "legend")
+        .attr("transform", "translate(" + width*0.65 + "," + -margin.top * 0.85 + ")")
+
+        legendText = ["0", "1", "2", "3", "4", "5"]
+        legendSize = 30 
+        legend.selectAll("rect")
+            .data(legendText)
+            .enter()
+            .append("rect")
+                .on("mousemove", mousemove)
+                .on("mouseenter", mouseover)
+                .on("mouseout", mouseout)
+            .attr("x", function(d,i){ return i * legendSize*1.2})
+            .attr("y", 0)
+            .attr("width", legendSize)
+            .attr("height", legendSize)
+            .attr("fill", "#14161b")
+            .attr("rx", 2)
+            .attr("ry", 2)
+            .attr("stroke", "#f3f3d0")
+        
+        legend.selectAll("text")
+            .data(legendText)
+            .enter()
+            .append("text")
+                .on("mousemove", mousemove)
+                .on("mouseenter", mouseover)
+                .on("mouseout", mouseout)
+            .attr("transform", "translate(" + legendSize/2 + ",0)")
+            .attr("x", function(d,i){ return i * legendSize*1.2})
+            .attr("y", legendSize/2)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("fill", "#f3f3d0")
+            .text(d=> d)
+
+        // legend.append("text")
+        //     .attr("x", -15)
+        //     .attr("y", legendSize/2)     
+        //     .attr("dominant-baseline", "middle")
+        //     .attr("text-anchor", "end")
+        //     .attr("fill", "#fff")
+        //     .text("Lockdown Level")
+
+        legendScale = legend.append("g")
+            .attr("transform", "translate(0," + legendSize * 1.3 + ")")
+        
+        var lineEnd = 6*legendSize*1.2
+        var lineStart = -legendSize*1.2/6
+
+        legendScale.append("line")
+            .attr("x1", lineStart)
+            .attr("x2", lineEnd)
+            .attr("y1", 0)
+            .attr("y2", 0)
+            .attr("stroke", "#fff")
+
+        legendScale.append("line")
+            .attr("x1", lineStart)
+            .attr("x2", lineStart)
+            .attr("y1", -5)
+            .attr("y2", 5)
+            .attr("stroke", "#fff")
+
+        legendScale.append("line")
+            .attr("x1", lineEnd)
+            .attr("x2", lineEnd)
+            .attr("y1", -5)
+            .attr("y2", 5)
+            .attr("stroke", "#fff")
+
+        legendScale.append("text")
+            .attr("x", lineStart)
+            .attr("y", 10)
+            .attr("font-size", "0.75rem")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "text-before-edge")
+            .text("No Lockdown")
+            .attr("fill", "#fff")
+
+        legendScale.append("text")
+            .attr("x", lineEnd)
+            .attr("y", 10)
+            .attr("font-size", "0.75rem")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "text-before-edge")
+            .text("High Lockdown")
+            .attr("fill", "#fff")
+    }
+
+
     function ordersChart(){
+        makeLegend();
         draw_chart();
         updateScales();
         draw_span_rects();
@@ -535,9 +633,11 @@ function orders_chart(config){
         if (d == undefined){
             document.body.style.cursor = "crosshair"
             return 
+        } else if (orderLevels.includes(d)){
+            document.body.style.cursor = "default"
+            return
         }
 
-        
         var states = d.data.map(d => d.state)
         states.forEach(function(v,i){
             update_highlight(v, "on")
@@ -547,29 +647,53 @@ function orders_chart(config){
 
 
     function mousemove(d){
-        var curX = d3.mouse(this)[0]
-        var i = Math.floor(curX/x.step())
-        var data = ordersByDate[x.domain()[i]]
-        verticalMarker
-            .lower()
-            .attr("x1", curX)
-            .attr("x2", curX)
-            .attr("opacity", 1)
+        if (orderLevels.includes(d)){
+            ordersTooltip
+                .html(
+                    "<p>" + 
+                    getLegendText(d)
+                    + "</p>"
+                )
+                .style("left", (event.pageX) + (15) + "px")
+                .style("top", (event.pageY) + (10) + "px")
+        } else {
+            var curX = d3.mouse(this)[0]
+            var i = Math.floor(curX/x.step())
+            var data = ordersByDate[x.domain()[i]]
+            verticalMarker
+                .lower()
+                .attr("x1", curX)
+                .attr("x2", curX)
+                .attr("opacity", 1)
+    
+            ordersTooltip
+                .html(
+                    "<p>" + 
+                    "Date: " + "<em>" + x.domain()[i] + "</em>" + "<br>" + 
+                    "States with Orders: " + "<em>" + data.length  + "</em>"+ "<br>" + 
+                    "States: "  + formatStatesText(data) 
+                    + "</p>"
+                )
+                .style("left", (event.pageX) + (10) + "px")
+                .style("top", (event.pageY) + (0) + "px")
+        }
 
-        
-        ordersTooltip
-            .html(
-                "<p>" + 
-                "Date: " + "<em>" + x.domain()[i] + "</em>" + "<br>" + 
-                "States with Orders: " + "<em>" + data.length  + "</em>"+ "<br>" + 
-                "States: "  + formatStatesText(data) 
-                + "</p>"
-            )
-        // .style("left", (d3.mouse(this)[0]) + (margin.left +30) + "px")
-        // .style("top", (d3.mouse(this)[1]) + (margin.top + margin.bottom/2) + "px")
+    }
 
-        .style("left", (event.pageX) + (10) + "px")
-        .style("top", (event.pageY) + (0) + "px")
+    function getLegendText(d){
+        if (d == "0"){
+            return "All businesses open, no social distancing"
+        } else if (d == "1"){
+            return "All non-essential businesses reopen, social distancing in effect"
+        } else if (d == "2"){
+            return "Some non-essential businesses open, with restrictions on capacity, social distancing still in effect"
+        } else if (d == "3"){
+            return "Elective medical procedures allowed, curb-side delivery can reopen, and a select few non-essential businesses reopen"
+        } else if (d == "4"){
+            return "Elective medical procedures and surgeries allowed, non-essential business closed, social distancing in effect"
+        } else if (d == "5"){
+            return "All non-essential business closed, essential medical procedures only"
+        }
     }
 
     function formatStatesText(d){
@@ -591,7 +715,7 @@ function orders_chart(config){
             .transition().duration(250)
             .attr("opacity", 0)
 
-        if (d == undefined) return
+        if (d == undefined || orderLevels.includes(d)) return
         var states = d.data.map(d => d.state)
         states.forEach(function(v,i){
             update_highlight(v, "off")
