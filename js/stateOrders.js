@@ -1,5 +1,5 @@
 function orders_chart(config){
-    var margin = { left:120, right:60, top:100, bottom:70 }
+    var margin = { left:140, right:60, top:40, bottom:70 }
         chartData = config.data,
         markerData = config.marker,
         raw_orders = config.raw_orders,
@@ -265,9 +265,11 @@ function orders_chart(config){
         .attr("transform", "translate(" + -margin.left * 0.4 + ",0)")
 
     upperChart.append('text')
-        .attr("x", -height2 * 0.5)
-        .attr("y", -margin.left * 0.7)
-        .attr("transform", "rotate(-90)")
+        // .attr("x", -height2 * 0.5)
+        // .attr("y", -margin.left * 0.7)
+        // .attr("transform", "rotate(-90)")
+        .attr("x", width/2)
+        .attr("y", -margin.top*0.4)
         .attr("class", "axis-label")
         .text("Lockdown Level Per state")
 
@@ -322,12 +324,13 @@ function orders_chart(config){
 
 
     function makeLegend(){
+        legendText = ["5", "4", "3", "2", "1", "0"]
+        legendSize = 30 
         legend = upperChart.append("g")
         .attr("class", "legend")
-        .attr("transform", "translate(" + width*0.65 + "," + -margin.top * 0.85 + ")")
+        .attr("transform", "translate(" + -margin.left*0.8 + "," + (height2/2 - 3*legendSize) + ")")
 
-        legendText = ["0", "1", "2", "3", "4", "5"]
-        legendSize = 30 
+
         legend.selectAll("rect")
             .data(legendText)
             .enter()
@@ -335,8 +338,8 @@ function orders_chart(config){
                 .on("mousemove", mousemove)
                 .on("mouseenter", mouseover)
                 .on("mouseout", mouseout)
-            .attr("x", function(d,i){ return i * legendSize*1.2})
-            .attr("y", 0)
+            .attr("x", 0)
+            .attr("y", function(d,i){ return i * legendSize*1.2})
             .attr("width", legendSize)
             .attr("height", legendSize)
             .attr("fill", "#14161b")
@@ -351,9 +354,9 @@ function orders_chart(config){
                 .on("mousemove", mousemove)
                 .on("mouseenter", mouseover)
                 .on("mouseout", mouseout)
-            .attr("transform", "translate(" + legendSize/2 + ",0)")
-            .attr("x", function(d,i){ return i * legendSize*1.2})
-            .attr("y", legendSize/2)
+            .attr("transform", "translate(" + legendSize/2 + "," + legendSize/2 + ")")
+            .attr("x", 0)
+            .attr("y", function(d,i){ return i * legendSize*1.2})
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
             .attr("fill", "#f3f3d0")
@@ -368,48 +371,48 @@ function orders_chart(config){
         //     .text("Lockdown Level")
 
         legendScale = legend.append("g")
-            .attr("transform", "translate(0," + legendSize * 1.3 + ")")
+            .attr("transform", "translate(" + -5 + ",0)")
         
         var lineEnd = 6*legendSize*1.2
         var lineStart = -legendSize*1.2/6
 
         legendScale.append("line")
-            .attr("x1", lineStart)
-            .attr("x2", lineEnd)
-            .attr("y1", 0)
-            .attr("y2", 0)
+            .attr("x1", 0)
+            .attr("x2", 0)
+            .attr("y1", lineStart)
+            .attr("y2", lineEnd)
             .attr("stroke", "#fff")
 
         legendScale.append("line")
-            .attr("x1", lineStart)
-            .attr("x2", lineStart)
-            .attr("y1", -5)
-            .attr("y2", 5)
+            .attr("x1", -5)
+            .attr("x2", 5)
+            .attr("y1", lineStart)
+            .attr("y2", lineStart)
             .attr("stroke", "#fff")
 
         legendScale.append("line")
-            .attr("x1", lineEnd)
-            .attr("x2", lineEnd)
-            .attr("y1", -5)
-            .attr("y2", 5)
+            .attr("x1", -5)
+            .attr("x2", 5)
+            .attr("y1", lineEnd)
+            .attr("y2", lineEnd)
             .attr("stroke", "#fff")
 
         legendScale.append("text")
-            .attr("x", lineStart)
-            .attr("y", 10)
+            .attr("x", 0)
+            .attr("y", lineEnd + 5)
             .attr("font-size", "0.75rem")
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "text-before-edge")
-            .text("No Lockdown")
+            .text("Low")
             .attr("fill", "#fff")
 
         legendScale.append("text")
-            .attr("x", lineEnd)
-            .attr("y", 10)
+            .attr("x", 0)
+            .attr("y", lineStart -5 )
             .attr("font-size", "0.75rem")
             .attr("text-anchor", "middle")
-            .attr("dominant-baseline", "text-before-edge")
-            .text("High Lockdown")
+            .attr("dominant-baseline", "text-after-edge")
+            .text("High")
             .attr("fill", "#fff")
     }
 
@@ -522,14 +525,14 @@ function orders_chart(config){
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
             .attr("fill", "#fff")
-            .text("Select a state to Populate Data..")
+            .text("Select a state to Populate Data....")
             //.attr("font-size", 0)
             
             .attr("opacity", 0)
             .transition().duration(dur)
-            .attr("font-size", "1rem")
+            .attr("font-size", "0.7rem")
             
-            .attr("opacity", 1)
+            .attr("opacity", 0.8)
 
     }
 
