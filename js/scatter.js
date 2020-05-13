@@ -5,9 +5,7 @@ function scatter_chart(config){
         selection = config.selection,
         states_data = config.states_data,
         full2abbrev = config.full2abbrev,
-        anno = config.anno,
         chart_data = [],
-        nodePadding = 4.5,
         populations = config.census,
         severitySelector = config.severity;
         groupSelector = config.group,
@@ -17,7 +15,8 @@ function scatter_chart(config){
         defaultColor = config.defaultColor,
         scatterDefaultOpacity = config.defaultOpacity * 1.5,
         dur = config.duration,
-        scatterFocus = [];
+        scatterFocus = [],
+        ordersData = config.ordersList
 
         var color = d3.scaleOrdinal(config.scheme);
         var cur_color = 0; 
@@ -39,6 +38,7 @@ function scatter_chart(config){
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
                 .attr("transform", "translate(" + (0 + margin.left) + "," + margin.top + ")")
+
 
     var axisLabels = svg.append("g")
         .attr("class", "axis-labels")
@@ -80,9 +80,8 @@ function scatter_chart(config){
     var colorScale = d3.scaleSequential(d3.interpolateReds)
         .domain([-3,20])
 
-    var scatterTooltip =  d3.select("#scatterTooltip")
-        .append("div")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    var scatterTooltip =  d3.select("#tooltip")
+        //.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .style("opacity", 0)
         .attr("class", "tooltip")
         // .style("font-size", "1.5rem")
@@ -141,51 +140,56 @@ function scatter_chart(config){
             .key(function(d){ return d.state; })
             .object(states_data)
 
-        const entries = Object.entries(anno);
-        var id=0;
-        for (const [key, vals] of entries){
 
-            if (vals.date != undefined){
-                var hundredCaseDate;
-                var tmp = data[full2abbrev[key]]
-                var arr = tmp.filter(function(d){
-                    if (d.positive >=100){
-                        hundredCaseDate = d.date;
+        test_data = []
+        var orderEntries = Object.entries(ordersData)
+        var id = 0;
+        for (const [key, vals] of orderEntries){
+            var hundredCaseDate;
+            var tmp = data[key]
+            vals.orders.forEach(function(d, i){
+                var arr = tmp.filter(function(v){
+                    if (v.positive >= 100){
+                        hundredCaseDate = v.date
                     }
-                    return d.date.getTime() == vals.date.getTime()
+                    return v.date.getTime() == d.date.getTime()
                 })
-
-                var pop = populations.filter(function(d){
-                    if (d.State == key) return d.Population
+                //console.log(arr)
+                var pop = populations.filter(function(v){
+                    if (v.State == abbrev2full[key]) return v.Population
                 })[0].Population
 
-                var affiliation = political_aff[key].affiliation
-                var stayAtHomeDate = arr[0].date
-                var state_hundred = getTimeDiff(hundredCaseDate, stayAtHomeDate)
-                var us_first = getTimeDiff(usFirstCase, stayAtHomeDate)
-                var us_hundred = getTimeDiff(usHundredCase, stayAtHomeDate)
-                var cases = arr[0].positive
-                var death = arr[0].death
-
-                chart_data.push({
+                var affiliation = political_aff[abbrev2full[key]].affiliation
+                var orderDate = arr[0].date
+                var state_hundred = getTimeDiff(hundredCaseDate, orderDate)
+                var us_first = getTimeDiff(usFirstCase, orderDate)
+                var us_hundred = getTimeDiff(usHundredCase, orderDate)
+                
+                test_data.push({
                     'id': id,
-                    'state': full2abbrev[key],
-                    'date': stayAtHomeDate,
+                    'state': key,
+                    'date': orderDate,
                     'state_hundred': state_hundred,
                     'us_hundred_case': us_hundred,
                     'us_first_case': us_first,
-                    'cases': cases,
-                    'deaths': death,
-                    'region': vals.region,
+                    'cases': arr[0].positive,
+                    'deaths': arr[0].death,
+                    'region': config.regions[abbrev2full[key]],
                     'population': pop,
-                    'cases_per_capita': cases/pop,
-                    'deaths_per_capita': death/pop,
-                    'urban': urban_percent[key].urban,
-                    'political_aff': affiliation
+                    'cases_per_capita': arr[0].positive/pop,
+                    'deaths_per_capita': arr[0].death/pop,
+                    'urban': urban_percent[abbrev2full[key]].urban,
+                    'political_aff': affiliation,
+                    'orderNum': i,
+                    'order': d.order
                 })
-            }
+            })
             id +=1
         }
+
+
+        chart_data = test_data.filter(d => d.orderNum == 0)
+
         yLinearPop.domain([0, 40000000])
         yLinearUrban.domain([min_urban, max_urban])
         format_yAxis();
@@ -461,9 +465,11 @@ function scatter_chart(config){
                 sevText   +  numberWithCommas(d[severitySelector]) + "<br>"
                 
         )
-        .style("left", (d3.mouse(this)[0]+ 175) + "px")
-        .style("top", (d3.mouse(this)[1]+50) + "px")
+        // .style("left", (d3.mouse(this)[0]+ 175) + "px")
+        // .style("top", (d3.mouse(this)[1]+50) + "px")
 
+        .style("left", (event.pageX) + (10) + "px")
+        .style("top", (event.pageY) + (0) + "px")
 
     }
 
@@ -486,6 +492,7 @@ function scatter_chart(config){
                 .transition().duration(dur)
                 .attr("r", function(d){ return a(area2radius(d[severitySelector])); })
                 .attr("fill", color(cur_color))
+                .attr("opacity", 1)
             cur_color += 1;
         }
     }
@@ -502,9 +509,12 @@ function scatter_chart(config){
         }
 
         d3.select("#sev-circ-" + d)
+            .attr("r", function(d){ return 1.2 * a.range()[1]; })
+            .attr("fill", "#fff")
             .transition().duration(dur/2)
             .attr("fill", defaultColor)
             .attr("opacity", scatterDefaultOpacity)
+            .attr("r", function(d){ return a(area2radius(d[severitySelector])); })
 
     }
 
@@ -512,9 +522,12 @@ function scatter_chart(config){
 
         scatterFocus.forEach(function(d){
             d3.select("#sev-circ-" + d)
+                .attr("r", function(d){ return 1.2 * a.range()[1]; })
+                .attr("fill", "#fff")
                 .transition().duration(dur/2)
                 .attr("fill", defaultColor)
                 .attr("opacity", scatterDefaultOpacity)
+                .attr("r", function(d){ return a(area2radius(d[severitySelector])); })
         })
         scatterFocus = [];
     }
@@ -542,12 +555,6 @@ function scatter_chart(config){
     scatterChart.colors = function(value){
         if (!arguments.length) return colors;
         colors = value;
-        return scatterChart;  
-    }
-
-    scatterChart.anno = function(value){
-        if (!arguments.length) return anno;
-        anno = value;
         return scatterChart;  
     }
 

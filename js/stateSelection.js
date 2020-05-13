@@ -24,13 +24,12 @@ function selector(config){
     var rect_svg = svg.append("g")
     var text_svg = svg.append("g")
 
+
     var icons_loc = svg.append("g")
         .attr("class", "states-icons")
         .attr("transform", "translate(" + (width + margin.right*0.4) + ",25)")
    
     var selectionTooltip =  d3.select("#selectionTooltip")
-        .append("div")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .style("opacity", 0)
         .attr("class", "tooltip")
         .style("padding", "7px")

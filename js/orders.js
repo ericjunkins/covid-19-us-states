@@ -156,7 +156,7 @@ function state_orders_chart(config){
     var h = yBand.bandwidth()
 
     var rectHeight = d3.scaleOrdinal()
-        .domain(["0", "1", "2", "3", "4", "5"])
+        .domain(["5", "4", "3", "2", "1", "0"])
         .range([h*0.8, h * 0.5, h * 0.3, h * 0.2, h * 0.1, 4])
 
    

@@ -9,7 +9,8 @@ function line_chart(config){
         stateOrders = config.order,
         historicalData = config.historicalData,
         defaultColor = config.defaultColor,
-        defaultOpacity = config.defaultOpacity
+        defaultOpacity = config.defaultOpacity,
+        ordersData = config.ordersList
 
 
     var color = d3.scaleOrdinal(config.scheme);
@@ -17,9 +18,10 @@ function line_chart(config){
     var focus = [],
         axesSelector = "log";
 
-    var orderR = 8,
+    var orderR = 6,
         lockdownMarkers = []
-        reopenMarkers = []
+        reopenMarkers = [],
+        markers = []
 
     var height = config.height - margin.top - margin.bottom, 
         width = config.width - margin.left - margin.right;
@@ -65,33 +67,33 @@ function line_chart(config){
         .attr("class", "legend")
         .attr("transform", "translate(" + width*0.075 + "," + height* 0.075 + ")")
     
-    legend.append('text')
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("fill", "#fff")
-        .text("Lockdown Order")
-        .attr("dominant-baseline", "middle")
+    // legend.append('text')
+    //     .attr("x", 0)
+    //     .attr("y", 0)
+    //     .attr("fill", "#fff")
+    //     .text("Lockdown Order")
+    //     .attr("dominant-baseline", "middle")
 
-    legend.append('text')
-        .attr("x", 0)
-        .attr("y", 25)
-        .attr("fill", "#fff")
-        .attr("text-anchor", "left")
-        .text("Reopening Order")
-        .attr("dominant-baseline", "middle")
+    // legend.append('text')
+    //     .attr("x", 0)
+    //     .attr("y", 25)
+    //     .attr("fill", "#fff")
+    //     .attr("text-anchor", "left")
+    //     .text("Reopening Order")
+    //     .attr("dominant-baseline", "middle")
 
-    legend.append('rect')
-        .attr("x", 140 - orderR)
-        .attr("y", 25 - orderR)
-        .attr("height", orderR *2)
-        .attr("width", orderR*2)
-        .attr("fill", "#fff")
+    // legend.append('rect')
+    //     .attr("x", 140 - orderR)
+    //     .attr("y", 25 - orderR)
+    //     .attr("height", orderR *2)
+    //     .attr("width", orderR*2)
+    //     .attr("fill", "#fff")
 
-    legend.append('circle')
-        .attr("cx", 140)
-        .attr("cy", 0)
-        .attr("fill", "#fff")
-        .attr("r", orderR)
+    // legend.append('circle')
+    //     .attr("cx", 140)
+    //     .attr("cy", 0)
+    //     .attr("fill", "#fff")
+    //     .attr("r", orderR)
 
     var xAxisCall = labels.append("g")
         .attr("transform", "translate(0," + height + ")")
@@ -188,15 +190,12 @@ function line_chart(config){
     
     function draw_orders(){
         //Draws the orders
+        console.log(markers)
 
-        circles = orderGroup.selectAll("circle")
-            .data(lockdownMarkers, d=> d.state)
+        circles = svg.selectAll(".lockdown-circle")
+            .data(markers, d=>d.id)
 
-        circles.exit().remove();
-
-        circles
-            .attr("cx", function(d){ return x(d.positive); })
-            .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
+        circles.exit().remove()
 
         circles.enter()
             .append("circle")
@@ -204,31 +203,50 @@ function line_chart(config){
             .attr("id", function(d){ return "mark-lockdown-circ-" + d.state; })
             .attr("fill", defaultColor)
             .attr("r", orderR)
-            .attr("cx", function(d){ return x(d.positive); })
-            .attr("cy", function(d){ return y(d.binnedPositiveIncrease); })
+            .attr("cx", function(d){ return (d.x < 10 ? x(10) : x(d.x))})
+            .attr("cy", function(d){ return (d.y < 10 ? y(10) : y(d.y))})
             .attr("opacity", 0)
+
+        // circles = orderGroup.selectAll("circle")
+        //     .data(lockdownMarkers, d=> d.state)
+
+        // circles.exit().remove();
+
+        // circles
+        //     .attr("cx", function(d){ return x(d.positive); })
+        //     .attr('cy', function(d){ return y(d.binnedPositiveIncrease); })
+
+        // circles.enter()
+        //     .append("circle")
+        //     .attr("class", "lockdown-circle")
+        //     .attr("id", function(d){ return "mark-lockdown-circ-" + d.state; })
+        //     .attr("fill", defaultColor)
+        //     .attr("r", orderR)
+        //     .attr("cx", function(d){ return x(d.positive); })
+        //     .attr("cy", function(d){ return y(d.binnedPositiveIncrease); })
+        //     .attr("opacity", 0)
 
 
         
-        rects = orderGroup.selectAll("rect")
-            .data(reopenMarkers, d=> d.state)
+        // rects = orderGroup.selectAll("rect")
+        //     .data(reopenMarkers, d=> d.state)
 
-        rects.exit().remove()
+        // rects.exit().remove()
 
-        rects
-            .attr("x", function(d){ return x(d.positive) - orderR; })
-            .attr("y", function(d){ return y(d.binnedPositiveIncrease) - orderR; })
+        // rects
+        //     .attr("x", function(d){ return x(d.positive) - orderR; })
+        //     .attr("y", function(d){ return y(d.binnedPositiveIncrease) - orderR; })
 
-        rects.enter()
-            .append("rect")
-            .attr("class", "reopen-rect")
-            .attr("id", function(d){ return "mark-reopen-rect-" + d.state; })
-            .attr("fill", defaultColor)
-            .attr("width", orderR *2)
-            .attr("height", orderR *2)
-            .attr("x", function(d){ return x(d.positive) - orderR; })
-            .attr("y", function(d){ return y(d.binnedPositiveIncrease) - orderR; })
-            .attr("opacity", 0)
+        // rects.enter()
+        //     .append("rect")
+        //     .attr("class", "reopen-rect")
+        //     .attr("id", function(d){ return "mark-reopen-rect-" + d.state; })
+        //     .attr("fill", defaultColor)
+        //     .attr("width", orderR *2)
+        //     .attr("height", orderR *2)
+        //     .attr("x", function(d){ return x(d.positive) - orderR; })
+        //     .attr("y", function(d){ return y(d.binnedPositiveIncrease) - orderR; })
+        //     .attr("opacity", 0)
 
 
 
@@ -270,7 +288,7 @@ function line_chart(config){
         })
 
 
-
+        
         lockdowns.forEach(function(d){
             d.forEach(function(v){
                 if (v.date != ""){
@@ -296,9 +314,14 @@ function line_chart(config){
                 }
             })
         })
-            
+        
+
+
+
         data_list = []
         stayHomeDots = []
+
+
 
         const entries = Object.entries(data);
         for (const [key, val] of entries){
@@ -311,6 +334,21 @@ function line_chart(config){
                     'state': key
                 })
             }
+        }
+
+        const ordersEntries = Object.entries(ordersData)
+        for(const [key, val] of ordersEntries){
+            val.orders.forEach(function(d,i){
+                tmp = {
+                    'state': d.state,
+                    'x': d.positive,
+                    'y': d.binnedPositiveIncrease,
+                    'order': d.order,
+                    'date': formatTime(d.date),
+                    'id': d.state + "-" + i
+                }
+                markers.push(tmp)
+            })
         }
 
         var maxY = d3.max(data_list, function(d){ 
@@ -354,13 +392,6 @@ function line_chart(config){
                 .attr("fill", color(cur_color))
                 .attr("r", orderR)
 
-            d3.selectAll("#mark-reopen-rect-" + d)
-                .raise()
-                .attr("opacity", 1)
-                .attr("fill", "#fff")
-                .transition().duration(dur)
-                .attr("fill", color(cur_color))
-
             cur_color += 1;
         } 
     }
@@ -384,17 +415,19 @@ function line_chart(config){
         }
 
         d3.select("#path-" + d)
-            .transition().duration(dur)
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 5)
+            .transition().duration(dur/2)
             .attr("stroke", defaultColor)
             .attr("stroke-width", 0.5)
             .attr("opacity", defaultOpacity * 2)
 
         d3.selectAll("#mark-lockdown-circ-" + d)
-            .transition().duration(dur)
-            .attr("opacity", 0)
-
-        d3.selectAll("#mark-reopen-rect-" + d)
-            .transition().duration(dur)
+            .attr("r", 30)
+            .attr("fill", "#fff")
+            .transition().duration(dur/2)
+            .attr("fill", defaultColor)
+            .attr("r", orderR)
             .attr("opacity", 0)
 
     }
@@ -403,18 +436,21 @@ function line_chart(config){
     function removeAll(){
         focus.forEach(function(d){
             d3.select("#path-" + d)
-                .transition().duration(dur/2)
-                .attr("stroke", defaultColor)
-                .attr("stroke-width", 0.5)
-                .attr("opacity", defaultOpacity * 2)
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 5)
+            .transition().duration(dur/2)
+            .attr("stroke", defaultColor)
+            .attr("stroke-width", 0.5)
+            .attr("opacity", defaultOpacity * 2)
 
-            d3.selectAll("#mark-lockdown-circ-" + d)
-                .transition().duration(dur/2)
-                .attr("opacity", 0)
+        d3.selectAll("#mark-lockdown-circ-" + d)
+            .attr("r", 30)
+            .attr("fill", "#fff")
+            .transition().duration(dur/2)
+            .attr("fill", defaultColor)
+            .attr("r", orderR)
+            .attr("opacity", 0)
 
-            d3.selectAll("#mark-reopen-rect-" + d)
-                .transition().duration(dur/2)
-                .attr("opacity", 0)
         })
         focus = [];
     }
@@ -434,9 +470,6 @@ function line_chart(config){
                 .raise()
                 .attr("opacity", function(){ return (action == "on" ? 1 : 0); })
                 
-            d3.selectAll("#mark-reopen-rect-" + d)
-                .raise()
-                .attr("opacity", function(){ return (action == "on" ? 1 : 0); })
         }
     }
 
@@ -469,8 +502,9 @@ function line_chart(config){
 
         }
         
-        draw_orders();
+        
         draw_paths();
+        draw_orders();
     }
 
     // Getters & Setters for vis

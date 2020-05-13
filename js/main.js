@@ -2,6 +2,7 @@ let full2abbrev = {};
 let abbrev2full = {};
 let line_vis;
 let states_time_data;
+let updatedOrders;
 let data_by_states;
 let date_range;
 let annotations;
@@ -14,17 +15,19 @@ var formatTime = d3.timeFormat("%m/%d/%y");
 var selection_vis;
 var circle_vis;
 var ordersByState = [];
+var orderList = [];
+var states
 
 //Promises for local files to read in
 var promises = [
     d3.json("data/abbreviations.json"),
     d3.json("data/stay_at_home.json"),
-    d3.csv('data/regions.csv'),
+    d3.json('data/regions.json'),
     d3.csv('data/2019_us_census.csv'),
     d3.json('data/us_urban_pop.json'),
     d3.json('data/2016_election_affiliation.json'),
     d3.json('data/orders.json'),
-    d3.json('data/newOrders.json')
+    d3.json('data/newOrders.json'),
 ]
 Promise.all(promises).then(ready)
 
@@ -134,7 +137,7 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
         .entries(tmp)
 
     annotations = anno
-
+    updatedOrders = newOrders
     //Get historical data from API
     var request = new XMLHttpRequest()
     request.open("GET", "https://covidtracking.com/api/v1/states/daily.json", true)
@@ -154,15 +157,17 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
             if(d.pending == null){d.pending = 0}
         })
         
-        var current = d3.nest()
+        states_time_data = states_time_data.filter(d=> d.state != "AS" && d.state != "PR" && d.state != "GU" && d.state != "MP" && d.state != "VI")
+        states = d3.nest()
             .key(function(d){ return d.state; })
-            .entries(states_time_data)
+            .object(states_time_data)
 
-        current.forEach(function(d){
-            d.values = d.values.slice(0,7);
-            d.state = d.key;
-            delete d.key
-        })
+        
+        // current.forEach(function(d){
+        //     d.values = d.values.slice(0,7);
+        //     d.state = d.key;
+        //     delete d.key
+        //})
 
         init_display();
 
@@ -207,7 +212,8 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
             'order': order,
             'defaultOpacity': default_opacity,
             'historicalData': states_time_data,
-            'scheme': scheme
+            'scheme': scheme,
+            'ordersList': orderList
         }
 
         // var bubblesConfig = {
@@ -256,10 +262,15 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
             'selection': '#orders-chart'
         }
 
+        statesList = []
+        d3.keys(states).forEach(function(d){
+            statesList.push(abbrev2full[d])
+        })
+
         var selectionConfig = {
             'height':selHeight,
             'width': selWidth,
-            'states_list': d3.values(abbrev),
+            'states_list': statesList,
             'selection': '#state-selection',
             'full2abbrev': full2abbrev,
             'rows': rows,
@@ -284,7 +295,6 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
         var scatterConfig = {
             'height':row2Height,
             'width': lineChartWidth,
-            'anno': anno,
             'regions': regions, 
             'states_data': states_time_data,
             'full2abbrev': full2abbrev,
@@ -298,7 +308,8 @@ function ready([abbrev, anno, regions, census, urban_pop, pol, order, newOrders]
             'duration': duration,
             'defaultColor': default_color,
             'defaultOpacity': default_opacity,
-            'scheme': scheme
+            'scheme': scheme,
+            'ordersList': orderList
         }
 
         // var levelComparisonConfig = {
@@ -394,11 +405,13 @@ function organize_data(){
         return d.date;
     })
     
-
+    orderList = []
     const entries = Object.entries(data_by_states);
     for (const [key, vals] of entries){
         var window = []
-        
+        //console.log(updatedOrders[key])
+        var orderIndex =0
+        orderList[key] = {'orders': []}
         for (var i = vals.length-1; i >= 0; i--){
             window.push(vals[i].positiveIncrease)
             if (window.length >7){
@@ -407,7 +420,7 @@ function organize_data(){
             var total = (window.length == 1 ? window[0] : d3.sum(window))
             data_by_states[key][i]['binnedPositiveIncrease'] = total
 
-
+            
             if (annotations[abbrev2full[key]].date != null){
                 if (vals[i].date.getTime() == annotations[abbrev2full[key]].date.getTime()){
                     ordersByState.push({
@@ -421,6 +434,26 @@ function organize_data(){
                     annotations[abbrev2full[key]]['binnedPositiveIncrease'] = vals[i].binnedPositiveIncrease
                     annotations[abbrev2full[key]]['positive'] = vals[i].positive
                 }
+            }
+
+            var t = d3.timeParse("%m/%d/%y")(updatedOrders[key].orders[orderIndex].date)
+            if (t.getTime() == vals[i].date.getTime()){
+                // orderList.push({
+                //     'state': key,
+                //     'binnedPositiveIncrease': vals[i].binnedPositiveIncrease,
+                //     'positive': vals[i].positive,
+                //     'order' : updatedOrders[key].orders[orderIndex].order,
+                //     'date': updatedOrders[key].orders[orderIndex].date
+                // })
+
+                orderList[key].orders.push({
+                    'state': key,
+                    'binnedPositiveIncrease': vals[i].binnedPositiveIncrease,
+                    'positive': vals[i].positive,
+                    'order' : updatedOrders[key].orders[orderIndex].order,
+                    'date': t
+                })
+                if (orderIndex < updatedOrders[key].orders.length -1) orderIndex += 1
             }
         }
 

@@ -25,10 +25,9 @@ function orders_chart(config){
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
 
-    var ordersTooltip =  d3.select("#ttest")
-        .append('div')
+    var ordersTooltip =  d3.select("#tooltip")
         //.style("width", "270px")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        //.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .style("opacity", 0)
         .attr("class", "tooltip")
         .style("data-placement", "right")
@@ -97,12 +96,12 @@ function orders_chart(config){
     var minDate = "03/07/20"
     var filteredData
     var groupedBarData = []
-    var orderLevels= ["0", "1", "2", "3", "4", "5"]
+    var orderLevels= ["5", "4", "3", "2", "1", "0"]
 
     id = 0
     for (const [key, vals] of dict){
         prevDate = minDate
-        prevOrder = "5"
+        prevOrder = "0"
         tmp = vals.orders.filter(function(d){ return d.date != "" && getDateObj(d.date) <= today})
         tmp.forEach(function(d, i){
             if (d.date != ""){
@@ -549,7 +548,7 @@ function orders_chart(config){
 
     function mousemove(d){
         var curX = d3.mouse(this)[0]
-        var i = Math.round(curX/x.step())
+        var i = Math.floor(curX/x.step())
         var data = ordersByDate[x.domain()[i]]
         verticalMarker
             .lower()
@@ -566,8 +565,11 @@ function orders_chart(config){
                 "States: "  + formatStatesText(data) 
                 + "</p>"
             )
-        .style("left", (d3.mouse(this)[0]) + (margin.left +30) + "px")
-        .style("top", (d3.mouse(this)[1]) + (margin.top + margin.bottom/2) + "px")
+        // .style("left", (d3.mouse(this)[0]) + (margin.left +30) + "px")
+        // .style("top", (d3.mouse(this)[1]) + (margin.top + margin.bottom/2) + "px")
+
+        .style("left", (event.pageX) + (10) + "px")
+        .style("top", (event.pageY) + (0) + "px")
     }
 
     function formatStatesText(d){
@@ -580,7 +582,7 @@ function orders_chart(config){
     }
 
     function mouseout(d){
-        document.body.style.cursor = "crosshair"
+        document.body.style.cursor = "default"
         ordersTooltip
             .transition().duration(250)
             .style("opacity", 0)
